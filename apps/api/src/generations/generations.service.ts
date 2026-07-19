@@ -9,7 +9,7 @@ import {
   RunOrigin,
 } from '@hitframe/shared';
 import { DB, Db } from '../db/db.module';
-import { generationJobs, generationRuns, nodeTemplates, tenants } from '../db/schema';
+import { generationJobs, generationRuns, nodeTemplates, projects, tenants } from '../db/schema';
 import { ExecutorService } from './executor.service';
 
 const TENANT = 'default'; // M1 单租户
@@ -35,6 +35,13 @@ export class GenerationsService {
 
   async create(dto: GenerationRequestDto, origin: RunOrigin): Promise<GenerationAcceptedDto> {
     this.validateBasics(dto);
+    if (dto.projectId) {
+      const project = await this.db.query.projects.findFirst({
+        where: eq(projects.id, dto.projectId),
+      });
+      if (!project)
+        throw new HttpException({ code: 400, message: `项目不存在：${dto.projectId}` }, 400);
+    }
     const { endpoint, prompt, inputFidelity } = await this.resolveInput(dto);
 
     const est = dto.options.candidateCount * POINTS_PER_IMAGE[dto.options.quality];

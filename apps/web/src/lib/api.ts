@@ -2,6 +2,7 @@ import type {
   GenerationAcceptedDto,
   GenerationRequestDto,
   MeDto,
+  ProjectDto,
   RunStatusDto,
   TemplateSummaryDto,
 } from '@hitframe/shared';
@@ -76,11 +77,21 @@ export const api = {
     const rows = await req<AssetRow[]>('/assets');
     return rows.map((a) => ({ ...a, url: relUrl(a.url) }));
   },
-  upload: (file: File) => {
+  upload: (file: File, projectId?: string | null) => {
     const form = new FormData();
     form.append('file', file);
+    if (projectId) form.append('projectId', projectId);
     return req<{ assetId: string; url: string }>('/assets/uploads', { method: 'POST', body: form });
   },
+  updateAsset: (id: string, patch: { projectId: string | null }) =>
+    req<{ id: string }>(`/assets/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  deleteAsset: (id: string) => req<{ id: string }>(`/assets/${id}`, { method: 'DELETE' }),
+  projects: () => req<ProjectDto[]>('/projects'),
+  createProject: (name: string) =>
+    req<{ id: string; name: string }>('/projects', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
   createGeneration: (dto: GenerationRequestDto) =>
     req<GenerationAcceptedDto>('/generations', { method: 'POST', body: JSON.stringify(dto) }),
   getRun: async (runId: string) => {

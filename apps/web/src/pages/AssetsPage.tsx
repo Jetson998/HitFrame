@@ -4,23 +4,31 @@ import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
+import { Chip } from '@/components/ui/chip';
 
-const FILTERS = [
+const TYPE_FILTERS = [
   ['all', '全部'],
   ['source', '上传素材'],
   ['result', '生成结果'],
 ] as const;
 
-/** 资产库（阶段 5 轻量版：列表 / 筛选 / 搜索 / 详情 / 再次引用；项目归档与管理为阶段 6） */
+/** 资产库（阶段 6）：类型/项目筛选、搜索、详情（改归属/删除/再次引用）、上传归入当前项目 */
 export function AssetsPage() {
-  const { assets, refreshAssets, openDetail, showToast } = useAppStore();
-  const [filter, setFilter] = useState<(typeof FILTERS)[number][0]>('all');
+  const { assets, projects, currentProjectId, refreshAssets, openDetail, showToast } =
+    useAppStore();
+  const [typeFilter, setTypeFilter] = useState<(typeof TYPE_FILTERS)[number][0]>('all');
+  const [projFilter, setProjFilter] = useState<'all' | 'none' | string>('all');
   const [q, setQ] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const rows = assets.filter(
-    (a) => (filter === 'all' || a.type === filter) && (!q || a.name.includes(q)),
+    (a) =>
+      (typeFilter === 'all' || a.type === typeFilter) &&
+      (projFilter === 'all' ||
+        (projFilter === 'none' ? !a.projectId : a.projectId === projFilter)) &&
+      (!q || a.name.includes(q)),
   );
+  const projName = (id?: string | null) => projects.find((p) => p.id === id)?.name;
 
   return (
     <div className="mx-auto w-full max-w-[1100px] px-8 py-8">
@@ -48,9 +56,11 @@ export function AssetsPage() {
               e.target.value = '';
               if (!f) return;
               try {
-                await api.upload(f);
+                await api.upload(f, currentProjectId);
                 await refreshAssets();
-                showToast(`已上传「${f.name}」`);
+                showToast(
+                  `已上传「${f.name}」${currentProjectId ? `到「${projName(currentProjectId)}」` : ''}`,
+                );
               } catch (err) {
                 showToast(`上传失败：${(err as Error).message}`);
               }
@@ -62,30 +72,33 @@ export function AssetsPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex gap-1.5">
-        {FILTERS.map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setFilter(key)}
-            className={cn(
-              'cursor-pointer rounded-full border px-3 py-1 text-[11.5px]',
-              filter === key
-                ? 'border-accent/50 bg-accent/15 font-semibold text-ink'
-                : 'border-line-soft bg-panel2 text-dim hover:text-ink',
-            )}
-          >
+      <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 text-[11px] text-faint">类型</span>
+        {TYPE_FILTERS.map(([key, label]) => (
+          <Chip key={key} active={typeFilter === key} onClick={() => setTypeFilter(key)}>
             {label}
-          </button>
+          </Chip>
         ))}
-        <span className="ml-auto self-center text-[11px] text-faint">
-          {rows.length} 项 · 项目归档 / 删除 / 批量操作于阶段 6 提供
-        </span>
+      </div>
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 text-[11px] text-faint">项目</span>
+        <Chip active={projFilter === 'all'} onClick={() => setProjFilter('all')}>
+          全部
+        </Chip>
+        <Chip active={projFilter === 'none'} onClick={() => setProjFilter('none')}>
+          未归类
+        </Chip>
+        {projects.map((p) => (
+          <Chip key={p.id} active={projFilter === p.id} onClick={() => setProjFilter(p.id)}>
+            {p.name}
+          </Chip>
+        ))}
+        <span className="ml-auto text-[11px] text-faint">{rows.length} 项</span>
       </div>
 
       {rows.length === 0 ? (
         <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-line text-[12.5px] text-faint">
-          还没有资产，先上传一张素材或生成一张图
+          没有符合条件的资产，先上传一张素材或生成一张图
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
@@ -102,7 +115,14 @@ export function AssetsPage() {
                 className="aspect-square w-full bg-[#0c1017] object-cover"
               />
               <div className="flex items-center justify-between gap-2 px-2.5 py-2 text-[11.5px] text-dim">
-                <span className="truncate">{a.name}</span>
+                <span className="min-w-0">
+                  <span className="block truncate">{a.name}</span>
+                  {a.projectId && (
+                    <span className="block truncate text-[10px] text-faint">
+                      📁 {projName(a.projectId) ?? a.projectId}
+                    </span>
+                  )}
+                </span>
                 <span
                   className={cn(
                     'shrink-0 rounded px-1.5 py-0.5 text-[9.5px]',

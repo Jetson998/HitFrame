@@ -11,6 +11,7 @@ import { RunsController } from './generations/runs.controller';
 import { AssetsController } from './assets/assets.controller';
 import { TemplatesController } from './templates.controller';
 import { MeController } from './me.controller';
+import { ProjectsController } from './projects.controller';
 
 @Module({
   imports: [DbModule],
@@ -21,6 +22,7 @@ import { MeController } from './me.controller';
     AssetsController,
     TemplatesController,
     MeController,
+    ProjectsController,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ApiTokenGuard },

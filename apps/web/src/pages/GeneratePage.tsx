@@ -26,8 +26,16 @@ const SUGGESTIONS = [
 
 /** AI 图片主页面：三 Tab（图生图 / 文生图 / 场景模板），同一套生成底座三种输入结构 */
 export function GeneratePage() {
-  const { genMode, setGenMode, refAssetId, setRefAssetId, refreshMe, refreshAssets, showToast } =
-    useAppStore();
+  const {
+    genMode,
+    setGenMode,
+    refAssetId,
+    setRefAssetId,
+    currentProjectId,
+    refreshMe,
+    refreshAssets,
+    showToast,
+  } = useAppStore();
   const [prompt, setPrompt] = useState('');
   const [ratio, setRatio] = useState<Ratio>('1:1');
   const [quality, setQuality] = useState<Quality>('standard');
@@ -60,6 +68,7 @@ export function GeneratePage() {
       },
       options: { ratio, quality, candidateCount: count },
       idempotencyKey: crypto.randomUUID(),
+      projectId: currentProjectId ?? undefined,
     };
     try {
       const accepted = await api.createGeneration(dto);

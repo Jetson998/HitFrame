@@ -20,8 +20,15 @@ import { ResultPanel } from '@/components/ResultPanel';
  * 整页由 GET /templates 的 slots/varsSchema 数据驱动，商品换背景即 tpl_bg。
  */
 export function TemplateConfigPage() {
-  const { templates, activeTplId, setActiveTplId, refreshMe, refreshAssets, showToast } =
-    useAppStore();
+  const {
+    templates,
+    activeTplId,
+    setActiveTplId,
+    currentProjectId,
+    refreshMe,
+    refreshAssets,
+    showToast,
+  } = useAppStore();
   const tpl = templates.find((t) => t.id === activeTplId);
 
   const [slotValues, setSlotValues] = useState<Record<string, string | null>>({});
@@ -69,6 +76,7 @@ export function TemplateConfigPage() {
       },
       options: { ratio, quality, candidateCount: count },
       idempotencyKey: crypto.randomUUID(),
+      projectId: currentProjectId ?? undefined,
     };
     try {
       const accepted = await api.createGeneration(dto);

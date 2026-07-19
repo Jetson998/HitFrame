@@ -135,3 +135,10 @@ export interface MeDto {
   name: string;
   pointsBalance: number;
 }
+
+/** 项目：资产归档单位（阶段 6）；projectId 同时决定结果对象键前缀 */
+export interface ProjectDto {
+  id: string;
+  name: string;
+  createdAt: string;
+}

@@ -39,7 +39,7 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 - [x] 阶段 3 Run / Job / Asset / UsageEvent 数据闭环（七表迁移 + 种子：`scripts/seed.mjs`）
 - [x] 阶段 4 `POST /api/v1/generations`（202 + `GET /runs/:id` 轮询 + 幂等重放 + 启动孤儿清理 + 简单扣点，t2i/template 两链路实测通过）
 - [x] 阶段 5 React 主流程（按 Demo 复刻：三 Tab 输入结构 / 模板配置页数据驱动 / 上传与资产选择 / 成本前置 / 202+轮询结果卡 / 资产详情与再次引用；新增 `GET /templates`、`GET /me`）
-- [ ] 阶段 6 资产库与项目
+- [x] 阶段 6 资产库与项目（项目新建/切换、上传与生成归入当前项目、类型/项目筛选、改归属、删除含存储清理；`GET/POST /projects`、`PATCH/DELETE /assets/:id`）
 - [ ] 阶段 7 M1 验收（三链路真实出图）
 
 ## 已知问题

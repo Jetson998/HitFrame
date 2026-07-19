@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useAppStore, type NavKey } from '@/store';
 import { TokenGate } from '@/components/TokenGate';
 import { AssetDetailDialog } from '@/components/AssetDetailDialog';
+import { ProjectSwitcher } from '@/components/ProjectSwitcher';
 import { HomePage } from '@/pages/HomePage';
 import { GeneratePage } from '@/pages/GeneratePage';
 import { TemplateConfigPage } from '@/pages/TemplateConfigPage';
@@ -66,7 +67,8 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="border-t border-line-soft p-3">
+        <ProjectSwitcher />
+        <div className="p-3">
           <div className="flex items-center gap-2 rounded-[10px] border border-line bg-panel2 px-3 py-2 text-[12px]">
             <Coins size={14} className="text-warn" />
             点数余额

@@ -16,7 +16,7 @@ interface AssetPickerProps {
  * 生成结果（type=result）同样可选 —— 「再次引用」闭环。
  */
 export function AssetPicker({ label, required, value, onChange }: AssetPickerProps) {
-  const { assets, refreshAssets, showToast } = useAppStore();
+  const { assets, currentProjectId, refreshAssets, showToast } = useAppStore();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const selected = assets.find((a) => a.id === value) ?? null;
@@ -24,7 +24,7 @@ export function AssetPicker({ label, required, value, onChange }: AssetPickerPro
   const handleFile = async (file: File) => {
     setUploading(true);
     try {
-      const { assetId } = await api.upload(file);
+      const { assetId } = await api.upload(file, currentProjectId);
       await refreshAssets();
       onChange(assetId);
       showToast(`已上传「${file.name}」并存入资产库`);
