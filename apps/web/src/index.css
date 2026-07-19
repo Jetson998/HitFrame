@@ -1,1 +1,41 @@
 @import 'tailwindcss';
+
+/* 视觉基准：output/HitFrame_demo.html（已封版）的暗色工作台配色 */
+@theme {
+  --color-bg: #0e1116;
+  --color-panel: #161b23;
+  --color-panel2: #1c232d;
+  --color-line: #2a333f;
+  --color-line-soft: #222a34;
+  --color-ink: #e6edf3;
+  --color-dim: #8b98a8;
+  --color-faint: #5f6b7a;
+  --color-accent: #4f8cff;
+  --color-accent-hov: #3f7bec;
+  --color-ok: #3fb950;
+  --color-warn: #d29922;
+  --color-err: #f85149;
+  --color-vio: #a371f7;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 结果卡进度条（不确定进度动画） */
+@keyframes hf-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+.hf-progress {
+  animation: hf-indeterminate 1.6s ease-in-out infinite;
+}

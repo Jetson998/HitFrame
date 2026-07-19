@@ -34,7 +34,8 @@ export class AssetsController {
   async upload(@UploadedFile() file?: Express.Multer.File) {
     if (!file) throw new BadRequestException({ code: 400, message: '缺少文件字段 file' });
     const ext = ALLOWED.get(file.mimetype);
-    if (!ext) throw new BadRequestException({ code: 400, message: `不支持的类型：${file.mimetype}` });
+    if (!ext)
+      throw new BadRequestException({ code: 400, message: `不支持的类型：${file.mimetype}` });
 
     const assetId = `asset_${randomUUID()}`;
     const key = `uploads/${assetId}.${ext}`;

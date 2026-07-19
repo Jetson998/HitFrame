@@ -17,7 +17,12 @@ export class RunsController {
   async get(@Param('runId') runId: string) {
     const timedOut = await this.db
       .update(generationJobs)
-      .set({ status: 'failed', error: 'orphaned: timeout', errorKind: 'retryable', finishedAt: new Date() })
+      .set({
+        status: 'failed',
+        error: 'orphaned: timeout',
+        errorKind: 'retryable',
+        finishedAt: new Date(),
+      })
       .where(
         and(
           eq(generationJobs.runId, runId),

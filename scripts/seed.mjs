@@ -16,26 +16,45 @@ await pool.query(
 
 const tplBg = {
   id: 'tpl_bg',
+  title: '商品换背景',
+  description: '一张商品图，分钟级换出 N 套场景/背景，替代外包摄影精修。',
   sceneType: 'bg',
   endpoint: 'edits',
   slots: [{ key: 'product', label: '商品图', required: true }],
   varsSchema: [
-    { key: 'bgStyle', label: '背景风格', required: false, default: '木质桌面' },
-    { key: 'light', label: '光影氛围', required: false, default: '柔光' },
+    {
+      key: 'bgStyle',
+      label: '背景风格',
+      required: false,
+      default: '木质桌面',
+      type: 'chips',
+      options: ['木质桌面', '大理石台面', 'ins 柔光', '纯色背景', '节日氛围'],
+    },
+    {
+      key: 'light',
+      label: '光影氛围',
+      required: false,
+      default: '柔光',
+      type: 'chips',
+      options: ['自然光', '柔光', '暖光', '冷光'],
+    },
   ],
   promptTemplate: '保持图中商品主体不变，背景替换为{bgStyle}，{light}，电商主图风格，高质感',
   defaultParams: { inputFidelity: 'high' },
 };
 
 await pool.query(
-  `INSERT INTO node_templates (id, scene_type, endpoint, slots, vars_schema, prompt_template, default_params, version)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,1)
+  `INSERT INTO node_templates (id, title, description, scene_type, endpoint, slots, vars_schema, prompt_template, default_params, version)
+   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1)
    ON CONFLICT (id) DO UPDATE SET
+     title = EXCLUDED.title, description = EXCLUDED.description,
      slots = EXCLUDED.slots, vars_schema = EXCLUDED.vars_schema,
      prompt_template = EXCLUDED.prompt_template, default_params = EXCLUDED.default_params,
      version = node_templates.version + 1, updated_at = now()`,
   [
     tplBg.id,
+    tplBg.title,
+    tplBg.description,
     tplBg.sceneType,
     tplBg.endpoint,
     JSON.stringify(tplBg.slots),

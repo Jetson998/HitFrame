@@ -92,7 +92,9 @@ export class ExecutorService implements OnApplicationBootstrap {
       const item = result.images[0];
       const buf = item.b64
         ? Buffer.from(item.b64, 'base64')
-        : Buffer.from(await (await fetch(item.url!, { signal: AbortSignal.timeout(60_000) })).arrayBuffer());
+        : Buffer.from(
+            await (await fetch(item.url!, { signal: AbortSignal.timeout(60_000) })).arrayBuffer(),
+          );
       const key = objectKey(job.projectId ?? 'unassigned', job.runId, job.id, 'png');
       const stored = await this.storage.save(key, buf);
 
@@ -139,7 +141,12 @@ export class ExecutorService implements OnApplicationBootstrap {
       await this.db.transaction(async (tx) => {
         await tx
           .update(generationJobs)
-          .set({ status: 'failed', error: message.slice(0, 1000), errorKind: kind, finishedAt: new Date() })
+          .set({
+            status: 'failed',
+            error: message.slice(0, 1000),
+            errorKind: kind,
+            finishedAt: new Date(),
+          })
           .where(eq(generationJobs.id, job.id));
         await tx.insert(usageEvents).values({
           id: `ue_${randomUUID()}`,
@@ -167,8 +174,13 @@ export class ExecutorService implements OnApplicationBootstrap {
       slotAssetIds.map(async (id) => {
         const row = byId.get(id);
         const key = (row?.meta as { storageKey?: string } | null)?.storageKey;
-        if (!row || !key) throw new ProviderError(`槽位资产不存在或无存储键：${id}`, 'non_retryable');
-        return { data: await this.storage.read(key), filename: `${id}.png`, contentType: 'image/png' };
+        if (!row || !key)
+          throw new ProviderError(`槽位资产不存在或无存储键：${id}`, 'non_retryable');
+        return {
+          data: await this.storage.read(key),
+          filename: `${id}.png`,
+          contentType: 'image/png',
+        };
       }),
     );
   }

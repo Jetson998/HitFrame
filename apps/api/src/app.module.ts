@@ -9,10 +9,19 @@ import { ExecutorService } from './generations/executor.service';
 import { GenerationsController } from './generations/generations.controller';
 import { RunsController } from './generations/runs.controller';
 import { AssetsController } from './assets/assets.controller';
+import { TemplatesController } from './templates.controller';
+import { MeController } from './me.controller';
 
 @Module({
   imports: [DbModule],
-  controllers: [HealthController, GenerationsController, RunsController, AssetsController],
+  controllers: [
+    HealthController,
+    GenerationsController,
+    RunsController,
+    AssetsController,
+    TemplatesController,
+    MeController,
+  ],
   providers: [
     { provide: APP_GUARD, useClass: ApiTokenGuard },
     StorageService,

@@ -1,4 +1,12 @@
-import { jsonb, numeric, pgTable, text, timestamp, uniqueIndex, integer } from 'drizzle-orm/pg-core';
+import {
+  jsonb,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  integer,
+} from 'drizzle-orm/pg-core';
 
 /**
  * M1 数据模型（技术方案 v3.0.2 §五 的 M1 子集）。
@@ -25,6 +33,8 @@ export const projects = pgTable('projects', {
 
 export const nodeTemplates = pgTable('node_templates', {
   id: text('id').primaryKey(),
+  title: text('title').notNull().default(''), // 卡片展示名（模板数据化，前端不硬编码）
+  description: text('description'),
   sceneType: text('scene_type').notNull(),
   endpoint: text('endpoint').notNull(), // generations | edits
   slots: jsonb('slots').notNull(), // 图片槽位定义：数量/必填性

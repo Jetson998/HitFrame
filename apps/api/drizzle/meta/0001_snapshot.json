@@ -1,6 +1,6 @@
 {
-  "id": "e1856d5e-1c06-407e-ac42-e2da302de0a9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "3e3143d3-df43-4338-b57f-a99a5c093762",
+  "prevId": "e1856d5e-1c06-407e-ac42-e2da302de0a9",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -308,6 +308,19 @@
           "type": "text",
           "primaryKey": true,
           "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "scene_type": {
           "name": "scene_type",

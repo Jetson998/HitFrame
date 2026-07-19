@@ -97,3 +97,41 @@ export interface RunStatusDto {
   createdAt: string;
   finishedAt?: string;
 }
+
+// ---- 模板 / 租户（M1 只读端点） ----
+
+export interface TemplateSlotDto {
+  key: string;
+  label: string;
+  required?: boolean;
+}
+
+export interface TemplateVarDto {
+  key: string;
+  label: string;
+  required?: boolean;
+  default?: string;
+  /** chips = 选项点选；text = 自由输入（默认 chips） */
+  type?: 'chips' | 'text';
+  options?: string[];
+  placeholder?: string;
+}
+
+/** GET /api/v1/templates 列表项；promptTemplate/defaultParams 不下发前端（不暴露 prompt） */
+export interface TemplateSummaryDto {
+  id: string;
+  title: string;
+  description?: string;
+  sceneType: string;
+  endpoint: 'generations' | 'edits';
+  slots: TemplateSlotDto[];
+  varsSchema: TemplateVarDto[];
+  version: number;
+}
+
+/** GET /api/v1/me：M1 单租户余额展示 */
+export interface MeDto {
+  tenantId: string;
+  name: string;
+  pointsBalance: number;
+}

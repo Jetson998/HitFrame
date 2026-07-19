@@ -41,7 +41,10 @@ export class GenerationsService {
     const tenant = await this.db.query.tenants.findFirst({ where: eq(tenants.id, TENANT) });
     if (!tenant) throw new HttpException({ code: 1, message: 'tenant not initialized' }, 500);
     if (tenant.pointsBalance < est) {
-      throw new HttpException({ code: 402, message: `点数不足：需 ${est}，余 ${tenant.pointsBalance}` }, 402);
+      throw new HttpException(
+        { code: 402, message: `点数不足：需 ${est}，余 ${tenant.pointsBalance}` },
+        402,
+      );
     }
 
     const runId = `run_${randomUUID()}`;
@@ -111,7 +114,8 @@ export class GenerationsService {
         eq(generationRuns.idempotencyKey, idempotencyKey),
       ),
     });
-    if (!run) throw new HttpException({ code: 1, message: 'idempotency conflict but run missing' }, 500);
+    if (!run)
+      throw new HttpException({ code: 1, message: 'idempotency conflict but run missing' }, 500);
     const jobs = await this.db
       .select({ id: generationJobs.id, status: generationJobs.status })
       .from(generationJobs)
@@ -119,7 +123,9 @@ export class GenerationsService {
     return {
       runId: run.id,
       jobs: jobs.map((j) => ({ jobId: j.id, status: j.status as never })),
-      pointsEstimated: run.candidateCount * POINTS_PER_IMAGE[(run.requestParams as GenerationRequestDto).options.quality],
+      pointsEstimated:
+        run.candidateCount *
+        POINTS_PER_IMAGE[(run.requestParams as GenerationRequestDto).options.quality],
     };
   }
 
@@ -133,7 +139,7 @@ export class GenerationsService {
     if (!(quality in POINTS_PER_IMAGE)) throw bad('quality 非法');
     if (!(ratio in RATIO_TO_SIZE)) throw bad('ratio 非法');
     if (dto.mode === 't2i' && !dto.inputs?.prompt?.trim()) throw bad('t2i 需要 prompt');
-    if (dto.mode === 'i2i' && !(dto.inputs?.slots?.length)) throw bad('i2i 需要至少 1 个图片槽位');
+    if (dto.mode === 'i2i' && !dto.inputs?.slots?.length) throw bad('i2i 需要至少 1 个图片槽位');
     if (dto.mode === 'template' && !dto.templateId) throw bad('template 模式需要 templateId');
   }
 
@@ -153,7 +159,10 @@ export class GenerationsService {
     const slotDefs = tpl.slots as TemplateSlotDef[];
     const requiredSlots = slotDefs.filter((s) => s.required !== false).length;
     if ((dto.inputs.slots?.length ?? 0) < requiredSlots)
-      throw new HttpException({ code: 400, message: `模板需要 ${requiredSlots} 个必填图片槽位` }, 400);
+      throw new HttpException(
+        { code: 400, message: `模板需要 ${requiredSlots} 个必填图片槽位` },
+        400,
+      );
 
     const varDefs = tpl.varsSchema as TemplateVarDef[];
     const vars: Record<string, string> = {};
