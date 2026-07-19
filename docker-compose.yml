@@ -1,0 +1,16 @@
+# M1 本地基础设施：仅 PostgreSQL（执行器为进程内，无队列/Worker，见技术方案 ADR-9）
+# M2a 再追加：valkey、独立 worker、seaweedfs（或直连客户 OSS）
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hitframe
+      POSTGRES_PASSWORD: hitframe
+      POSTGRES_DB: hitframe
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

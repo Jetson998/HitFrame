@@ -1,0 +1,27 @@
+{
+  "name": "hitframe",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @hitframe/shared -w @hitframe/image-provider -w @hitframe/api -w @hitframe/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "dev:api": "npm run dev -w @hitframe/api",
+    "dev:web": "npm run dev -w @hitframe/web"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "eslint": "^9.30.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.35.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
