@@ -21,7 +21,8 @@ const QUALITY_TO_ENGINE: Record<Quality, string> = {
   high: 'high',
 };
 
-const DEFAULT_TIMEOUT_MS = 180_000;
+/** 官方接口说明：curl 示例 --max-time 300；图生图/多图融合耗时更长，取 300s */
+const DEFAULT_TIMEOUT_MS = 300_000;
 
 export class MuskapisProvider implements ImageProvider {
   readonly name = 'muskapis';

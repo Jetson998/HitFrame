@@ -9,8 +9,18 @@ import { StorageService } from '../storage/storage.service';
 import { getImageProvider } from '../provider.factory';
 
 const TENANT = 'default';
-/** running 超过此时限视为孤儿（引擎单张实测 ~66s，fetch 层 180s 超时兜底） */
+/** running 超过此时限视为孤儿（fetch 层 300s 超时 + 下载重试，留足余量） */
 export const ORPHAN_TIMEOUT_MS = 10 * 60 * 1000;
+
+/** 图片魔数校验（供应商文档：获取结果 → 校验 → 转存自有存储） */
+function sniffImage(buf: Buffer): 'png' | 'jpeg' | 'webp' | null {
+  if (buf.length < 12) return null;
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'png';
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpeg';
+  if (buf.subarray(0, 4).toString('latin1') === 'RIFF' && buf.subarray(8, 12).toString('latin1') === 'WEBP')
+    return 'webp';
+  return null;
+}
 
 interface JobInputParams {
   prompt: string;
@@ -88,14 +98,16 @@ export class ExecutorService implements OnApplicationBootstrap {
               quality: params.quality,
             });
 
-      // 引擎 URL 有时效：立即取二进制并转存（DB 永不存临时 URL）
+      // 引擎 URL 有时效：立即取二进制并转存（DB 永不存临时 URL）；下载带退避重试（供应商文档建议）
       const item = result.images[0];
       const buf = item.b64
         ? Buffer.from(item.b64, 'base64')
-        : Buffer.from(
-            await (await fetch(item.url!, { signal: AbortSignal.timeout(60_000) })).arrayBuffer(),
-          );
-      const key = objectKey(job.projectId ?? 'unassigned', job.runId, job.id, 'png');
+        : await this.downloadWithRetry(item.url!);
+      const ext = sniffImage(buf);
+      if (!ext) {
+        throw new ProviderError('引擎返回内容不是有效图片（魔数校验失败）', 'retryable');
+      }
+      const key = objectKey(job.projectId ?? 'unassigned', job.runId, job.id, ext === 'jpeg' ? 'jpg' : ext);
       const stored = await this.storage.save(key, buf);
 
       const pointsCost = POINTS_PER_IMAGE[params.quality];
@@ -162,6 +174,22 @@ export class ExecutorService implements OnApplicationBootstrap {
       });
       this.log.warn(`job ${job.id} failed (${kind}): ${message.slice(0, 200)}`);
     }
+  }
+
+  /** 结果 URL 下载：4 次尝试，3s/6s/9s 退避（供应商文档生产建议） */
+  private async downloadWithRetry(url: string): Promise<Buffer> {
+    let lastErr: unknown;
+    for (let i = 1; i <= 4; i++) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+        if (!res.ok) throw new Error(`download http ${res.status}`);
+        return Buffer.from(await res.arrayBuffer());
+      } catch (err) {
+        lastErr = err;
+        if (i < 4) await new Promise((s) => setTimeout(s, i * 3000));
+      }
+    }
+    throw new ProviderError(`结果图片下载失败：${String(lastErr)}`, 'retryable');
   }
 
   /** i2i/template：槽位资产 → 本地二进制（经 StorageAdapter，不直接碰路径） */
