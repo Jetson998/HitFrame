@@ -8,6 +8,14 @@ import { jsonb, numeric, pgTable, text, timestamp, uniqueIndex, integer } from '
 
 const tenantId = () => text('tenant_id').notNull().default('default');
 
+/** M1 单租户：一行 'default'。简单扣点走 pointsBalance 同事务扣减；M2a 起配 CreditTransaction 流水 */
+export const tenants = pgTable('tenants', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  pointsBalance: integer('points_balance').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const projects = pgTable('projects', {
   id: text('id').primaryKey(),
   tenantId: tenantId(),
