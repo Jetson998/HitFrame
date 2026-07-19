@@ -31,9 +31,13 @@ docker compose up -d        # PostgreSQL（阶段 3 起需要；需本机安装 
 ## M1 阶段进度
 
 - [x] 阶段 1 工程骨架（monorepo / TS / lint / env / 健康检查 / Drizzle 配置与 schema）
-- [ ] 阶段 2 Muskapis 真实出图验证
+- [x] 阶段 2 Muskapis 真实出图验证（t2i 66s / i2i 66s，`scripts/verify-provider.mjs`）
 - [ ] 阶段 3 Run / Job / Asset / UsageEvent 数据闭环
 - [ ] 阶段 4 `POST /api/v1/generations`（202 + 轮询 + 幂等 + 孤儿清理）
 - [ ] 阶段 5 React 主流程（按 Demo 复刻）
 - [ ] 阶段 6 资产库与项目
 - [ ] 阶段 7 M1 验收（三链路真实出图）
+
+## 已知问题
+
+- **引擎 size 参数为弱约束**（2026-07-19 实测）：请求 `1024x1024` 返回 1086×1448（3:4）；请求 `1536x1024` 返回 1402×1122（≈5:4）。方向大致生效、精确尺寸不生效。处理：阶段 3 技术校验层记录实际尺寸到 `Asset.meta`，前端按实际尺寸展示；「比例」选项文案避免承诺精确像素；必要时本地按目标比例裁切。待与供应商确认参数口径。
