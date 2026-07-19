@@ -112,7 +112,7 @@ export function AssetsPage() {
               <img
                 src={a.url}
                 alt={a.name}
-                className="aspect-square w-full bg-[#0c1017] object-cover"
+                className="aspect-square w-full bg-stage object-cover"
               />
               <div className="flex items-center justify-between gap-2 px-2.5 py-2 text-[11.5px] text-dim">
                 <span className="min-w-0">

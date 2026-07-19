@@ -71,7 +71,7 @@ export function AssetDetailDialog() {
   return (
     <Dialog open onOpenChange={(open) => !open && closeDetail()}>
       <DialogContent className="grid max-w-[760px] grid-cols-1 md:grid-cols-[380px_1fr]">
-        <div className="grid max-h-[70vh] place-items-center bg-[#0c1017]">
+        <div className="grid max-h-[70vh] place-items-center bg-stage">
           <img src={asset.url} alt={asset.name} className="max-h-[70vh] w-full object-contain" />
         </div>
         <div className="flex flex-col gap-3 p-5">

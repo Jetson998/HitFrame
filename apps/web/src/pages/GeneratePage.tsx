@@ -16,12 +16,13 @@ import { OutputSettings } from '@/components/OutputSettings';
 import { ResultPanel } from '@/components/ResultPanel';
 import { TemplateCards } from '@/pages/TemplateCards';
 
+/** 示例提示词：完整结构（主体 + 场景 + 光影 + 风格），有构图有意义 */
 const SUGGESTIONS = [
-  '秋日咖啡馆窗边静物，暖光，胶片感',
-  '极简白底产品图',
-  'ins 风生活场景',
-  '大理石台面，高级感',
-  '国风插画',
+  '霓虹雨夜的赛博朋克街头，机车女骑手侧身回眸，青紫霓虹倒映在湿漉路面，电影感低角度构图',
+  '白衬衫女生坐在落地窗前的晨光里，浅景深人像，发丝逆光，胶片质感，时尚杂志封面构图',
+  '磨砂玻璃精华液瓶立于弧形米色石台，侧逆光勾勒瓶身轮廓，水珠特写，高端护肤品电商主图',
+  '深蓝渐变背景中悬浮的无线耳机，一束棱镜光斜穿画面，金属细节锐利，科技感产品海报',
+  '午后咖啡馆木桌上的手冲咖啡与翻开的书，暖光斜照，蒸汽可见，生活方式杂志风',
 ];
 
 /** AI 图片主页面：三 Tab（图生图 / 文生图 / 场景模板），同一套生成底座三种输入结构 */
@@ -129,7 +130,7 @@ export function GeneratePage() {
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="描述希望生成或修改的画面…"
+              placeholder="主体 + 场景 + 光影 + 风格，例如：霓虹雨夜的赛博朋克街头，机车女骑手回眸，电影感构图"
               className="min-h-[72px] w-full resize-y rounded-[10px] border border-line bg-panel2 px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
             />
             <div className="mt-2 flex flex-wrap gap-1.5">

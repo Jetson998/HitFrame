@@ -56,7 +56,7 @@ export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPan
           <div
             key={job?.jobId ?? i}
             className={cn(
-              'group relative grid place-items-center overflow-hidden rounded-xl border border-line-soft bg-[#0c1017] text-center text-[11.5px] text-faint',
+              'group relative grid place-items-center overflow-hidden rounded-xl border border-line-soft bg-stage text-center text-[11.5px] text-faint',
               aspect,
             )}
           >
@@ -66,7 +66,7 @@ export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPan
                 <div className="absolute inset-x-2 bottom-2 flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                   <Button
                     size="sm"
-                    className="flex-1 bg-[rgba(14,17,22,0.85)]"
+                    className="flex-1 bg-white/90 backdrop-blur-sm"
                     onClick={() => downloadUrl(job.resultUrl!, `hitframe_${job.jobId}.png`)}
                   >
                     <Download size={12} /> 下载
@@ -74,7 +74,7 @@ export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPan
                   {job.resultAssetId && (
                     <Button
                       size="sm"
-                      className="flex-1 bg-[rgba(14,17,22,0.85)]"
+                      className="flex-1 bg-white/90 backdrop-blur-sm"
                       onClick={() => void openDetailById(job.resultAssetId!)}
                     >
                       <Info size={12} /> 详情
@@ -93,7 +93,7 @@ export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPan
             ) : job || submitting ? (
               <div className="w-full px-4">
                 <div>{job ? STATUS_TEXT[job.status] : '提交中…'}</div>
-                <div className="mx-auto mt-2 h-[5px] w-full overflow-hidden rounded bg-white/10">
+                <div className="mx-auto mt-2 h-[5px] w-full overflow-hidden rounded bg-[#172b4d]/10">
                   <div className="hf-progress h-full w-2/5 rounded bg-gradient-to-r from-accent to-vio" />
                 </div>
                 <div className="mt-2 text-[10.5px] text-faint">

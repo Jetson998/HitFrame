@@ -9,7 +9,7 @@ const buttonVariants = cva(
       variant: {
         primary: 'bg-accent font-semibold text-white hover:bg-accent-hov',
         secondary:
-          'border border-line bg-panel2 text-ink hover:border-[#38424f] hover:bg-[#232c37]',
+          'border border-line bg-panel text-ink shadow-[0_1px_2px_rgba(23,43,77,0.06)] hover:border-[#cfd8e6] hover:bg-panel2',
         ghost: 'text-dim hover:bg-panel2 hover:text-ink',
       },
       size: {

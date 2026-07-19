@@ -96,7 +96,7 @@ export default function App() {
 
       <AssetDetailDialog />
       {toast && (
-        <div className="fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-full border border-line bg-panel2 px-4 py-2 text-[12px] shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+        <div className="fixed bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-full border border-line bg-panel px-4 py-2 text-[12px] shadow-[0_8px_30px_rgba(23,43,77,0.16)]">
           {toast}
         </div>
       )}

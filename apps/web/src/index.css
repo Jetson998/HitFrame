@@ -1,21 +1,22 @@
 @import 'tailwindcss';
 
-/* 视觉基准：output/HitFrame_demo.html（已封版）的暗色工作台配色 */
+/* 白色浅色主题（参考 deevid.ai/app）：白底卡片 + 蓝色主色 + 柔和投影 */
 @theme {
-  --color-bg: #0e1116;
-  --color-panel: #161b23;
-  --color-panel2: #1c232d;
-  --color-line: #2a333f;
-  --color-line-soft: #222a34;
-  --color-ink: #e6edf3;
-  --color-dim: #8b98a8;
-  --color-faint: #5f6b7a;
-  --color-accent: #4f8cff;
-  --color-accent-hov: #3f7bec;
-  --color-ok: #3fb950;
-  --color-warn: #d29922;
-  --color-err: #f85149;
-  --color-vio: #a371f7;
+  --color-bg: #f5f7fb;
+  --color-panel: #ffffff;
+  --color-panel2: #f3f5f9;
+  --color-line: #e3e8f0;
+  --color-line-soft: #edf0f6;
+  --color-ink: #1b2430;
+  --color-dim: #5b6b7f;
+  --color-faint: #93a0b4;
+  --color-accent: #2f7cf6;
+  --color-accent-hov: #1f6ae0;
+  --color-ok: #22a06b;
+  --color-warn: #d97a08;
+  --color-err: #e5484d;
+  --color-vio: #8b5cf6;
+  --color-stage: #eef1f6; /* 图片展示区底色 */
 }
 
 body {

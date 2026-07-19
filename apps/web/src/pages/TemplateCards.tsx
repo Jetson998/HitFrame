@@ -32,7 +32,7 @@ export function TemplateCards() {
           >
             <div className="relative grid aspect-[16/10] place-items-center bg-panel2 text-4xl">
               {SCENE_ICON[tpl.sceneType] ?? '🧩'}
-              <span className="absolute top-2.5 right-2.5 rounded-full border border-line bg-[rgba(14,17,22,0.8)] px-2 py-0.5 text-[10.5px]">
+              <span className="absolute top-2.5 right-2.5 rounded-full border border-line bg-white/85 px-2 py-0.5 text-[10.5px] text-dim backdrop-blur-sm">
                 图片槽位 × {tpl.slots.length}
               </span>
             </div>
