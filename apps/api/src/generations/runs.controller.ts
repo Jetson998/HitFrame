@@ -12,26 +12,22 @@ export class RunsController {
     private readonly executor: ExecutorService,
   ) {}
 
-  /** A0 轮询端点；内置孤儿超时判定（running 超时 → failed，失败不扣点） */
+  /** A0 轮询端点；内置孤儿超时判定（running 超时 → failed + refund，S1 起统一走执行器退点路径） */
   @Get(':runId')
   async get(@Param('runId') runId: string) {
-    const timedOut = await this.db
-      .update(generationJobs)
-      .set({
-        status: 'failed',
-        error: 'orphaned: timeout',
-        errorKind: 'retryable',
-        finishedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(generationJobs.runId, runId),
-          inArray(generationJobs.status, ['running']),
-          lt(generationJobs.createdAt, new Date(Date.now() - ORPHAN_TIMEOUT_MS)),
-        ),
-      )
-      .returning({ id: generationJobs.id });
-    if (timedOut.length > 0) await this.executor.aggregateRun(runId);
+    const timedOutJobs = await this.db.query.generationJobs.findMany({
+      where: and(
+        eq(generationJobs.runId, runId),
+        inArray(generationJobs.status, ['running']),
+        lt(generationJobs.createdAt, new Date(Date.now() - ORPHAN_TIMEOUT_MS)),
+      ),
+    });
+    if (timedOutJobs.length > 0) {
+      for (const job of timedOutJobs) {
+        await this.executor.failJobWithRefund(job, 'orphaned: timeout', 'retryable');
+      }
+      await this.executor.aggregateRun(runId);
+    }
 
     const run = await this.db.query.generationRuns.findFirst({
       where: eq(generationRuns.id, runId),

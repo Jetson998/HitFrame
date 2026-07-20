@@ -4,6 +4,7 @@ import { HealthController } from './health.controller';
 import { DbModule } from './db/db.module';
 import { ApiTokenGuard } from './auth.guard';
 import { StorageService } from './storage/storage.service';
+import { CreditsService } from './credits/credits.service';
 import { GenerationsService } from './generations/generations.service';
 import { ExecutorService } from './generations/executor.service';
 import { GenerationsController } from './generations/generations.controller';
@@ -27,6 +28,7 @@ import { ProjectsController } from './projects.controller';
   providers: [
     { provide: APP_GUARD, useClass: ApiTokenGuard },
     StorageService,
+    CreditsService,
     GenerationsService,
     ExecutorService,
   ],

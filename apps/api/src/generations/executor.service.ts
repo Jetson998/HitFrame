@@ -4,8 +4,9 @@ import { randomUUID } from 'node:crypto';
 import { objectKey, POINTS_PER_IMAGE, Quality } from '@hitframe/shared';
 import { ProviderError } from '@hitframe/image-provider';
 import { DB, Db } from '../db/db.module';
-import { assets, generationJobs, generationRuns, tenants, usageEvents } from '../db/schema';
+import { assets, generationJobs, generationRuns, usageEvents } from '../db/schema';
 import { StorageService } from '../storage/storage.service';
+import { CreditsService } from '../credits/credits.service';
 import { getImageProvider } from '../provider.factory';
 
 const TENANT = 'default';
@@ -31,6 +32,35 @@ interface JobInputParams {
 }
 
 /**
+ * 全局并发信号量（2026-07-20 拍板）：进程内执行器对引擎的并发闸门，
+ * 默认 2（种子配置基线 Worker 并发 2–4 的下限），EXECUTOR_CONCURRENCY 可调。
+ * S2 迁移 BullMQ 后由 Worker concurrency 配置取代。
+ */
+class Semaphore {
+  private inFlight = 0;
+  private readonly waiters: Array<() => void> = [];
+
+  constructor(private readonly limit: number) {}
+
+  async acquire(): Promise<void> {
+    if (this.inFlight < this.limit) {
+      this.inFlight++;
+      return;
+    }
+    await new Promise<void>((resolve) => this.waiters.push(resolve));
+    this.inFlight++;
+  }
+
+  release(): void {
+    this.inFlight--;
+    this.waiters.shift()?.();
+  }
+}
+
+const EXECUTOR_CONCURRENCY = Math.max(1, Number(process.env.EXECUTOR_CONCURRENCY ?? 2) || 2);
+const engineGate = new Semaphore(EXECUTOR_CONCURRENCY);
+
+/**
  * M1 进程内非持久执行器（ADR-9）。
  * 接受的限制：进程重启时运行中任务失败，不自动恢复；由启动孤儿清理兜底。
  * M2a 将本类替换为 BullMQ Worker，API 契约不变。
@@ -42,24 +72,44 @@ export class ExecutorService implements OnApplicationBootstrap {
   constructor(
     @Inject(DB) private readonly db: Db,
     private readonly storage: StorageService,
+    private readonly credits: CreditsService,
   ) {}
 
-  /** 启动孤儿清理：上次进程留下的 queued/running 全部收敛为 failed（失败不扣点） */
+  /**
+   * 启动收敛（S1 起按 outbox 语义分流）：
+   * - running → 进程内执行器不可恢复中断（ADR-9）→ failed + refund；
+   * - queued（含 enqueueState=pending 的「已提交未派发」）→ 补投重新执行。
+   */
   async onApplicationBootstrap(): Promise<void> {
-    const orphans = await this.db
-      .update(generationJobs)
-      .set({ status: 'failed', error: 'orphaned: process restarted', errorKind: 'non_retryable' })
-      .where(inArray(generationJobs.status, ['queued', 'running']))
-      .returning({ runId: generationJobs.runId });
-    if (orphans.length > 0) {
-      const runIds = [...new Set(orphans.map((o) => o.runId))];
+    const interrupted = await this.db.query.generationJobs.findMany({
+      where: inArray(generationJobs.status, ['running']),
+    });
+    for (const job of interrupted) {
+      await this.failJobWithRefund(job, 'orphaned: process restarted', 'retryable');
+    }
+    if (interrupted.length > 0) {
+      const runIds = [...new Set(interrupted.map((o) => o.runId))];
       for (const runId of runIds) await this.aggregateRun(runId);
-      this.log.warn(`orphan sweep: ${orphans.length} job(s) in ${runIds.length} run(s) → failed`);
+      this.log.warn(`orphan sweep: ${interrupted.length} running job(s) → failed+refund`);
+    }
+
+    const queued = await this.db
+      .selectDistinct({ runId: generationJobs.runId })
+      .from(generationJobs)
+      .where(eq(generationJobs.status, 'queued'));
+    for (const { runId } of queued) {
+      this.log.log(`reconciler: redispatch run ${runId}`);
+      void this.execute(runId);
     }
   }
 
   async execute(runId: string): Promise<void> {
     try {
+      // outbox 流转：派发即标记 enqueued（S2 起由 BullMQ add 成功后回写，jobId=job.id）
+      await this.db
+        .update(generationJobs)
+        .set({ enqueueState: 'enqueued', queueJobId: sql`${generationJobs.id}` })
+        .where(and(eq(generationJobs.runId, runId), eq(generationJobs.status, 'queued')));
       await this.db
         .update(generationRuns)
         .set({ status: 'running' })
@@ -76,11 +126,27 @@ export class ExecutorService implements OnApplicationBootstrap {
   }
 
   private async runJob(job: typeof generationJobs.$inferSelect): Promise<void> {
+    // 幂等（S0 §4 第 4 条）：执行前查 DB 终态，重复派发直接跳过
+    const fresh = await this.db.query.generationJobs.findFirst({
+      where: eq(generationJobs.id, job.id),
+    });
+    if (!fresh || fresh.status === 'succeeded' || fresh.status === 'failed') return;
+
+    // 全局并发闸门：同一时刻最多 EXECUTOR_CONCURRENCY 个 Job 触达引擎
+    await engineGate.acquire();
+    try {
+      await this.runJobInner(job);
+    } finally {
+      engineGate.release();
+    }
+  }
+
+  private async runJobInner(job: typeof generationJobs.$inferSelect): Promise<void> {
     const params = job.inputParams as unknown as JobInputParams;
     const provider = getImageProvider();
     await this.db
       .update(generationJobs)
-      .set({ status: 'running' })
+      .set({ status: 'running', attempts: sql`${generationJobs.attempts} + 1` })
       .where(eq(generationJobs.id, job.id));
     try {
       const result =
@@ -140,40 +206,55 @@ export class ExecutorService implements OnApplicationBootstrap {
           .update(generationJobs)
           .set({ status: 'succeeded', resultUrl: stored.url, pointsCost, finishedAt: new Date() })
           .where(eq(generationJobs.id, job.id));
-        // M1 简单扣减（成功才扣）；M2a 起换预扣/结算 + CreditTransaction 流水
-        await tx
-          .update(tenants)
-          .set({ pointsBalance: sql`${tenants.pointsBalance} - ${pointsCost}` })
-          .where(eq(tenants.id, TENANT));
+        // S1：hold 已在入队事务扣减，此处只记 settle 确认凭证（amount=0）
+        await this.credits.settle(tx as unknown as Db, TENANT, job.runId, job.id, pointsCost);
       });
       this.log.log(`job ${job.id} succeeded (${pointsCost} pts, ${buf.length} bytes)`);
     } catch (err) {
       const kind = err instanceof ProviderError ? err.kind : 'non_retryable';
       const message = err instanceof Error ? err.message : String(err);
-      await this.db.transaction(async (tx) => {
-        await tx
-          .update(generationJobs)
-          .set({
-            status: 'failed',
-            error: message.slice(0, 1000),
-            errorKind: kind,
-            finishedAt: new Date(),
-          })
-          .where(eq(generationJobs.id, job.id));
-        await tx.insert(usageEvents).values({
-          id: `ue_${randomUUID()}`,
-          tenantId: TENANT,
-          runId: job.runId,
-          jobId: job.id,
-          operation: job.endpoint === 'edits' ? 'edit' : 'generate',
-          provider: provider.name,
-          model: provider.model,
-          quantity: 1,
-          status: 'failed',
-        });
-      });
+      await this.failJobWithRefund(job, message, kind, provider.name, provider.model);
       this.log.warn(`job ${job.id} failed (${kind}): ${message.slice(0, 200)}`);
     }
+  }
+
+  /** 失败终态 + refund 同事务（S1）：hold 已扣，失败按单 Job 点数退还 */
+  async failJobWithRefund(
+    job: typeof generationJobs.$inferSelect,
+    message: string,
+    kind: string,
+    providerName?: string,
+    providerModel?: string,
+  ): Promise<void> {
+    const params = job.inputParams as unknown as JobInputParams;
+    const refundAmount = POINTS_PER_IMAGE[params.quality] ?? 0;
+    await this.db.transaction(async (tx) => {
+      const updated = await tx
+        .update(generationJobs)
+        .set({
+          status: 'failed',
+          error: message.slice(0, 1000),
+          errorKind: kind,
+          finishedAt: new Date(),
+        })
+        .where(
+          and(eq(generationJobs.id, job.id), inArray(generationJobs.status, ['queued', 'running'])),
+        )
+        .returning({ id: generationJobs.id });
+      if (updated.length === 0) return; // 已终态：幂等跳过（不重复 refund）
+      await this.credits.refund(tx as unknown as Db, TENANT, job.runId, job.id, refundAmount);
+      await tx.insert(usageEvents).values({
+        id: `ue_${randomUUID()}`,
+        tenantId: TENANT,
+        runId: job.runId,
+        jobId: job.id,
+        operation: job.endpoint === 'edits' ? 'edit' : 'generate',
+        provider: providerName ?? 'muskapis',
+        model: providerModel ?? 'gpt-image-2',
+        quantity: 1,
+        status: 'failed',
+      });
+    });
   }
 
   /** 结果 URL 下载：4 次尝试，3s/6s/9s 退避（供应商文档生产建议） */

@@ -10,6 +10,7 @@ import {
 } from '@hitframe/shared';
 import { DB, Db } from '../db/db.module';
 import { generationJobs, generationRuns, nodeTemplates, projects, tenants } from '../db/schema';
+import { CreditsService } from '../credits/credits.service';
 import { ExecutorService } from './executor.service';
 
 const TENANT = 'default'; // M1 单租户
@@ -31,6 +32,7 @@ export class GenerationsService {
   constructor(
     @Inject(DB) private readonly db: Db,
     private readonly executor: ExecutorService,
+    private readonly credits: CreditsService,
   ) {}
 
   async create(dto: GenerationRequestDto, origin: RunOrigin): Promise<GenerationAcceptedDto> {
@@ -46,13 +48,7 @@ export class GenerationsService {
 
     const est = dto.options.candidateCount * POINTS_PER_IMAGE[dto.options.quality];
     const tenant = await this.db.query.tenants.findFirst({ where: eq(tenants.id, TENANT) });
-    if (!tenant) throw new HttpException({ code: 1, message: 'tenant not initialized' }, 500);
-    if (tenant.pointsBalance < est) {
-      throw new HttpException(
-        { code: 402, message: `点数不足：需 ${est}，余 ${tenant.pointsBalance}` },
-        402,
-      );
-    }
+    if (!tenant) throw new HttpException({ code: 50000, message: '系统繁忙，请稍后再试' }, 500);
 
     const runId = `run_${randomUUID()}`;
     const jobIds = Array.from({ length: dto.options.candidateCount }, () => `job_${randomUUID()}`);
@@ -66,6 +62,8 @@ export class GenerationsService {
     };
 
     try {
+      // 入队事务（S1）：Run + Jobs（enqueueState=pending 即 outbox 标记）+ hold 预扣同事务提交；
+      // 条件扣减防并发透支；幂等冲突整体回滚 → 不会产生重复 hold
       await this.db.transaction(async (tx) => {
         await tx.insert(generationRuns).values({
           id: runId,
@@ -92,8 +90,10 @@ export class GenerationsService {
             status: 'queued' as const,
           })),
         );
+        await this.credits.hold(tx as unknown as Db, TENANT, runId, est);
       });
     } catch (err) {
+      if (err instanceof HttpException) throw err; // 40201 点数不足等业务错误直接透出
       // 幂等：同 (tenantId, idempotencyKey) 重复提交 → 返回首次的 runId + jobs[]
       // Drizzle 将 pg 错误包装为 DrizzleQueryError，唯一约束码在 cause.code
       const pgCode =

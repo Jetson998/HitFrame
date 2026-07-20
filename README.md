@@ -47,7 +47,9 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 ## M2a 阶段进度（方案：`HitFrame_M2a_实施方案草案.md` v0.3，M1 基线 tag `m1-accepted`）
 
 - [x] S0 拍板收尾（迁移 0002：credit_transactions + jobs 队列列；状态机/错误码/幂等键定稿：`docs/M2a_S0_状态机与错误码.md`）
-- [ ] S1 CreditTransaction 预扣/结算/退还 + 入队 outbox
+- [x] S0.1 opening 流水基线（迁移 0003；`pointsBalance = Σ流水` 自基线起严格成立）+ 记账口径修正
+- [x] S1 CreditTransaction 预扣/结算/退还 + 入队 outbox（hold 条件扣减防透支；失败/孤儿统一 refund；fake 压测：并发闸门=2、注入分流、32 并发抢余额零透支）
+- [x] 测试加固（2026-07-20 拍板）：**FakeProvider**（`IMAGE_PROVIDER=fake`，秒级占位图，支持 `[fail]` / `[fail:non_retryable]` / `[fail:moderation]` / `[slow:ms]` 注入）+ **执行器全局并发信号量**（默认 2，`EXECUTOR_CONCURRENCY` 可调，S2 后由 Worker concurrency 取代）。破坏性/压测一律走 fake，真实引擎只用于单张回归与演示图
 - [ ] S2 BullMQ/Valkey/Worker 迁移
 - [ ] S3 StorageAdapter + SeaweedFS/OSS + 存量迁移
 - [ ] S4 重试/死信/恢复/观测 + 错误码收敛实现
@@ -58,3 +60,4 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 ## 已知问题
 
 - **引擎 size 参数为弱约束**（2026-07-19 实测）：请求 `1024x1024` 返回 1086×1448（3:4）；请求 `1536x1024` 返回 1402×1122（≈5:4）。方向大致生效、精确尺寸不生效。处理：阶段 3 技术校验层记录实际尺寸到 `Asset.meta`，前端按实际尺寸展示；「比例」选项文案避免承诺精确像素；必要时本地按目标比例裁切。待与供应商确认参数口径。
+
