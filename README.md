@@ -44,6 +44,17 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 
 **M1 已完成。** 后续 M2a：执行内核换 BullMQ/Valkey + 对象存储 + 三模板 + 规则路由 Agent + CreditTransaction（种子客户试用）。
 
+## M2a 阶段进度（方案：`HitFrame_M2a_实施方案草案.md` v0.3，M1 基线 tag `m1-accepted`）
+
+- [x] S0 拍板收尾（迁移 0002：credit_transactions + jobs 队列列；状态机/错误码/幂等键定稿：`docs/M2a_S0_状态机与错误码.md`）
+- [ ] S1 CreditTransaction 预扣/结算/退还 + 入队 outbox
+- [ ] S2 BullMQ/Valkey/Worker 迁移
+- [ ] S3 StorageAdapter + SeaweedFS/OSS + 存量迁移
+- [ ] S4 重试/死信/恢复/观测 + 错误码收敛实现
+- [ ] S5 三模板 + Agent 规则路由
+- [ ] S6 种子客户验收
+- [ ] S7 （可选）Socket.IO/SSE
+
 ## 已知问题
 
 - **引擎 size 参数为弱约束**（2026-07-19 实测）：请求 `1024x1024` 返回 1086×1448（3:4）；请求 `1536x1024` 返回 1402×1122（≈5:4）。方向大致生效、精确尺寸不生效。处理：阶段 3 技术校验层记录实际尺寸到 `Asset.meta`，前端按实际尺寸展示；「比例」选项文案避免承诺精确像素；必要时本地按目标比例裁切。待与供应商确认参数口径。

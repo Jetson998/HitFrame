@@ -15,6 +15,13 @@
       "when": 1784475667538,
       "tag": "0001_previous_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784530967931,
+      "tag": "0002_good_fantastic_four",
+      "breakpoints": true
     }
   ]
 }

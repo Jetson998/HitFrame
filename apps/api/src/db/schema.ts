@@ -4,6 +4,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   integer,
 } from 'drizzle-orm/pg-core';
@@ -79,6 +80,10 @@ export const generationJobs = pgTable('generation_jobs', {
   pointsCost: integer('points_cost'),
   error: text('error'),
   errorKind: text('error_kind'), // retryable | non_retryable | moderation_rejected
+  // ---- M2a S0 起：队列执行与 outbox（M2a 方案 §二/§三）----
+  attempts: integer('attempts').notNull().default(0), // Worker 已尝试次数
+  queueJobId: text('queue_job_id'), // BullMQ 关联（约定 = job.id，留列便于排障）
+  enqueueState: text('enqueue_state').notNull().default('pending'), // pending|enqueued（Reconciler 只扫 pending+queued）
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   finishedAt: timestamp('finished_at', { withTimezone: true }),
 });
@@ -112,3 +117,27 @@ export const usageEvents = pgTable('usage_events', {
   status: text('status').notNull(), // succeeded | failed
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * 点数流水（M2a S1 起启用）：可审计、可重放的凭证；tenants.pointsBalance 仍是
+ * 事务性维护的权威快速余额（同一 PG 事务条件更新），流水用于审计与对账修复。
+ * hold 记 Run 级（jobId 空）；settle/refund 记 Job 级；唯一约束防重复入账。
+ */
+export const creditTransactions = pgTable(
+  'credit_transactions',
+  {
+    id: text('id').primaryKey(),
+    tenantId: tenantId(),
+    runId: text('run_id'),
+    jobId: text('job_id'),
+    type: text('type').notNull(), // hold | settle | refund | topup
+    amount: integer('amount').notNull(), // 有符号：hold/settle 负、refund/topup 正
+    balanceAfter: integer('balance_after').notNull(),
+    note: text('note'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    // NULLS NOT DISTINCT（PG15+）：同一 Run 的 hold（jobId 为空）也只允许一条
+    unique('credit_tx_uq').on(t.tenantId, t.runId, t.jobId, t.type).nullsNotDistinct(),
+  ],
+);
