@@ -130,8 +130,8 @@ export const creditTransactions = pgTable(
     tenantId: tenantId(),
     runId: text('run_id'),
     jobId: text('job_id'),
-    type: text('type').notNull(), // hold | settle | refund | topup
-    amount: integer('amount').notNull(), // 有符号：hold/settle 负、refund/topup 正
+    type: text('type').notNull(), // opening | hold | settle | refund | topup
+    amount: integer('amount').notNull(), // 有符号：hold 负、settle 0（确认凭证）、refund/topup/opening 正
     balanceAfter: integer('balance_after').notNull(),
     note: text('note'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

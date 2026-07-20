@@ -34,14 +34,15 @@ queued ──► running ──► succeeded
 
 | 时机 | type | 级别 | amount | 幂等键 `(tenantId, runId, jobId, type)` |
 |---|---|---|---|---|
+| 迁移 0003 / 新租户建立 | `opening` | 租户（runId/jobId=NULL） | +当时 pointsBalance | (t, NULL, NULL, opening) |
 | 入队事务（与 Run/Job 创建同事务） | `hold` | Run（jobId=NULL） | −预估总额 | (t, run, NULL, hold) |
 | Job 成功落库事务 | `settle` | Job | 0（hold 已扣，settle 记确认；见下） | (t, run, job, settle) |
 | Job 失败终态事务 | `refund` | Job | +单张点数 | (t, run, job, refund) |
-| 人工充值 | `topup` | — | +N | (t, NULL, NULL, topup) 不唯一约束限制（runId 空但 id 各异 → 用 note 记凭证） |
+| 人工充值 | `topup` | — | +N | (t, 'topup_'+凭证号, NULL, topup) |
 
-记账口径（定稿）：**hold 即时从 `pointsBalance` 条件扣减**（`UPDATE tenants SET points_balance = points_balance - :est WHERE id=:t AND points_balance >= :est`，0 行 = 40201 点数不足）；settle 金额记 0 仅作确认凭证（余额不再变动）；refund 按失败 Job 单张点数回加。任意时刻 `pointsBalance == 初始 + Σ amount`。对账任务发现不一致 → 以流水重放修复快照 + 告警。
+记账口径（定稿）：**hold 即时从 `pointsBalance` 条件扣减**（`UPDATE tenants SET points_balance = points_balance - :est WHERE id=:t AND points_balance >= :est`，0 行 = 40201 点数不足）；settle 金额记 0 仅作确认凭证（余额不再变动）；refund 按失败 Job 单张点数回加。**opening 基线（迁移 0003）使 `pointsBalance == Σ amount` 自基线起严格成立**；对账任务发现不一致 → 以流水重放修复快照 + 告警。
 
-> topup 注：唯一约束对 `(t, NULL, NULL, topup)` 因 NULLS NOT DISTINCT 只允许一行——**topup 必须带唯一 runId 占位**（约定 `runId = 'topup_' + 凭证号`），S1 实现时落此约定。
+> topup 注：NULLS NOT DISTINCT 下 `(t, NULL, NULL, topup)` 只允许一行，故 **topup 必须带唯一凭证号占位 runId**（约定 `runId = 'topup_' + 凭证号`）。M3 正式充值体系再增 `externalReference`，现不扩张。
 
 ## 4 幂等键清单（缺一不可）
 
