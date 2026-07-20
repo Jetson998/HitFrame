@@ -18,7 +18,10 @@ function sniffImage(buf: Buffer): 'png' | 'jpeg' | 'webp' | null {
   if (buf.length < 12) return null;
   if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'png';
   if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'jpeg';
-  if (buf.subarray(0, 4).toString('latin1') === 'RIFF' && buf.subarray(8, 12).toString('latin1') === 'WEBP')
+  if (
+    buf.subarray(0, 4).toString('latin1') === 'RIFF' &&
+    buf.subarray(8, 12).toString('latin1') === 'WEBP'
+  )
     return 'webp';
   return null;
 }
@@ -173,7 +176,12 @@ export class ExecutorService implements OnApplicationBootstrap {
       if (!ext) {
         throw new ProviderError('引擎返回内容不是有效图片（魔数校验失败）', 'retryable');
       }
-      const key = objectKey(job.projectId ?? 'unassigned', job.runId, job.id, ext === 'jpeg' ? 'jpg' : ext);
+      const key = objectKey(
+        job.projectId ?? 'unassigned',
+        job.runId,
+        job.id,
+        ext === 'jpeg' ? 'jpg' : ext,
+      );
       const stored = await this.storage.save(key, buf);
 
       const pointsCost = POINTS_PER_IMAGE[params.quality];

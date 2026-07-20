@@ -1,4 +1,5 @@
 import { useAppStore, type GenMode } from '@/store';
+import { ShowcaseWall } from '@/components/ShowcaseWall';
 
 const QUICK: Array<{ icon: string; label: string; mode?: GenMode; nav?: 'assets' }> = [
   { icon: '✨', label: '空白文生图', mode: 't2i' },
@@ -45,6 +46,13 @@ export function HomePage() {
         ))}
       </div>
 
+      {/* 已登录但还没有产出：案例墙提到最显眼位置 */}
+      {results.length === 0 && (
+        <div className="mt-9">
+          <ShowcaseWall />
+        </div>
+      )}
+
       <div className="mt-9 mb-3.5 text-[12px] font-semibold tracking-wider text-faint uppercase">
         推荐模板
       </div>
@@ -87,6 +95,13 @@ export function HomePage() {
             ))}
           </div>
         </>
+      )}
+
+      {/* 有产出时案例墙沉底常显 */}
+      {results.length > 0 && (
+        <div className="mt-9">
+          <ShowcaseWall />
+        </div>
       )}
     </div>
   );

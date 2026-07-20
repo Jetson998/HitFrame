@@ -146,12 +146,7 @@
       "uniqueConstraints": {
         "credit_tx_uq": {
           "name": "credit_tx_uq",
-          "columns": [
-            "tenant_id",
-            "run_id",
-            "job_id",
-            "type"
-          ],
+          "columns": ["tenant_id", "run_id", "job_id", "type"],
           "nullsNotDistinct": true
         }
       },

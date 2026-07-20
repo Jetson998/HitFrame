@@ -4,6 +4,7 @@ import type {
   MeDto,
   ProjectDto,
   RunStatusDto,
+  ShowcaseItemDto,
   TemplateSummaryDto,
 } from '@hitframe/shared';
 
@@ -87,6 +88,11 @@ export const api = {
     req<{ id: string }>(`/assets/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
   deleteAsset: (id: string) => req<{ id: string }>(`/assets/${id}`, { method: 'DELETE' }),
   projects: () => req<ProjectDto[]>('/projects'),
+  /** 公开端点：未登录也可访问（灵感/案例墙） */
+  showcase: async () => {
+    const rows = await req<ShowcaseItemDto[]>('/showcase');
+    return rows.map((s) => ({ ...s, url: relUrl(s.url) }));
+  },
   createProject: (name: string) =>
     req<{ id: string; name: string }>('/projects', {
       method: 'POST',

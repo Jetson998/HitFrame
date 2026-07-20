@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ProjectDto, TemplateSummaryDto } from '@hitframe/shared';
+import type { ProjectDto, ShowcaseItemDto, TemplateSummaryDto } from '@hitframe/shared';
 import { api, ApiError, type AssetRow } from './lib/api';
 
 /** 侧边栏 IA 与 Demo（output/HitFrame_demo.html）保持一致；Agent 在 M1 为禁用占位，M2a 开放 */
@@ -40,6 +40,14 @@ interface AppState {
   openDetail: (asset: AssetRow) => void;
   openDetailById: (assetId: string) => Promise<void>;
   closeDetail: () => void;
+
+  /** 灵感/案例墙（公开数据，未登录也加载） */
+  showcase: ShowcaseItemDto[];
+  loadShowcase: () => Promise<void>;
+  /** 「用这个提示词」：跳文生图并回填（GeneratePage 消费后清空） */
+  pendingPrompt: string | null;
+  tryPrompt: (prompt: string) => void;
+  consumePendingPrompt: () => string | null;
 
   toast: string | null;
   showToast: (msg: string) => void;
@@ -131,6 +139,23 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (asset) set({ detailAsset: asset });
   },
   closeDetail: () => set({ detailAsset: null }),
+
+  showcase: [],
+  loadShowcase: async () => {
+    try {
+      set({ showcase: await api.showcase() });
+    } catch {
+      /* 案例墙加载失败静默（不阻断主流程） */
+    }
+  },
+  pendingPrompt: null,
+  tryPrompt: (prompt) =>
+    set({ pendingPrompt: prompt, genMode: 't2i', activeTplId: null, nav: 'generate' }),
+  consumePendingPrompt: () => {
+    const p = get().pendingPrompt;
+    if (p) set({ pendingPrompt: null });
+    return p;
+  },
 
   toast: null,
   showToast: (toast) => {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   POINTS_PER_IMAGE,
   type GenerationRequestDto,
@@ -38,6 +38,12 @@ export function GeneratePage() {
     showToast,
   } = useAppStore();
   const [prompt, setPrompt] = useState('');
+  const consumePendingPrompt = useAppStore((s) => s.consumePendingPrompt);
+  // 案例墙「用这个提示词」回填
+  useEffect(() => {
+    const pending = consumePendingPrompt();
+    if (pending) setPrompt(pending);
+  }, [consumePendingPrompt]);
   const [ratio, setRatio] = useState<Ratio>('1:1');
   const [quality, setQuality] = useState<Quality>('standard');
   const [count, setCount] = useState(2);

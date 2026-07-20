@@ -142,3 +142,12 @@ export interface ProjectDto {
   name: string;
   createdAt: string;
 }
+
+/** GET /api/v1/showcase（公开，免鉴权）：灵感/案例墙，未登录与空产出态展示 */
+export interface ShowcaseItemDto {
+  id: string;
+  url: string;
+  title: string;
+  prompt?: string;
+  mode?: string; // t2i | i2i | template
+}

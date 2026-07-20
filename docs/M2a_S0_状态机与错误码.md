@@ -32,13 +32,13 @@ queued ──► running ──► succeeded
 
 ## 3 CreditTransaction 流转
 
-| 时机 | type | 级别 | amount | 幂等键 `(tenantId, runId, jobId, type)` |
-|---|---|---|---|---|
-| 迁移 0003 / 新租户建立 | `opening` | 租户（runId/jobId=NULL） | +当时 pointsBalance | (t, NULL, NULL, opening) |
-| 入队事务（与 Run/Job 创建同事务） | `hold` | Run（jobId=NULL） | −预估总额 | (t, run, NULL, hold) |
-| Job 成功落库事务 | `settle` | Job | 0（hold 已扣，settle 记确认；见下） | (t, run, job, settle) |
-| Job 失败终态事务 | `refund` | Job | +单张点数 | (t, run, job, refund) |
-| 人工充值 | `topup` | — | +N | (t, 'topup_'+凭证号, NULL, topup) |
+| 时机                              | type      | 级别                     | amount                              | 幂等键 `(tenantId, runId, jobId, type)` |
+| --------------------------------- | --------- | ------------------------ | ----------------------------------- | --------------------------------------- |
+| 迁移 0003 / 新租户建立            | `opening` | 租户（runId/jobId=NULL） | +当时 pointsBalance                 | (t, NULL, NULL, opening)                |
+| 入队事务（与 Run/Job 创建同事务） | `hold`    | Run（jobId=NULL）        | −预估总额                           | (t, run, NULL, hold)                    |
+| Job 成功落库事务                  | `settle`  | Job                      | 0（hold 已扣，settle 记确认；见下） | (t, run, job, settle)                   |
+| Job 失败终态事务                  | `refund`  | Job                      | +单张点数                           | (t, run, job, refund)                   |
+| 人工充值                          | `topup`   | —                        | +N                                  | (t, 'topup_'+凭证号, NULL, topup)       |
 
 记账口径（定稿）：**hold 即时从 `pointsBalance` 条件扣减**（`UPDATE tenants SET points_balance = points_balance - :est WHERE id=:t AND points_balance >= :est`，0 行 = 40201 点数不足）；settle 金额记 0 仅作确认凭证（余额不再变动）；refund 按失败 Job 单张点数回加。**opening 基线（迁移 0003）使 `pointsBalance == Σ amount` 自基线起严格成立**；对账任务发现不一致 → 以流水重放修复快照 + 告警。
 
@@ -57,30 +57,30 @@ queued ──► running ──► succeeded
 
 ### 5.1 API 请求级
 
-| code | 场景 | message 示例 |
-|---|---|---|
-| 0 | 成功 | ok / accepted |
-| 40001 | 参数无效（mode/ratio/quality/candidateCount 等） | candidateCount 取值 1–4 |
-| 40002 | 模板不存在 | 模板不存在 |
-| 40003 | 槽位/变量缺失 | 模板需要 1 个必填图片槽位 |
-| 40004 | 项目不存在 | 项目不存在 |
-| 40101 | 未授权 | 令牌无效 |
-| 40201 | 点数不足 | 点数不足：需 N，余 M |
-| 40401 | 资源不存在（run/asset） | 资源不存在 |
-| 50000 | 内部错误（兜底） | 系统繁忙，请稍后再试 |
+| code  | 场景                                             | message 示例              |
+| ----- | ------------------------------------------------ | ------------------------- |
+| 0     | 成功                                             | ok / accepted             |
+| 40001 | 参数无效（mode/ratio/quality/candidateCount 等） | candidateCount 取值 1–4   |
+| 40002 | 模板不存在                                       | 模板不存在                |
+| 40003 | 槽位/变量缺失                                    | 模板需要 1 个必填图片槽位 |
+| 40004 | 项目不存在                                       | 项目不存在                |
+| 40101 | 未授权                                           | 令牌无效                  |
+| 40201 | 点数不足                                         | 点数不足：需 N，余 M      |
+| 40401 | 资源不存在（run/asset）                          | 资源不存在                |
+| 50000 | 内部错误（兜底）                                 | 系统繁忙，请稍后再试      |
 
 ### 5.2 Job 级（`jobs[].errorCode` 新字段，S4 实现；`error` 原文仅日志）
 
-| errorCode | errorKind | 用户可见文案 | 处置 |
-|---|---|---|---|
-| JOB_ENGINE_TIMEOUT | retryable | 引擎响应超时，已自动重试 | 退避重试→耗尽落死信 |
-| JOB_ENGINE_BUSY | retryable | 引擎繁忙（限流/5xx），已自动重试 | 同上 |
-| JOB_ENGINE_REJECTED | moderation_rejected | 内容未通过引擎审核 | 不重试；退还点数 |
-| JOB_ENGINE_ERROR | non_retryable | 引擎返回错误 | 不重试；退还点数 |
-| JOB_INPUT_INVALID | non_retryable | 输入素材缺失或已删除 | 不重试；退还点数 |
-| JOB_RESULT_INVALID | retryable | 结果图片校验失败，已自动重试 | 魔数/下载失败归此 |
-| JOB_STORAGE_ERROR | retryable | 结果保存失败，已自动重试 | 存储层异常 |
-| JOB_INTERRUPTED | retryable | 执行中断已恢复/待恢复 | Worker 崩溃恢复路径 |
+| errorCode           | errorKind           | 用户可见文案                     | 处置                |
+| ------------------- | ------------------- | -------------------------------- | ------------------- |
+| JOB_ENGINE_TIMEOUT  | retryable           | 引擎响应超时，已自动重试         | 退避重试→耗尽落死信 |
+| JOB_ENGINE_BUSY     | retryable           | 引擎繁忙（限流/5xx），已自动重试 | 同上                |
+| JOB_ENGINE_REJECTED | moderation_rejected | 内容未通过引擎审核               | 不重试；退还点数    |
+| JOB_ENGINE_ERROR    | non_retryable       | 引擎返回错误                     | 不重试；退还点数    |
+| JOB_INPUT_INVALID   | non_retryable       | 输入素材缺失或已删除             | 不重试；退还点数    |
+| JOB_RESULT_INVALID  | retryable           | 结果图片校验失败，已自动重试     | 魔数/下载失败归此   |
+| JOB_STORAGE_ERROR   | retryable           | 结果保存失败，已自动重试         | 存储层异常          |
+| JOB_INTERRUPTED     | retryable           | 执行中断已恢复/待恢复            | Worker 崩溃恢复路径 |
 
 ## 6 S0 完成判定
 

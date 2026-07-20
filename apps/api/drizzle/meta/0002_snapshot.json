@@ -147,12 +147,7 @@
         "credit_tx_uq": {
           "name": "credit_tx_uq",
           "nullsNotDistinct": true,
-          "columns": [
-            "tenant_id",
-            "run_id",
-            "job_id",
-            "type"
-          ]
+          "columns": ["tenant_id", "run_id", "job_id", "type"]
         }
       },
       "policies": {},

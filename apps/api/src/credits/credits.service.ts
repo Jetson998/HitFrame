@@ -46,7 +46,13 @@ export class CreditsService {
   }
 
   /** 结算（Job 级，成功落库事务内）：amount=0 确认凭证，余额不变。 */
-  async settle(tx: Db, tenantId: string, runId: string, jobId: string, pointsCost: number): Promise<void> {
+  async settle(
+    tx: Db,
+    tenantId: string,
+    runId: string,
+    jobId: string,
+    pointsCost: number,
+  ): Promise<void> {
     await this.insertIdempotent(tx, {
       tenantId,
       runId,
@@ -58,7 +64,13 @@ export class CreditsService {
   }
 
   /** 退还（Job 级，失败终态事务内）：按单 Job 点数回加余额。 */
-  async refund(tx: Db, tenantId: string, runId: string, jobId: string, amount: number): Promise<void> {
+  async refund(
+    tx: Db,
+    tenantId: string,
+    runId: string,
+    jobId: string,
+    amount: number,
+  ): Promise<void> {
     const inserted = await this.insertIdempotent(tx, {
       tenantId,
       runId,
