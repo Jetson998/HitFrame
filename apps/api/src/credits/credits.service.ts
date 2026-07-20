@@ -88,28 +88,38 @@ export class CreditsService {
     }
   }
 
-  /** 对账：pointsBalance == Σ amount；不一致以流水重放修复快照并告警。返回是否一致。 */
-  async reconcile(tenantId: string): Promise<boolean> {
-    const [row] = await this.db
-      .select({
-        balance: tenants.pointsBalance,
-        ledger: sql<number>`(
-          SELECT COALESCE(SUM(${creditTransactions.amount}), 0)::int
-          FROM ${creditTransactions} WHERE ${creditTransactions.tenantId} = ${tenantId}
-        )`,
-      })
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    if (!row) return false;
-    if (row.balance === row.ledger) return true;
-    this.log.error(
-      `reconcile mismatch tenant=${tenantId}: balance=${row.balance} ledger=${row.ledger} → 以流水修复快照`,
-    );
-    await this.db
-      .update(tenants)
-      .set({ pointsBalance: row.ledger })
-      .where(eq(tenants.id, tenantId));
-    return false;
+  /**
+   * 对账：pointsBalance == Σ amount。全程在单事务内 SELECT … FOR UPDATE 锁住租户行，
+   * 锁定后再重新聚合流水比对（S2 P1：防读取与修复之间有并发 hold/refund 提交被覆盖）。
+   * repair=false 时只告警不改写快照（人工维护窗口修复）。返回是否一致。
+   */
+  async reconcile(tenantId: string, repair = true): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      // 先锁租户行，阻塞并发的 hold/settle/refund 事务，直到本事务结束
+      const [locked] = await tx
+        .select({ balance: tenants.pointsBalance })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId))
+        .for('update');
+      if (!locked) return false;
+      // 锁定后重新聚合，读到的是被锁点之前的全部已提交流水
+      const [{ ledger }] = await tx
+        .select({
+          ledger: sql<number>`COALESCE(SUM(${creditTransactions.amount}), 0)::int`,
+        })
+        .from(creditTransactions)
+        .where(eq(creditTransactions.tenantId, tenantId));
+      if (locked.balance === ledger) return true;
+      this.log.error(
+        `reconcile mismatch tenant=${tenantId}: balance=${locked.balance} ledger=${ledger}${
+          repair ? ' → 以流水修复快照' : ' → 仅告警（人工修复）'
+        }`,
+      );
+      if (repair) {
+        await tx.update(tenants).set({ pointsBalance: ledger }).where(eq(tenants.id, tenantId));
+      }
+      return false;
+    });
   }
 
   /**

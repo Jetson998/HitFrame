@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "dev:api": "npm run dev -w @hitframe/api",
-    "dev:web": "npm run dev -w @hitframe/web"
+    "dev:web": "npm run dev -w @hitframe/web",
+    "dev:worker": "node apps/api/dist/worker-main.js"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

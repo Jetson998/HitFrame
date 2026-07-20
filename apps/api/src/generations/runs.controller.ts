@@ -3,13 +3,14 @@ import { and, eq, inArray, lt } from 'drizzle-orm';
 import { RunStatusDto } from '@hitframe/shared';
 import { DB, Db } from '../db/db.module';
 import { assets, generationJobs, generationRuns } from '../db/schema';
-import { ExecutorService, ORPHAN_TIMEOUT_MS } from './executor.service';
+import { ORPHAN_TIMEOUT_MS } from './executor.service';
+import { JobRunnerService } from './job-runner.service';
 
 @Controller('runs')
 export class RunsController {
   constructor(
     @Inject(DB) private readonly db: Db,
-    private readonly executor: ExecutorService,
+    private readonly runner: JobRunnerService,
   ) {}
 
   /** A0 轮询端点；内置孤儿超时判定（running 超时 → failed + refund，S1 起统一走执行器退点路径） */
@@ -24,9 +25,9 @@ export class RunsController {
     });
     if (timedOutJobs.length > 0) {
       for (const job of timedOutJobs) {
-        await this.executor.failJobWithRefund(job, 'orphaned: timeout', 'retryable');
+        await this.runner.failJobWithRefund(job, 'orphaned: timeout', 'retryable');
       }
-      await this.executor.aggregateRun(runId);
+      await this.runner.aggregateRun(runId);
     }
 
     const run = await this.db.query.generationRuns.findFirst({

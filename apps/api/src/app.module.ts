@@ -7,6 +7,8 @@ import { StorageService } from './storage/storage.service';
 import { CreditsService } from './credits/credits.service';
 import { GenerationsService } from './generations/generations.service';
 import { ExecutorService } from './generations/executor.service';
+import { JobRunnerService } from './generations/job-runner.service';
+import { QueueDispatcherService } from './queue/dispatcher.service';
 import { GenerationsController } from './generations/generations.controller';
 import { RunsController } from './generations/runs.controller';
 import { AssetsController } from './assets/assets.controller';
@@ -32,7 +34,9 @@ import { ShowcaseController } from './showcase.controller';
     StorageService,
     CreditsService,
     GenerationsService,
+    JobRunnerService,
     ExecutorService,
+    QueueDispatcherService,
   ],
 })
 export class AppModule {}

@@ -16,11 +16,13 @@ import {
  *   [fail]             → retryable 错误
  *   [fail:non_retryable] → non_retryable 错误
  *   [fail:moderation]  → moderation_rejected 错误
+ *   [fail:alternate]   → 每第 2 次调用抛 non_retryable（partial 场景专用）
  *   [slow:5000]        → 延迟 5000ms 后成功（默认延迟 300ms）
  */
 export class FakeProvider implements ImageProvider {
   readonly name = 'fake';
   readonly model = 'fake-image-1';
+  private alternateCounter = 0;
 
   async generate(input: GenerateInput): Promise<ImageResult> {
     return this.respond(input.prompt);
@@ -36,6 +38,9 @@ export class FakeProvider implements ImageProvider {
 
     if (prompt.includes('[fail:non_retryable]')) {
       throw new ProviderError('fake: injected non-retryable failure', 'non_retryable');
+    }
+    if (prompt.includes('[fail:alternate]') && ++this.alternateCounter % 2 === 0) {
+      throw new ProviderError('fake: injected alternate failure', 'non_retryable');
     }
     if (prompt.includes('[fail:moderation]')) {
       throw new ProviderError('fake: injected moderation rejection', 'moderation_rejected');

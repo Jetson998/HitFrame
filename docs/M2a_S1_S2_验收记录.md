@@ -1,0 +1,44 @@
+# M2a S1 验收记录（补录）+ S2 验收记录
+
+> 2026-07-20 ｜ 全部场景走 FakeProvider（零真实额度、零上游流量）｜ S2 套件已固化为可重复脚本：`scripts/accept/s2-queue.mjs`（`node --env-file=.env scripts/accept/s2-queue.mjs`）
+
+## S1 验收（2026-07-20 现场执行，本文档为补录存档）
+
+环境：inline 执行器 + FakeProvider + EXECUTOR_CONCURRENCY=2。
+
+| # | 场景 | 结果 | 证据 |
+|---|---|---|---|
+| 1 | 同 idempotencyKey 并发 6 连发 | ✅ | 全部 202，唯一 runId 数 = 1，仅 1 笔 hold |
+| 2 | 并发闸门 | ✅ | 4 个 3s 任务总耗时 6.2s（严格两批 = 上限 2 生效） |
+| 3 | 失败注入分流 | ✅ | `[fail]`→retryable、`[fail:moderation]`→moderation_rejected；失败即退款，余额净不变 |
+| 4 | 32 并发抢余额（high×4=16 点/单，余额 462） | ✅ | 通过 28 = 容量 floor(462/16)，4 个 402，余额全程 ≥0 零透支 |
+| 5 | 账实恒等 | ✅ | 压测全程与清场后 `pointsBalance == Σ流水`（470=470） |
+
+遗留（评审已提出、S2 修复）：非原子抢占与 reconcile 无锁 → 见下文 S2 P1。
+
+## S2 验收（队列内核，`scripts/accept/s2-queue.mjs` 10/10 通过，110s）
+
+环境：EXECUTION_MODE=queue + Valkey 8 + BullMQ（attempts=3，退避 5s/10s/20s）+ 独立 Worker（concurrency=2）+ FakeProvider。
+
+**P1 阶段门（评审要求，已实现并验证）：**
+- **CAS 原子抢占**：`UPDATE … SET status='running', attempts=attempts+1 WHERE id=:id AND status='queued' RETURNING *`——只有拿到返回行的执行者调用 Provider；running 残留恢复用 attempts 值二次 CAS，同抢仅一个胜出（场景 3 双并发 CAS 实测胜者=1、attempts=1）。
+- **安全 reconcile**：单事务 `SELECT … FOR UPDATE` 锁租户行后重新聚合流水再比对修复，支持 `repair=false` 只告警模式。
+
+| # | 必验场景（评审清单） | 结果 | 证据 |
+|---|---|---|---|
+| 1 | PG 提交后、queue.add 前崩溃 → Reconciler 补投 | ✅ | SQL 伪造 pending+hold 现场，30s 内补投并 succeeded |
+| 2 | 同一 jobId 重复投递，Provider 只调用一次 | ✅ | 绕过 BullMQ 幂等直发重复消息，资产仍=1（CAS 兜底） |
+| 3 | 两个执行者同抢一个 Job，仅一个 CAS 成功 | ✅ | 并发双 UPDATE 胜者=1，attempts=1 |
+| 4 | Worker 执行中 SIGKILL，stalled/retry 恢复 | ✅ | 8s 慢任务执行中杀 Worker，新 Worker 恢复认领后 succeeded |
+| 5 | retryable ≤3 次，最终失败只退款一次 | ✅ | attempts=3、refund 行=1、余额净不变 |
+| 6 | non_retryable/moderation 不重试 | ✅ | attempts 均=1，errorKind 正确 |
+| 7 | API 重启不影响执行中 Worker | ✅ | 执行中杀 API 再启，Job 照常 succeeded |
+| 8 | Worker 停机 API 照常接单存 pending | ✅ | 停机时 202 + queued，Worker 回来即消化 |
+| 9 | partial：成功 Job settle、失败 Job refund | ✅ | `[fail:alternate]` 2 候选：settle=1、refund=1、净扣 2 点 |
+| 10 | 队列模式三链路复验 + 账实恒等 | ✅ | t2i(×2)/i2i/template 全 succeeded，账 442=442；清场后终核 462=462 |
+
+**架构要点**：BullMQ payload 只带 jobId（DB 是唯一状态源）；`BullMQ jobId = GenerationJob.id` 队列层去重；`EXECUTION_MODE=queue|inline` 互斥（queue 模式下 inline 执行器 idle，作回滚开关）；Worker SIGTERM 优雅停机；stalled 超限兜底收敛 failed+refund。
+
+## 结论
+
+S2 完成，两个 P1 阶段门（CAS 抢占 / 安全 reconcile）关闭。ADR-9 进程内执行器退役为回滚开关。下一阶段 S3：StorageAdapter + SeaweedFS/客户 OSS + 签名 URL + M1 存量迁移。

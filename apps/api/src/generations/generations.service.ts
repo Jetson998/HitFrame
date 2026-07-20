@@ -12,6 +12,7 @@ import { DB, Db } from '../db/db.module';
 import { generationJobs, generationRuns, nodeTemplates, projects, tenants } from '../db/schema';
 import { CreditsService } from '../credits/credits.service';
 import { ExecutorService } from './executor.service';
+import { QueueDispatcherService } from '../queue/dispatcher.service';
 
 const TENANT = 'default'; // M1 单租户
 
@@ -33,6 +34,7 @@ export class GenerationsService {
     @Inject(DB) private readonly db: Db,
     private readonly executor: ExecutorService,
     private readonly credits: CreditsService,
+    private readonly dispatcher: QueueDispatcherService,
   ) {}
 
   async create(dto: GenerationRequestDto, origin: RunOrigin): Promise<GenerationAcceptedDto> {
@@ -104,8 +106,9 @@ export class GenerationsService {
       throw err;
     }
 
-    // 202 之后由进程内执行器接管（ADR-9：非持久，重启由孤儿清理兜底）
-    void this.executor.execute(runId);
+    // 202 之后按 EXECUTION_MODE 互斥派发：queue → BullMQ（S2）；inline → 进程内执行器（回滚开关）
+    if (this.dispatcher.enabled) void this.dispatcher.dispatchRun(runId);
+    else void this.executor.execute(runId);
 
     return {
       runId,

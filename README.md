@@ -50,7 +50,7 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 - [x] S0.1 opening 流水基线（迁移 0003；`pointsBalance = Σ流水` 自基线起严格成立）+ 记账口径修正
 - [x] S1 CreditTransaction 预扣/结算/退还 + 入队 outbox（hold 条件扣减防透支；失败/孤儿统一 refund；fake 压测：并发闸门=2、注入分流、32 并发抢余额零透支）
 - [x] 测试加固（2026-07-20 拍板）：**FakeProvider**（`IMAGE_PROVIDER=fake`，秒级占位图，支持 `[fail]` / `[fail:non_retryable]` / `[fail:moderation]` / `[slow:ms]` 注入）+ **执行器全局并发信号量**（默认 2，`EXECUTOR_CONCURRENCY` 可调，S2 后由 Worker concurrency 取代）。破坏性/压测一律走 fake，真实引擎只用于单张回归与演示图
-- [ ] S2 BullMQ/Valkey/Worker 迁移
+- [x] S2 BullMQ/Valkey/Worker 迁移（CAS 抢占 + FOR UPDATE reconcile 两 P1 阶段门关闭；EXECUTION_MODE=queue|inline 互斥回滚开关；破坏性验收 10/10：`scripts/accept/s2-queue.mjs`，记录 `docs/M2a_S1_S2_验收记录.md`）
 - [ ] S3 StorageAdapter + SeaweedFS/OSS + 存量迁移
 - [ ] S4 重试/死信/恢复/观测 + 错误码收敛实现
 - [ ] S5 三模板 + Agent 规则路由
