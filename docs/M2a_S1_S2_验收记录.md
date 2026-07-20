@@ -39,6 +39,16 @@
 
 **架构要点**：BullMQ payload 只带 jobId（DB 是唯一状态源）；`BullMQ jobId = GenerationJob.id` 队列层去重；`EXECUTION_MODE=queue|inline` 互斥（queue 模式下 inline 执行器 idle，作回滚开关）；Worker SIGTERM 优雅停机；stalled 超限兜底收敛 failed+refund。
 
+**执行语义口径（S2.1 评审收口）**：
+- **重复投递**：数据库资产与结算严格幂等；Provider 正常情况下只调用一次（CAS 抢占拦截）。
+- **Worker 崩溃 / stalled 恢复**：**至少一次（at-least-once）执行**——若旧 Worker 在 BullMQ 锁过期后仍未真正退出，新 Worker 恢复认领时 Provider 可能被再次调用；数据库最终结果仍幂等（终态 CAS 保证只产一份资产/一笔退款），但**外部引擎可能重复调用并产生一次额外消耗**。此项登记为 M2a 已知风险（技术方案风险表 R11）；若供应商支持请求幂等键，后续以 `jobId` 作为 Provider 幂等键消除。
+
+## S2.1 修正（评审 P1×2，2026-07-20）
+
+1. **Run 状态收敛**：`claim()` 首次 CAS 抢到 Job（含 running 恢复）后，条件更新 `generation_runs: queued → running`——修复队列模式下 Job 已执行而 `GET /runs/:runId` 仍返回 queued 的用户可见错位；
+2. **孤儿超时按模式分流**：RunsController 的 10 分钟 orphan timeout 仅 `EXECUTION_MODE=inline` 启用；queue 模式恢复/终态化由 BullMQ stalled + Reconciler 负责，轮询端点不再误杀正常长任务；
+3. 验证：fake 慢任务执行中轮询 Run 返回 running（此前为 queued）；queue 模式下超时路径不触发（代码分支 + 复跑 `s2-queue.mjs` 10/10）。
+
 ## 结论
 
-S2 完成，两个 P1 阶段门（CAS 抢占 / 安全 reconcile）关闭。ADR-9 进程内执行器退役为回滚开关。下一阶段 S3：StorageAdapter + SeaweedFS/客户 OSS + 签名 URL + M1 存量迁移。
+S2 + S2.1 完成，评审阶段门全部关闭。ADR-9 进程内执行器退役为回滚开关。下一阶段 S3：StorageAdapter + SeaweedFS/客户 OSS + 签名 URL + M1 存量迁移。

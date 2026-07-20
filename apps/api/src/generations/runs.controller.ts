@@ -5,29 +5,35 @@ import { DB, Db } from '../db/db.module';
 import { assets, generationJobs, generationRuns } from '../db/schema';
 import { ORPHAN_TIMEOUT_MS } from './executor.service';
 import { JobRunnerService } from './job-runner.service';
+import { executionMode } from '../queue/queue.constants';
 
 @Controller('runs')
 export class RunsController {
+  /** 孤儿超时兜底仅 inline 回滚模式启用（S2.1 P1）：queue 模式恢复/终态化由 BullMQ stalled + Reconciler 负责，轮询端点不得误杀正常长任务 */
+  private readonly inlineOrphanSweep = executionMode() === 'inline';
+
   constructor(
     @Inject(DB) private readonly db: Db,
     private readonly runner: JobRunnerService,
   ) {}
 
-  /** A0 轮询端点；内置孤儿超时判定（running 超时 → failed + refund，S1 起统一走执行器退点路径） */
+  /** A0 轮询端点；inline 模式内置孤儿超时判定（running 超时 → failed + refund） */
   @Get(':runId')
   async get(@Param('runId') runId: string) {
-    const timedOutJobs = await this.db.query.generationJobs.findMany({
-      where: and(
-        eq(generationJobs.runId, runId),
-        inArray(generationJobs.status, ['running']),
-        lt(generationJobs.createdAt, new Date(Date.now() - ORPHAN_TIMEOUT_MS)),
-      ),
-    });
-    if (timedOutJobs.length > 0) {
-      for (const job of timedOutJobs) {
-        await this.runner.failJobWithRefund(job, 'orphaned: timeout', 'retryable');
+    if (this.inlineOrphanSweep) {
+      const timedOutJobs = await this.db.query.generationJobs.findMany({
+        where: and(
+          eq(generationJobs.runId, runId),
+          inArray(generationJobs.status, ['running']),
+          lt(generationJobs.createdAt, new Date(Date.now() - ORPHAN_TIMEOUT_MS)),
+        ),
+      });
+      if (timedOutJobs.length > 0) {
+        for (const job of timedOutJobs) {
+          await this.runner.failJobWithRefund(job, 'orphaned: timeout', 'retryable');
+        }
+        await this.runner.aggregateRun(runId);
       }
-      await this.runner.aggregateRun(runId);
     }
 
     const run = await this.db.query.generationRuns.findFirst({

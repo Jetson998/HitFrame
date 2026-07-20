@@ -60,7 +60,10 @@ export class JobRunnerService {
       .set({ status: 'running', attempts: sql`${generationJobs.attempts} + 1` })
       .where(and(eq(generationJobs.id, jobId), eq(generationJobs.status, 'queued')))
       .returning();
-    if (first) return first;
+    if (first) {
+      await this.markRunRunning(first.runId);
+      return first;
+    }
 
     const row = await this.db.query.generationJobs.findFirst({
       where: eq(generationJobs.id, jobId),
@@ -78,7 +81,16 @@ export class JobRunnerService {
         ),
       )
       .returning();
+    if (recovered) await this.markRunRunning(recovered.runId);
     return recovered ?? null;
+  }
+
+  /** 首个抢占成功的 Job 把 Run 收敛为 running（条件更新，天然幂等无并发问题）——S2.1 P1 */
+  private async markRunRunning(runId: string): Promise<void> {
+    await this.db
+      .update(generationRuns)
+      .set({ status: 'running' })
+      .where(and(eq(generationRuns.id, runId), eq(generationRuns.status, 'queued')));
   }
 
   /** 执行已抢占的 Job；抛出 ProviderError（含 kind）或普通错误由调用方决定重试/终态 */
