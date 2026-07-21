@@ -1,5 +1,5 @@
 /**
- * M1 种子数据：默认租户（点数）+ 商品换背景模板（NodeTemplate，M3 前以种子维护）。
+ * M1 种子数据：默认租户（点数）+ 三场景模板（NodeTemplate，M3 前以种子维护）。
  * 运行：node --env-file=.env scripts/seed.mjs（可重复执行，upsert 语义）
  */
 import pg from 'pg';
@@ -43,26 +43,109 @@ const tplBg = {
   defaultParams: { inputFidelity: 'high' },
 };
 
-await pool.query(
-  `INSERT INTO node_templates (id, title, description, scene_type, endpoint, slots, vars_schema, prompt_template, default_params, version)
-   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1)
-   ON CONFLICT (id) DO UPDATE SET
-     title = EXCLUDED.title, description = EXCLUDED.description,
-     slots = EXCLUDED.slots, vars_schema = EXCLUDED.vars_schema,
-     prompt_template = EXCLUDED.prompt_template, default_params = EXCLUDED.default_params,
-     version = node_templates.version + 1, updated_at = now()`,
-  [
-    tplBg.id,
-    tplBg.title,
-    tplBg.description,
-    tplBg.sceneType,
-    tplBg.endpoint,
-    JSON.stringify(tplBg.slots),
-    JSON.stringify(tplBg.varsSchema),
-    tplBg.promptTemplate,
-    JSON.stringify(tplBg.defaultParams),
+const tplModel = {
+  id: 'tpl_model',
+  title: '模特上身 / 真人试穿',
+  description: '服装/配饰商品图 + 可选模特参考，生成模特上身效果图，用于电商详情页/营销素材。',
+  sceneType: 'model',
+  endpoint: 'edits',
+  slots: [
+    { key: 'product', label: '服装/商品图', required: true },
+    { key: 'modelRef', label: '模特参考图（可选）', required: false },
   ],
-);
+  varsSchema: [
+    {
+      key: 'modelType',
+      label: '人物风格',
+      required: false,
+      default: '时尚模特',
+      type: 'chips',
+      options: ['时尚模特', '日常穿搭', '运动健身', '商务正装', '街头潮流'],
+    },
+    {
+      key: 'pose',
+      label: '姿态',
+      required: false,
+      default: '自然站姿',
+      type: 'chips',
+      options: ['自然站姿', '侧身展示', '动态pose', '半身特写'],
+    },
+    {
+      key: 'scene',
+      label: '场景',
+      required: false,
+      default: '纯色背景',
+      type: 'chips',
+      options: ['纯色背景', '室内场景', '户外街景', '工作室'],
+    },
+  ],
+  promptTemplate:
+    '{modelType}穿着图中服装，{pose}，{scene}，时尚摄影，高质感，电商主图风格',
+  defaultParams: { inputFidelity: 'high' },
+};
+
+const tplPoster = {
+  id: 'tpl_poster',
+  title: '电商海报 / 小红书封面',
+  description: '商品图 + 标题/卖点，生成营销海报或小红书封面图，直接可用于投放。',
+  sceneType: 'poster',
+  endpoint: 'edits',
+  slots: [{ key: 'product', label: '商品图', required: true }],
+  varsSchema: [
+    {
+      key: 'title',
+      label: '标题文案',
+      required: true,
+      default: '',
+      type: 'text',
+      placeholder: '例如：夏日新品 / 限时特惠',
+    },
+    {
+      key: 'sellingPoint',
+      label: '核心卖点',
+      required: false,
+      default: '',
+      type: 'text',
+      placeholder: '例如：买二送一 / 全场包邮',
+    },
+    {
+      key: 'style',
+      label: '设计风格',
+      required: false,
+      default: '简约现代',
+      type: 'chips',
+      options: ['简约现代', '国潮风', '小清新', '高端奢华', '活力撞色'],
+    },
+  ],
+  promptTemplate:
+    '电商海报设计，标题"{title}"，{sellingPoint}，{style}风格，商品居中，文字排版清晰，营销氛围感强',
+  defaultParams: { inputFidelity: 'high' },
+};
+
+const templates = [tplBg, tplModel, tplPoster];
+
+for (const tpl of templates) {
+  await pool.query(
+    `INSERT INTO node_templates (id, title, description, scene_type, endpoint, slots, vars_schema, prompt_template, default_params, version)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,1)
+     ON CONFLICT (id) DO UPDATE SET
+       title = EXCLUDED.title, description = EXCLUDED.description,
+       slots = EXCLUDED.slots, vars_schema = EXCLUDED.vars_schema,
+       prompt_template = EXCLUDED.prompt_template, default_params = EXCLUDED.default_params,
+       version = node_templates.version + 1, updated_at = now()`,
+    [
+      tpl.id,
+      tpl.title,
+      tpl.description,
+      tpl.sceneType,
+      tpl.endpoint,
+      JSON.stringify(tpl.slots),
+      JSON.stringify(tpl.varsSchema),
+      tpl.promptTemplate,
+      JSON.stringify(tpl.defaultParams),
+    ],
+  );
+}
 
 const { rows } = await pool.query(
   `SELECT (SELECT points_balance FROM tenants WHERE id='default') AS balance,

@@ -17,9 +17,10 @@ import { TemplatesController } from './templates.controller';
 import { MeController } from './me.controller';
 import { ProjectsController } from './projects.controller';
 import { ShowcaseController } from './showcase.controller';
+import { AgentModule } from './agent/agent.module';
 
 @Module({
-  imports: [DbModule],
+  imports: [DbModule, AgentModule],
   controllers: [
     HealthController,
     GenerationsController,
