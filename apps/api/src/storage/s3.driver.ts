@@ -2,12 +2,13 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHash } from 'node:crypto';
-import type { StorageDriver, StoredObjectMeta } from './driver';
+import type { StorageDriver, StorageListItem, StoredObjectMeta } from './driver';
 
 /**
  * S3 兼容驱动：SeaweedFS（Apache-2.0）或客户 OSS（阿里云/腾讯云/AWS）通吃。
@@ -85,6 +86,26 @@ export class S3StorageDriver implements StorageDriver {
       new GetObjectCommand({ Bucket: this.bucket, Key: key }),
       { expiresIn: ttlSeconds },
     );
+  }
+
+  async list(): Promise<StorageListItem[]> {
+    const out: StorageListItem[] = [];
+    let token: string | undefined;
+    do {
+      const res = await this.client.send(
+        new ListObjectsV2Command({ Bucket: this.bucket, ContinuationToken: token }),
+      );
+      for (const o of res.Contents ?? []) {
+        if (!o.Key) continue;
+        out.push({
+          key: o.Key,
+          bytes: o.Size ?? null,
+          lastModifiedMs: o.LastModified ? o.LastModified.getTime() : null,
+        });
+      }
+      token = res.IsTruncated ? res.NextContinuationToken : undefined;
+    } while (token);
+    return out;
   }
 }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { StorageDriver, StoredObjectMeta } from './driver';
+import type { StorageDriver, StorageListItem, StoredObjectMeta } from './driver';
 import { LocalStorageDriver } from './local.driver';
 import { S3StorageDriver } from './s3.driver';
 
@@ -44,6 +44,10 @@ export class StorageService {
 
   head(key: string): Promise<StoredObjectMeta> {
     return this.driver.head(key);
+  }
+
+  list(): Promise<StorageListItem[]> {
+    return this.driver.list();
   }
 
   /** 稳定网关 URL（不随驱动变化） */

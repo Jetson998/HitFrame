@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, promises as fs } from 'node:fs';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
-import type { StorageDriver, StoredObjectMeta } from './driver';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+import type { StorageDriver, StorageListItem, StoredObjectMeta } from './driver';
 
 /** M1 本地 Volume 驱动：保留原 StorageService 行为，供回滚与开发默认。 */
 export class LocalStorageDriver implements StorageDriver {
@@ -41,6 +41,34 @@ export class LocalStorageDriver implements StorageDriver {
 
   async presign(): Promise<string | null> {
     return null; // 本地无签名：网关直接回流
+  }
+
+  async list(): Promise<StorageListItem[]> {
+    const out: StorageListItem[] = [];
+    const walk = async (dir: string): Promise<void> => {
+      let entries: import('node:fs').Dirent[];
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+      } catch {
+        return; // 根目录不存在（尚无任何对象）
+      }
+      for (const e of entries) {
+        const full = resolve(dir, e.name);
+        if (e.isDirectory()) {
+          await walk(full);
+        } else if (e.isFile()) {
+          const st = await fs.stat(full);
+          // 对象键 = 相对 root 的 posix 路径
+          out.push({
+            key: relative(this.root, full).split(sep).join('/'),
+            bytes: st.size,
+            lastModifiedMs: st.mtimeMs,
+          });
+        }
+      }
+    };
+    await walk(this.root);
+    return out;
   }
 
   private safePath(key: string): string {

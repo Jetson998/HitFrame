@@ -17,11 +17,22 @@ export interface StoredObjectMeta {
   exists: boolean;
 }
 
+/** 巡检列举项：孤儿回收据此比对 DB 资产并按 lastModified 施加宽限期 */
+export interface StorageListItem {
+  key: string;
+  bytes: number | null;
+  /** 对象最后修改时间（ms epoch）；用于宽限期判定，避免误删在途上传 */
+  lastModifiedMs: number | null;
+}
+
 export interface StorageDriver {
   readonly kind: 'local' | 's3';
 
   /** 保存对象；返回其对象键（URL 由 StorageService 统一拼稳定网关 URL） */
   save(key: string, data: Buffer, contentType?: string): Promise<void>;
+
+  /** 列举全部对象键（分页内部处理）；孤儿巡检用 */
+  list(): Promise<StorageListItem[]>;
 
   /** 读回二进制（i2i 取素材、local 网关回流用） */
   read(key: string): Promise<Buffer>;
