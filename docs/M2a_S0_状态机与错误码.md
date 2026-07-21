@@ -69,7 +69,12 @@ queued ──► running ──► succeeded
 | 40401 | 资源不存在（run/asset）                          | 资源不存在                |
 | 50000 | 内部错误（兜底）                                 | 系统繁忙，请稍后再试      |
 
-### 5.2 Job 级（`jobs[].errorCode` 新字段，S4 实现；`error` 原文仅日志）
+### 5.2 Job 级（`jobs[].errorCode` 字段，**S4 已实现**；`error` 原文仅日志）
+
+> 实现落点：`shared/JOB_ERROR_CATALOG` + `classifyJobError`；schema `error_code` 列（迁移 0004）；
+> `runs.controller` 只出 `errorCode`+`errorKind`+目录文案；全局 `AllExceptionsFilter` 兜底 50000。
+> 内部抛错点显式赋码：魔数/下载失败→`JOB_RESULT_INVALID`、槽位缺失→`JOB_INPUT_INVALID`、
+> 存储失败→`JOB_STORAGE_ERROR`、中断/恢复→`JOB_INTERRUPTED`。
 
 | errorCode           | errorKind           | 用户可见文案                     | 处置                |
 | ------------------- | ------------------- | -------------------------------- | ------------------- |

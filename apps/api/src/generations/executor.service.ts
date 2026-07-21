@@ -113,8 +113,9 @@ export class ExecutorService implements OnApplicationBootstrap {
     await engineGate.acquire();
     try {
       // CAS 原子抢占（S2 P1）：抢不到（0 行）直接退出，杜绝双调引擎/双产资产
-      const claimed = await this.runner.claim(job.id, false);
-      if (!claimed) return;
+      const result = await this.runner.claim(job.id, false);
+      if (!result) return;
+      const claimed = result.job;
       try {
         await this.runner.execute(claimed);
       } catch (err) {

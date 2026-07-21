@@ -7,6 +7,7 @@ import {
   executionMode,
   GENERATION_QUEUE,
   GenerationJobData,
+  logEvent,
   MAX_ATTEMPTS,
   redisConnection,
 } from './queue.constants';
@@ -65,6 +66,7 @@ export class QueueDispatcherService implements OnApplicationShutdown {
         .update(generationJobs)
         .set({ enqueueState: 'enqueued', queueJobId: jobId })
         .where(eq(generationJobs.id, jobId));
+      logEvent('enqueue', { jobId, runId });
     } catch (err) {
       // 投递失败留在 pending，Reconciler 下轮补投
       this.log.warn(`dispatch ${jobId} failed (reconciler will retry): ${String(err)}`);

@@ -24,3 +24,33 @@ export interface GenerationJobData {
   jobId: string;
   runId: string;
 }
+
+/** 可观测事件类型（S4.3）：贯穿入队/认领/终态/重试/退款/死信/恢复 */
+export type JobEventType =
+  | 'enqueue'
+  | 'claim'
+  | 'succeeded'
+  | 'failed'
+  | 'retry'
+  | 'refund'
+  | 'dead_letter'
+  | 'recovered';
+
+/**
+ * 结构化观测事件：单行 JSON，便于日志采集/告警聚合。
+ * 只出脱敏字段（jobId/runId/errorCode/attempts/points）；绝不含原文/路径/密钥。
+ */
+export function logEvent(
+  event: JobEventType,
+  fields: {
+    jobId?: string;
+    runId?: string;
+    errorCode?: string;
+    errorKind?: string;
+    attempts?: number;
+    points?: number;
+    mode?: string;
+  },
+): void {
+  console.log(JSON.stringify({ evt: `job.${event}`, ts: new Date().toISOString(), ...fields }));
+}

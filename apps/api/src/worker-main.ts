@@ -9,6 +9,7 @@ import { JobRunnerService } from './generations/job-runner.service';
 import {
   GENERATION_QUEUE,
   GenerationJobData,
+  logEvent,
   MAX_ATTEMPTS,
   redisConnection,
 } from './queue/queue.constants';
@@ -33,23 +34,29 @@ async function bootstrap() {
       const { jobId, runId } = job.data;
       // BullMQ 锁保证同一时刻仅本 Worker 持有该 job → DB 若仍是 running，
       // 必为失联持有者残留（stalled 重投/崩溃恢复），允许 CAS 恢复认领
-      const claimed = await runner.claim(jobId, true);
-      if (!claimed) {
+      const result = await runner.claim(jobId, true);
+      if (!result) {
         log.log(`skip ${jobId}: 未抢占到（已终态或他方持有）`);
         return;
       }
+      const claimed = result.job;
+      const attemptNo = claimed.attempts;
+      // viaRecovery = DB 仍 running 的失联持有者残留被本 Worker 恢复认领
+      logEvent(result.viaRecovery ? 'recovered' : 'claim', { jobId, runId, attempts: attemptNo });
       try {
         await runner.execute(claimed);
         await runner.aggregateRun(runId);
+        logEvent('succeeded', { jobId, runId, attempts: attemptNo });
       } catch (err) {
         const kind = err instanceof ProviderError ? err.kind : 'non_retryable';
         const message = err instanceof Error ? err.message : String(err);
         const pe = err instanceof ProviderError ? err : undefined;
-        const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? MAX_ATTEMPTS);
+        const isLastAttempt = attemptNo >= (job.opts.attempts ?? MAX_ATTEMPTS);
         if (kind === 'retryable' && !isLastAttempt) {
           // 让位下一次重试认领：running → queued，再抛错触发 BullMQ 退避
           await runner.releaseForRetry(jobId);
-          log.warn(`job ${jobId} attempt ${job.attemptsMade + 1} failed (retryable): ${message.slice(0, 160)}`);
+          logEvent('retry', { jobId, runId, attempts: attemptNo, errorKind: kind });
+          log.warn(`job ${jobId} attempt ${attemptNo} failed (retryable): ${message.slice(0, 160)}`);
           throw err;
         }
         await runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {
@@ -57,6 +64,14 @@ async function bootstrap() {
           httpStatus: pe?.httpStatus,
         });
         await runner.aggregateRun(runId);
+        // retryable 耗尽 = 落死信（removeOnFail=false，留 failed 集合可重放）
+        logEvent(kind === 'retryable' ? 'dead_letter' : 'failed', {
+          jobId,
+          runId,
+          attempts: attemptNo,
+          errorKind: kind,
+          errorCode: pe?.errorCode,
+        });
         log.warn(`job ${jobId} failed terminally (${kind}): ${message.slice(0, 160)}`);
         // non_retryable/moderation 立即终止重试；retryable 耗尽本身已是最后一次
         throw kind === 'retryable' ? err : new UnrecoverableError(message.slice(0, 300));
@@ -72,9 +87,9 @@ async function bootstrap() {
   worker.on('failed', (job, err) => {
     if (!job || !/stalled/i.test(err.message)) return;
     void (async () => {
-      const claimed = await runner.claim(job.data.jobId, true);
-      if (!claimed) return;
-      await runner.failJobWithRefund(claimed, `stalled: ${err.message}`, 'retryable', undefined, undefined, {
+      const result = await runner.claim(job.data.jobId, true);
+      if (!result) return;
+      await runner.failJobWithRefund(result.job, `stalled: ${err.message}`, 'retryable', undefined, undefined, {
         explicitCode: 'JOB_INTERRUPTED',
       });
       await runner.aggregateRun(job.data.runId);

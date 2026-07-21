@@ -61,7 +61,10 @@ export class JobRunnerService {
    * 队列重投恢复：status 停在 running（上一持有者失联，BullMQ 锁过期重投）时，
    * 以 attempts 值做 CAS 递增，仅一个恢复者胜出——两个 Worker 同抢只有一个成功。
    */
-  async claim(jobId: string, allowRunningRecovery: boolean): Promise<JobRow | null> {
+  async claim(
+    jobId: string,
+    allowRunningRecovery: boolean,
+  ): Promise<{ job: JobRow; viaRecovery: boolean } | null> {
     const [first] = await this.db
       .update(generationJobs)
       .set({ status: 'running', attempts: sql`${generationJobs.attempts} + 1` })
@@ -69,7 +72,7 @@ export class JobRunnerService {
       .returning();
     if (first) {
       await this.markRunRunning(first.runId);
-      return first;
+      return { job: first, viaRecovery: false };
     }
 
     const row = await this.db.query.generationJobs.findFirst({
@@ -77,6 +80,7 @@ export class JobRunnerService {
     });
     if (!row || row.status === 'succeeded' || row.status === 'failed') return null;
     if (!allowRunningRecovery || row.status !== 'running') return null;
+    // 到此：DB 仍 running 但无 BullMQ 处理者 = 上一持有者失联，本次为崩溃/失联恢复
     const [recovered] = await this.db
       .update(generationJobs)
       .set({ attempts: sql`${generationJobs.attempts} + 1` })
@@ -88,8 +92,9 @@ export class JobRunnerService {
         ),
       )
       .returning();
-    if (recovered) await this.markRunRunning(recovered.runId);
-    return recovered ?? null;
+    if (!recovered) return null;
+    await this.markRunRunning(recovered.runId);
+    return { job: recovered, viaRecovery: true };
   }
 
   /** 首个抢占成功的 Job 把 Run 收敛为 running（条件更新，天然幂等无并发问题）——S2.1 P1 */
