@@ -59,7 +59,7 @@ async function bootstrap() {
           log.warn(`job ${jobId} attempt ${attemptNo} failed (retryable): ${message.slice(0, 160)}`);
           throw err;
         }
-        await runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {
+        const finalCode = await runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {
           explicitCode: pe?.errorCode,
           httpStatus: pe?.httpStatus,
         });
@@ -70,7 +70,7 @@ async function bootstrap() {
           runId,
           attempts: attemptNo,
           errorKind: kind,
-          errorCode: pe?.errorCode,
+          errorCode: finalCode, // P2 修复：内部抛错推导码也进观测事件
         });
         log.warn(`job ${jobId} failed terminally (${kind}): ${message.slice(0, 160)}`);
         // non_retryable/moderation 立即终止重试；retryable 耗尽本身已是最后一次

@@ -208,7 +208,7 @@ export class JobRunnerService {
     providerName?: string,
     providerModel?: string,
     signal?: { explicitCode?: JobErrorCode; httpStatus?: number },
-  ): Promise<void> {
+  ): Promise<JobErrorCode> {
     const params = job.inputParams as unknown as JobInputParams;
     const refundAmount = POINTS_PER_IMAGE[params.quality] ?? 0;
     const errorCode = classifyJobError({
@@ -244,6 +244,7 @@ export class JobRunnerService {
         status: 'failed',
       });
     });
+    return errorCode;
   }
 
   /** 重试让位：running → queued（本次尝试失败、等待下一次重试认领） */
