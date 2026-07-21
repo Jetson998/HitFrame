@@ -1,7 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
-import { objectKey, POINTS_PER_IMAGE, Quality } from '@hitframe/shared';
+import {
+  classifyJobError,
+  JobErrorCode,
+  JobErrorKind,
+  objectKey,
+  POINTS_PER_IMAGE,
+  Quality,
+} from '@hitframe/shared';
 import { ProviderError } from '@hitframe/image-provider';
 import { DB, Db } from '../db/db.module';
 import { assets, generationJobs, generationRuns, usageEvents } from '../db/schema';
@@ -117,14 +124,33 @@ export class JobRunnerService {
     const item = result.images[0];
     const buf = item.b64 ? Buffer.from(item.b64, 'base64') : await this.downloadWithRetry(item.url!);
     const ext = sniffImage(buf);
-    if (!ext) throw new ProviderError('引擎返回内容不是有效图片（魔数校验失败）', 'retryable');
+    if (!ext)
+      throw new ProviderError(
+        '引擎返回内容不是有效图片（魔数校验失败）',
+        'retryable',
+        undefined,
+        undefined,
+        'JOB_RESULT_INVALID',
+      );
     const key = objectKey(
       job.projectId ?? 'unassigned',
       job.runId,
       job.id,
       ext === 'jpeg' ? 'jpg' : ext,
     );
-    const stored = await this.storage.save(key, buf);
+    let stored: { key: string; url: string };
+    try {
+      stored = await this.storage.save(key, buf);
+    } catch (err) {
+      // 存储层异常（对象存储不可达/写失败）：retryable，脱敏为 JOB_STORAGE_ERROR
+      throw new ProviderError(
+        `结果保存失败：${String(err)}`,
+        'retryable',
+        undefined,
+        undefined,
+        'JOB_STORAGE_ERROR',
+      );
+    }
 
     const pointsCost = POINTS_PER_IMAGE[params.quality];
     const assetId = `asset_${randomUUID()}`;
@@ -165,16 +191,26 @@ export class JobRunnerService {
     this.log.log(`job ${job.id} succeeded (${pointsCost} pts, ${buf.length} bytes)`);
   }
 
-  /** 失败终态 + refund 同事务：终态 CAS 幂等（重复调用不重复退款） */
+  /**
+   * 失败终态 + refund 同事务：终态 CAS 幂等（重复调用不重复退款）。
+   * S4：错误码由 classifyJobError 推导（显式 code 优先），对外只出 code + 目录文案；
+   * message 原文仅落 DB error 列供内部排障，绝不进 API 响应。
+   */
   async failJobWithRefund(
     job: JobRow,
     message: string,
     kind: string,
     providerName?: string,
     providerModel?: string,
+    signal?: { explicitCode?: JobErrorCode; httpStatus?: number },
   ): Promise<void> {
     const params = job.inputParams as unknown as JobInputParams;
     const refundAmount = POINTS_PER_IMAGE[params.quality] ?? 0;
+    const errorCode = classifyJobError({
+      explicitCode: signal?.explicitCode,
+      kind: kind as JobErrorKind,
+      httpStatus: signal?.httpStatus,
+    });
     await this.db.transaction(async (tx) => {
       const updated = await tx
         .update(generationJobs)
@@ -182,6 +218,7 @@ export class JobRunnerService {
           status: 'failed',
           error: message.slice(0, 1000),
           errorKind: kind,
+          errorCode,
           finishedAt: new Date(),
         })
         .where(
@@ -240,7 +277,13 @@ export class JobRunnerService {
         if (i < 4) await new Promise((s) => setTimeout(s, i * 3000));
       }
     }
-    throw new ProviderError(`结果图片下载失败：${String(lastErr)}`, 'retryable');
+    throw new ProviderError(
+      `结果图片下载失败：${String(lastErr)}`,
+      'retryable',
+      undefined,
+      undefined,
+      'JOB_RESULT_INVALID',
+    );
   }
 
   /** i2i/template：槽位资产 → 本地二进制（经 StorageAdapter，不直接碰路径） */
@@ -253,7 +296,14 @@ export class JobRunnerService {
       slotAssetIds.map(async (id) => {
         const row = byId.get(id);
         const key = (row?.meta as { storageKey?: string } | null)?.storageKey;
-        if (!row || !key) throw new ProviderError(`槽位资产不存在或无存储键：${id}`, 'non_retryable');
+        if (!row || !key)
+          throw new ProviderError(
+            `槽位资产不存在或无存储键：${id}`,
+            'non_retryable',
+            undefined,
+            undefined,
+            'JOB_INPUT_INVALID',
+          );
         return {
           data: await this.storage.read(key),
           filename: `${id}.png`,

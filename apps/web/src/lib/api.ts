@@ -23,10 +23,20 @@ export interface AssetRow {
 
 const TOKEN_KEY = 'hf_api_token';
 
+/**
+ * 运行时配置（R10 修复）：不再用 `import.meta.env.VITE_API_TOKEN`——那会在构建期
+ * 被 Vite 静态内联进 JS 产物，任何配了 token 的构建都会把令牌打进包里泄漏。
+ * 改从运行时全局 `window.__HF_CONFIG__` 读取（由部署时生成的 /config.js 注入，
+ * 独立于主包，可按环境替换、不重新构建）。缺省为空，用户仍以 TokenGate 粘贴为主。
+ */
+declare global {
+  interface Window {
+    __HF_CONFIG__?: { apiToken?: string };
+  }
+}
+
 export function getToken(): string {
-  return (
-    localStorage.getItem(TOKEN_KEY) ?? (import.meta.env.VITE_API_TOKEN as string | undefined) ?? ''
-  );
+  return localStorage.getItem(TOKEN_KEY) ?? window.__HF_CONFIG__?.apiToken ?? '';
 }
 export function setToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token.trim());

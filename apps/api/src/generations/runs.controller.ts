@@ -1,6 +1,6 @@
 import { Controller, Get, Inject, NotFoundException, Param } from '@nestjs/common';
 import { and, eq, inArray, lt } from 'drizzle-orm';
-import { RunStatusDto } from '@hitframe/shared';
+import { jobErrorMessage, JobStatusDto, RunStatusDto } from '@hitframe/shared';
 import { DB, Db } from '../db/db.module';
 import { assets, generationJobs, generationRuns } from '../db/schema';
 import { ORPHAN_TIMEOUT_MS } from './executor.service';
@@ -63,7 +63,10 @@ export class RunsController {
         status: j.status as never,
         resultAssetId: assetByJob.get(j.id)?.id,
         resultUrl: j.resultUrl ?? undefined,
-        error: j.error ?? undefined,
+        // S4 脱敏：只出稳定 code + 目录文案；DB 的 error 原文（路径/上游/密钥）绝不回显
+        errorCode: (j.errorCode as JobStatusDto['errorCode']) ?? undefined,
+        errorKind: (j.errorKind as JobStatusDto['errorKind']) ?? undefined,
+        error: jobErrorMessage(j.errorCode),
       })),
       createdAt: run.createdAt.toISOString(),
       finishedAt: run.finishedAt?.toISOString(),

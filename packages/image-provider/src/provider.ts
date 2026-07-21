@@ -1,4 +1,4 @@
-import type { Quality } from '@hitframe/shared';
+import type { JobErrorCode, Quality } from '@hitframe/shared';
 
 /** 错误三分类：M1 消费方 = 扣点（失败不扣）+ 前端文案；M2a 复用为重试策略 */
 export type ProviderErrorKind = 'retryable' | 'non_retryable' | 'moderation_rejected';
@@ -9,6 +9,8 @@ export class ProviderError extends Error {
     public readonly kind: ProviderErrorKind,
     public readonly httpStatus?: number,
     public readonly raw?: unknown,
+    /** S4：显式错误码（内部抛错点直接指定；缺省时由 classifyJobError 从 kind/httpStatus 推导） */
+    public readonly errorCode?: JobErrorCode,
   ) {
     super(message);
     this.name = 'ProviderError';

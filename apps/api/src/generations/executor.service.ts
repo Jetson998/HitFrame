@@ -66,7 +66,9 @@ export class ExecutorService implements OnApplicationBootstrap {
       where: inArray(generationJobs.status, ['running']),
     });
     for (const job of interrupted) {
-      await this.runner.failJobWithRefund(job, 'orphaned: process restarted', 'retryable');
+      await this.runner.failJobWithRefund(job, 'orphaned: process restarted', 'retryable', undefined, undefined, {
+        explicitCode: 'JOB_INTERRUPTED',
+      });
     }
     if (interrupted.length > 0) {
       const runIds = [...new Set(interrupted.map((o) => o.runId))];
@@ -119,7 +121,11 @@ export class ExecutorService implements OnApplicationBootstrap {
         // inline 模式无重试（M1 语义）：一次失败即终态 + refund
         const kind = err instanceof ProviderError ? err.kind : 'non_retryable';
         const message = err instanceof Error ? err.message : String(err);
-        await this.runner.failJobWithRefund(claimed, message, kind);
+        const pe = err instanceof ProviderError ? err : undefined;
+        await this.runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {
+          explicitCode: pe?.errorCode,
+          httpStatus: pe?.httpStatus,
+        });
         this.log.warn(`job ${job.id} failed (${kind}): ${message.slice(0, 200)}`);
       }
     } finally {

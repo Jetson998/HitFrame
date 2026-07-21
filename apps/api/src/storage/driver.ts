@@ -11,7 +11,7 @@
 export interface StoredObjectMeta {
   /** 字节数（不存在时为 null） */
   bytes: number | null;
-  /** 内容哈希：local=sha256 hex；s3=ETag（去引号，多为 MD5，用于快速比对） */
+  /** 内容哈希：local=sha256 hex；s3 优先返回写入的 sha256 元数据，缺失时回退 ETag */
   checksum: string | null;
   /** 是否存在 */
   exists: boolean;

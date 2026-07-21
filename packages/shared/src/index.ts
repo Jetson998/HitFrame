@@ -18,6 +18,68 @@ export type Ratio = '1:1' | '3:4' | '4:3' | '9:16';
 export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
 export type RunStatus = 'queued' | 'running' | 'partial' | 'succeeded' | 'failed';
 
+// ---- S4 Job 级错误码（对外只出 code + 用户文案；原文/路径/密钥仅进日志） ----
+
+export type JobErrorKind = 'retryable' | 'non_retryable' | 'moderation_rejected';
+
+export type JobErrorCode =
+  | 'JOB_ENGINE_TIMEOUT'
+  | 'JOB_ENGINE_BUSY'
+  | 'JOB_ENGINE_REJECTED'
+  | 'JOB_ENGINE_ERROR'
+  | 'JOB_INPUT_INVALID'
+  | 'JOB_RESULT_INVALID'
+  | 'JOB_STORAGE_ERROR'
+  | 'JOB_INTERRUPTED';
+
+export interface JobErrorEntry {
+  kind: JobErrorKind;
+  /** 用户可见文案（脱敏后对外的唯一错误说明） */
+  message: string;
+}
+
+/** JOB_* 错误码目录（S0 §5.2 定稿）：code → {kind, 用户文案}。对外文案不含任何内部细节。 */
+export const JOB_ERROR_CATALOG: Record<JobErrorCode, JobErrorEntry> = {
+  JOB_ENGINE_TIMEOUT: { kind: 'retryable', message: '引擎响应超时，已自动重试' },
+  JOB_ENGINE_BUSY: { kind: 'retryable', message: '引擎繁忙，已自动重试' },
+  JOB_ENGINE_REJECTED: { kind: 'moderation_rejected', message: '内容未通过引擎审核' },
+  JOB_ENGINE_ERROR: { kind: 'non_retryable', message: '引擎返回错误' },
+  JOB_INPUT_INVALID: { kind: 'non_retryable', message: '输入素材缺失或已删除' },
+  JOB_RESULT_INVALID: { kind: 'retryable', message: '结果图片校验失败，已自动重试' },
+  JOB_STORAGE_ERROR: { kind: 'retryable', message: '结果保存失败，已自动重试' },
+  JOB_INTERRUPTED: { kind: 'retryable', message: '执行中断，已恢复或待恢复' },
+};
+
+/** 用户可见文案（未知 code 落兜底文案，绝不回显原文） */
+export function jobErrorMessage(code?: string | null): string | undefined {
+  if (!code) return undefined;
+  return JOB_ERROR_CATALOG[code as JobErrorCode]?.message ?? '生成失败，请重试';
+}
+
+/**
+ * 由错误信号推导 JOB_* 错误码（S4）。显式 code 优先；否则按 kind + httpStatus 归类。
+ * 只吃原始信号（不依赖 ProviderError 类型，避免循环依赖）。
+ * 中断/恢复路径（Worker 崩溃、orphan、stalled）由调用方显式传 JOB_INTERRUPTED；
+ * 未预期内部异常按 kind='non_retryable' 落 JOB_ENGINE_ERROR（安全：不自动重试、退点）。
+ */
+export function classifyJobError(signal: {
+  explicitCode?: JobErrorCode;
+  kind?: JobErrorKind;
+  httpStatus?: number;
+}): JobErrorCode {
+  if (signal.explicitCode) return signal.explicitCode;
+  switch (signal.kind) {
+    case 'moderation_rejected':
+      return 'JOB_ENGINE_REJECTED';
+    case 'retryable':
+      // 408 超时归 TIMEOUT；429/5xx 及其余 retryable 归 BUSY
+      return signal.httpStatus === 408 ? 'JOB_ENGINE_TIMEOUT' : 'JOB_ENGINE_BUSY';
+    case 'non_retryable':
+    default:
+      return 'JOB_ENGINE_ERROR';
+  }
+}
+
 // ---- 唯一口径映射 ----
 
 /** 画质 → 点数/张（技术方案 A0 画质档位映射表） */
@@ -84,6 +146,11 @@ export interface JobStatusDto {
   status: JobStatus;
   resultAssetId?: string;
   resultUrl?: string;
+  /** S4：稳定错误码（前端据此本地化/分支）；无错误时省略 */
+  errorCode?: JobErrorCode;
+  /** S4：重试策略分类（retryable/non_retryable/moderation_rejected） */
+  errorKind?: JobErrorKind;
+  /** S4：脱敏后的用户可见文案（来自 JOB_ERROR_CATALOG，绝不含原文/路径/密钥） */
   error?: string;
 }
 

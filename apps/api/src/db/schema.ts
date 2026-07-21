@@ -78,8 +78,9 @@ export const generationJobs = pgTable('generation_jobs', {
   status: text('status').notNull(), // queued|running|succeeded|failed
   resultUrl: text('result_url'), // 转存后的自有 URL（永不存引擎临时 URL）
   pointsCost: integer('points_cost'),
-  error: text('error'),
+  error: text('error'), // 原文（供应商/内部）——仅内部排障，绝不出 API
   errorKind: text('error_kind'), // retryable | non_retryable | moderation_rejected
+  errorCode: text('error_code'), // S4：JOB_* 稳定错误码（对外只出 code + 目录文案）
   // ---- M2a S0 起：队列执行与 outbox（M2a 方案 §二/§三）----
   attempts: integer('attempts').notNull().default(0), // Worker 已尝试次数
   queueJobId: text('queue_job_id'), // BullMQ 关联（约定 = job.id，留列便于排障）

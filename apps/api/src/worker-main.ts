@@ -44,6 +44,7 @@ async function bootstrap() {
       } catch (err) {
         const kind = err instanceof ProviderError ? err.kind : 'non_retryable';
         const message = err instanceof Error ? err.message : String(err);
+        const pe = err instanceof ProviderError ? err : undefined;
         const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? MAX_ATTEMPTS);
         if (kind === 'retryable' && !isLastAttempt) {
           // 让位下一次重试认领：running → queued，再抛错触发 BullMQ 退避
@@ -51,7 +52,10 @@ async function bootstrap() {
           log.warn(`job ${jobId} attempt ${job.attemptsMade + 1} failed (retryable): ${message.slice(0, 160)}`);
           throw err;
         }
-        await runner.failJobWithRefund(claimed, message, kind);
+        await runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {
+          explicitCode: pe?.errorCode,
+          httpStatus: pe?.httpStatus,
+        });
         await runner.aggregateRun(runId);
         log.warn(`job ${jobId} failed terminally (${kind}): ${message.slice(0, 160)}`);
         // non_retryable/moderation 立即终止重试；retryable 耗尽本身已是最后一次
@@ -70,7 +74,9 @@ async function bootstrap() {
     void (async () => {
       const claimed = await runner.claim(job.data.jobId, true);
       if (!claimed) return;
-      await runner.failJobWithRefund(claimed, `stalled: ${err.message}`, 'retryable');
+      await runner.failJobWithRefund(claimed, `stalled: ${err.message}`, 'retryable', undefined, undefined, {
+        explicitCode: 'JOB_INTERRUPTED',
+      });
       await runner.aggregateRun(job.data.runId);
       log.warn(`job ${job.data.jobId} stalled beyond limit → failed+refund`);
     })();
