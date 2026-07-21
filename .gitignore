@@ -1,6 +1,7 @@
 node_modules/
 dist/
-storage/
+# 运行时对象存储 Volume（仅仓库根的 ./storage，不含 apps/api/src/storage 源码）
+/storage/
 .env
 .env.local
 .env.*.local

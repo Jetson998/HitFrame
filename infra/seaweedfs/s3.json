@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "hitframe",
+      "credentials": [
+        {
+          "accessKey": "hitframe-dev",
+          "secretKey": "hitframe-dev-secret"
+        }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

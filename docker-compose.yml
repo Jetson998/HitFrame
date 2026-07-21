@@ -23,6 +23,26 @@ services:
       - valkeydata:/data
     restart: unless-stopped
 
+  # 对象存储（Apache-2.0）：S3 兼容网关，供 STORAGE_DRIVER=s3 使用。
+  # 生产可换客户 OSS（阿里云/腾讯云/AWS），仅改 .env 的 S3_* 即可，代码不变。
+  seaweedfs:
+    image: chrislusf/seaweedfs:3.68
+    command:
+      - server
+      - -dir=/data
+      - -s3
+      - -s3.config=/etc/seaweedfs/s3.json
+      - -s3.port=8333
+      - -master.volumeSizeLimitMB=1024
+    ports:
+      - '8333:8333' # S3 API
+      - '8888:8888' # filer（调试可选）
+    volumes:
+      - seaweeddata:/data
+      - ./infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    restart: unless-stopped
+
 volumes:
   pgdata:
   valkeydata:
+  seaweeddata:

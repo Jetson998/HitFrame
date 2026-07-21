@@ -51,7 +51,8 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 - [x] S1 CreditTransaction 预扣/结算/退还 + 入队 outbox（hold 条件扣减防透支；失败/孤儿统一 refund；fake 压测：并发闸门=2、注入分流、32 并发抢余额零透支）
 - [x] 测试加固（2026-07-20 拍板）：**FakeProvider**（`IMAGE_PROVIDER=fake`，秒级占位图，支持 `[fail]` / `[fail:non_retryable]` / `[fail:moderation]` / `[slow:ms]` 注入）+ **执行器全局并发信号量**（默认 2，`EXECUTOR_CONCURRENCY` 可调，S2 后由 Worker concurrency 取代）。破坏性/压测一律走 fake，真实引擎只用于单张回归与演示图
 - [x] S2 BullMQ/Valkey/Worker 迁移（CAS 抢占 + FOR UPDATE reconcile 两 P1 阶段门关闭；EXECUTION_MODE=queue|inline 互斥回滚开关；破坏性验收 10/10：`scripts/accept/s2-queue.mjs`，记录 `docs/M2a_S1_S2_验收记录.md`）
-- [ ] S3 StorageAdapter + SeaweedFS/OSS + 存量迁移
+- [x] S2.1 评审修正（claim 后 Run queued→running 条件更新；queue 模式关闭轮询孤儿判定，交由 BullMQ stalled+Reconciler；at-least-once 执行语义入档，风险 R11）
+- [x] S3 StorageAdapter 双驱动（Local/S3）+ SeaweedFS/客户 OSS + 稳定网关 `/files/{key}`（s3 302→短时效签名，过期即刷新）+ 存量迁移（幂等+校验和+三方一致）；验收 9/9：`scripts/accept/s3-storage.mjs`，迁移 `scripts/migrate/local-to-s3.mjs`，记录 `docs/M2a_S3_验收记录.md`
 - [ ] S4 重试/死信/恢复/观测 + 错误码收敛实现
 - [ ] S5 三模板 + Agent 规则路由
 - [ ] S6 种子客户验收
