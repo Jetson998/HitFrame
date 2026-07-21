@@ -97,14 +97,25 @@ async function main() {
       head = null;
     }
 
-    if (head && head.ContentLength === buf.length) {
+    // AWS SDK 把用户元数据键小写化；上传时写入的 sha256 在此读回
+    const s3Sha = head?.Metadata?.sha256 ?? null;
+    const bytesMatch = head?.ContentLength === buf.length;
+    // 幂等/一致判据：字节数一致 且 sha256 一致（缺 sha256 元数据视为不一致，需重传补齐）
+    if (head && bytesMatch && s3Sha === sha) {
       s3Present++;
-      skipped++; // 幂等：已存在且字节数一致
+      skipped++;
       continue;
     }
     if (VERIFY_ONLY) {
       mismatch++;
-      console.log(`[verify-miss] ${key} local=${buf.length} s3=${head?.ContentLength ?? 'absent'}`);
+      const reason = !head
+        ? 'absent'
+        : !bytesMatch
+          ? `bytes local=${buf.length} s3=${head.ContentLength}`
+          : s3Sha == null
+            ? 'no-sha256-meta'
+            : `sha local=${sha.slice(0, 12)} s3=${s3Sha.slice(0, 12)}`;
+      console.log(`[verify-miss] ${key} ${reason}`);
       continue;
     }
 
@@ -117,11 +128,13 @@ async function main() {
         Metadata: { sha256: sha },
       }),
     );
-    // 上传后即刻 HeadObject 校验字节数
+    // 上传后即刻 HeadObject 校验字节数 + sha256 元数据
     const verify = await s3.send(new HeadObjectCommand({ Bucket: BUCKET, Key: key }));
-    if (verify.ContentLength !== buf.length) {
+    if (verify.ContentLength !== buf.length || verify.Metadata?.sha256 !== sha) {
       mismatch++;
-      console.log(`[upload-mismatch] ${key} expected=${buf.length} got=${verify.ContentLength}`);
+      console.log(
+        `[upload-mismatch] ${key} bytes exp=${buf.length} got=${verify.ContentLength} sha exp=${sha.slice(0, 12)} got=${(verify.Metadata?.sha256 ?? 'none').slice(0, 12)}`,
+      );
       continue;
     }
     migrated++;

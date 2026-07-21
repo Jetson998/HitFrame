@@ -71,6 +71,17 @@ S3 存在且字节一致       : 22
 
 ---
 
+## 二·补、评审 P2 收口（S4-precheck）
+
+评审判 S3「条件通过」，两条 P2 在进 S4 前已补：
+
+1. **本地驱动路径边界收紧**（`local.driver.ts`）：`startsWith(root)` 会把 `/storage2` 误判为在 `/storage` 内。改用 `relative(root, path)` 判逃逸（结果为空 / 以 `..` 开头 / 绝对路径即拒）。5 例验证：合法嵌套 ACCEPT；`../etc/passwd`、`../storage2/x`、绝对路径、空 key 全 REJECT。
+2. **迁移脚本真正比对 sha256**（`local-to-s3.mjs`）：原先只按字节数判一致，口径偏强。现幂等/一致判据为「字节数一致 **且** sha256 一致」，缺 sha256 元数据视为不一致需重传；`--verify` 打印具体不一致原因（absent / bytes / no-sha256-meta / sha 前缀）。
+3. **连带修正——运行时也写 sha256**（`s3.driver.ts`）：`save()` 每次 PutObject 写入 `Metadata.sha256`，`head()` 优先返回该值（跨驱动 checksum 统一为 sha256，回退 ETag）。使 App 生成对象与迁移脚本共用同一完整性凭据，`--verify` 对运行时对象同样成立。
+4. **验收脚本自清 S3 对象**：s3 模式无本地文件，清场时 best-effort 删除桶内测试对象，避免留孤儿（正式孤儿回收进 S4）。复跑后 bucket 对象数 = DB storageKey 数（22=22，0 孤儿）。
+
+复跑结果：迁移 `--verify` 22/22 sha256 一致 ✅；阶段套件 9/9 ✅；账实 462=462。
+
 ## 三、遗留 / 风险
 
 - **SigV4 签名精度到秒**：同一秒内多次命中网关得到相同签名属正常（非缺陷）；刷新有效性由「旧签名 TTL 过期 403 → 新命中 200」证明。

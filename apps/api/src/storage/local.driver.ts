@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, promises as fs } from 'node:fs';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import type { StorageDriver, StoredObjectMeta } from './driver';
 
 /** M1 本地 Volume 驱动：保留原 StorageService 行为，供回滚与开发默认。 */
@@ -44,8 +44,13 @@ export class LocalStorageDriver implements StorageDriver {
   }
 
   private safePath(key: string): string {
-    const path = normalize(join(this.root, key));
-    if (!path.startsWith(this.root)) throw new Error(`invalid storage key: ${key}`);
+    const path = resolve(this.root, key);
+    // 用 relative 判逃逸：结果以 .. 开头或本身是绝对路径 → 逃出 root
+    // （规避 startsWith 的 `/storage` 误判 `/storage2` 前缀问题）
+    const rel = relative(this.root, path);
+    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+      throw new Error(`invalid storage key: ${key}`);
+    }
     return path;
   }
 }

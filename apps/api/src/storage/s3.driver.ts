@@ -6,6 +6,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { createHash } from 'node:crypto';
 import type { StorageDriver, StoredObjectMeta } from './driver';
 
 /**
@@ -32,12 +33,15 @@ export class S3StorageDriver implements StorageDriver {
   }
 
   async save(key: string, data: Buffer, contentType?: string): Promise<void> {
+    // 写入 sha256 元数据：运行时与迁移脚本共用同一完整性凭据（--verify 据此比对）
+    const sha256 = createHash('sha256').update(data).digest('hex');
     await this.client.send(
       new PutObjectCommand({
         Bucket: this.bucket,
         Key: key,
         Body: data,
         ContentType: contentType,
+        Metadata: { sha256 },
       }),
     );
   }
@@ -62,9 +66,11 @@ export class S3StorageDriver implements StorageDriver {
       const res = await this.client.send(
         new HeadObjectCommand({ Bucket: this.bucket, Key: key }),
       );
+      // 优先返回我们写入的 sha256（跨驱动一致）；缺失时回退 ETag
+      const sha = res.Metadata?.sha256;
       return {
         bytes: res.ContentLength ?? null,
-        checksum: res.ETag ? res.ETag.replace(/"/g, '') : null,
+        checksum: sha ?? (res.ETag ? res.ETag.replace(/"/g, '') : null),
         exists: true,
       };
     } catch (err) {

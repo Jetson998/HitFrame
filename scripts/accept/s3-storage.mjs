@@ -134,6 +134,22 @@ async function main() {
   const localKey = psql(`SELECT meta->>'storageKey' FROM assets WHERE id='${assetId}'`);
   psql(`DELETE FROM assets WHERE id='${assetId}'`);
   execSync(`rm -f storage/${localKey}`, { shell: '/bin/bash' });
+  // s3 模式无本地文件；删除桶内测试对象，避免留孤儿（正式孤儿回收见 S4）
+  try {
+    const { S3Client, DeleteObjectCommand } = await import('@aws-sdk/client-s3');
+    const s3 = new S3Client({
+      region: process.env.S3_REGION ?? 'us-east-1',
+      endpoint: process.env.S3_ENDPOINT || undefined,
+      forcePathStyle: (process.env.S3_FORCE_PATH_STYLE ?? 'true') !== 'false',
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY ?? '',
+        secretAccessKey: process.env.S3_SECRET_KEY ?? '',
+      },
+    });
+    await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET ?? 'hitframe', Key: localKey }));
+  } catch {
+    /* best-effort */
+  }
   const bal1 = balBefore();
   const spent = bal0 - bal1;
   if (spent > 0) {
