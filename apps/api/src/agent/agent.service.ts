@@ -1,25 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { POINTS_PER_IMAGE, Quality, Ratio } from '@hitframe/shared';
+import { AgentPlanDto, POINTS_PER_IMAGE, Quality, Ratio } from '@hitframe/shared';
 
-/** Agent 路由结果（S5.3，无副作用：不创建 Run、不扣点） */
-export interface AgentPlan {
-  /** 推荐路径：t2i(文生图) / i2i(图生图，无模板) / template(模板) */
-  mode: 't2i' | 'i2i' | 'template';
-  /** 模板 ID（mode=template 时） */
-  templateId?: string;
-  /** 解析的参数 */
-  params: {
-    ratio?: Ratio;
-    candidateCount?: number;
-    quality?: Quality;
-  };
-  /** 槽位缺失提示 */
-  missingSlots?: string[];
-  /** 预计点数 */
-  estimatedPoints: number;
-  /** 补充描述（用户模糊表达，不结构化） */
-  additionalPrompt?: string;
-}
+/** Agent 路由结果（S5.3，无副作用：不创建 Run、不扣点）——契约见 shared AgentPlanDto */
+export type AgentPlan = AgentPlanDto;
 
 @Injectable()
 export class AgentService {

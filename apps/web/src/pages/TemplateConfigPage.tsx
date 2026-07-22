@@ -182,7 +182,13 @@ export function TemplateConfigPage() {
           </div>
         </div>
 
-        <ResultPanel run={run} submitting={submitting} expectedCount={count} ratio={ratio} />
+        <ResultPanel
+          run={run}
+          submitting={submitting}
+          expectedCount={count}
+          ratio={ratio}
+          onRetry={() => void submit()}
+        />
       </div>
     </div>
   );

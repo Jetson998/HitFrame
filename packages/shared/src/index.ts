@@ -218,3 +218,23 @@ export interface ShowcaseItemDto {
   prompt?: string;
   mode?: string; // t2i | i2i | template
 }
+
+/** POST /api/v1/agent/route 响应（S5.4）：Agent 规则路由方案卡（无副作用） */
+export interface AgentPlanDto {
+  /** 推荐路径：t2i(文生图) / i2i(图生图，无模板) / template(模板) */
+  mode: 't2i' | 'i2i' | 'template';
+  /** 模板 ID（mode=template 时） */
+  templateId?: string;
+  /** 解析的参数 */
+  params: {
+    ratio?: Ratio;
+    candidateCount?: number;
+    quality?: Quality;
+  };
+  /** 槽位缺失提示（有值时前端只允许补图，不允许提交） */
+  missingSlots?: string[];
+  /** 预计点数 */
+  estimatedPoints: number;
+  /** 补充描述（用户模糊表达，进 prompt 不结构化） */
+  additionalPrompt?: string;
+}

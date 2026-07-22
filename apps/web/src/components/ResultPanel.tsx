@@ -32,10 +32,12 @@ interface ResultPanelProps {
   submitting: boolean;
   expectedCount: number;
   ratio: Ratio;
+  /** 失败时「重新发起一单」（S5：不做程序化死信重放，重发走统一 hold/queue 链路） */
+  onRetry?: () => void;
 }
 
 /** 生成结果卡片区：占位 → 排队/生成中（进度条）→ 图片（悬浮 下载/详情）/ 失败原因 */
-export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPanelProps) {
+export function ResultPanel({ run, submitting, expectedCount, ratio, onRetry }: ResultPanelProps) {
   const openDetailById = useAppStore((s) => s.openDetailById);
   const aspect = RATIO_ASPECT[ratio];
   const cells: (JobStatusDto | null)[] =
@@ -86,9 +88,15 @@ export function ResultPanel({ run, submitting, expectedCount, ratio }: ResultPan
               <div className="px-3">
                 <div className="mb-1 text-base">⚠️</div>
                 <div className="text-err">生成失败（不扣点）</div>
+                {/* S4 脱敏文案：job.error 已是 JOB_ERROR_CATALOG 目录文案，非原始 error */}
                 <div className="mt-1 line-clamp-3 text-[10.5px] text-faint">
                   {job.error ?? '未知错误'}
                 </div>
+                {onRetry && (
+                  <Button size="sm" className="mt-2 bg-white/90" onClick={onRetry}>
+                    重新发起一单
+                  </Button>
+                )}
               </div>
             ) : job || submitting ? (
               <div className="w-full px-4">

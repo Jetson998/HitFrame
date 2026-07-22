@@ -1,4 +1,5 @@
 import type {
+  AgentPlanDto,
   GenerationAcceptedDto,
   GenerationRequestDto,
   MeDto,
@@ -7,6 +8,8 @@ import type {
   ShowcaseItemDto,
   TemplateSummaryDto,
 } from '@hitframe/shared';
+
+export type AgentPlan = AgentPlanDto;
 
 /** 资产行（GET /assets 返回的 DB 行子集；完整类型收敛到阶段 6） */
 export interface AssetRow {
@@ -110,6 +113,12 @@ export const api = {
     }),
   createGeneration: (dto: GenerationRequestDto) =>
     req<GenerationAcceptedDto>('/generations', { method: 'POST', body: JSON.stringify(dto) }),
+  /** Agent 规则路由（S5.4）：无副作用，只返回方案卡；用户确认后再调 createGeneration */
+  agentRoute: (userInput: string, uploadedImages?: string[]) =>
+    req<AgentPlan>('/agent/route', {
+      method: 'POST',
+      body: JSON.stringify({ userInput, uploadedImages }),
+    }),
   getRun: async (runId: string) => {
     const run = await req<RunStatusDto>(`/runs/${runId}`);
     return {

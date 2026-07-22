@@ -8,12 +8,13 @@ import { ProjectSwitcher } from '@/components/ProjectSwitcher';
 import { HomePage } from '@/pages/HomePage';
 import { GeneratePage } from '@/pages/GeneratePage';
 import { TemplateConfigPage } from '@/pages/TemplateConfigPage';
+import { AgentPage } from '@/pages/AgentPage';
 import { AssetsPage } from '@/pages/AssetsPage';
 
 const NAV_ITEMS: Array<{ key: NavKey; icon: string; label: string; disabled?: boolean }> = [
   { key: 'home', icon: '🏠', label: '首页' },
   { key: 'generate', icon: '✨', label: 'AI 图片' },
-  { key: 'agent', icon: '🤖', label: 'Agent', disabled: true }, // M2a 开放
+  { key: 'agent', icon: '🤖', label: 'Agent' }, // S5.4 开放
   { key: 'assets', icon: '🗂️', label: '资产库' },
 ];
 
@@ -91,6 +92,7 @@ export default function App() {
           ) : (
             <GeneratePage />
           ))}
+        {nav === 'agent' && <AgentPage />}
         {nav === 'assets' && <AssetsPage />}
       </main>
 
