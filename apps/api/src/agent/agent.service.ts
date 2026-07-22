@@ -125,7 +125,7 @@ export class AgentService {
   /** 提取补充描述（去掉已解析的结构化部分，保留模糊表达） */
   private extractAdditional(input: string): string | undefined {
     // 简化：S5 只做关键词去除，不做复杂 NLP
-    let clean = input
+    const clean = input
       .replace(/(\d+)\s*[:比xX×]\s*(\d+)/g, '') // 去比例
       .replace(/(\d+|一|两|二|三|四)\s*[张个幅份]/g, '') // 去数量
       .replace(/高清|hd|标准|质量/gi, '') // 去质量
