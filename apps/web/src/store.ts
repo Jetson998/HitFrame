@@ -5,7 +5,7 @@ import { api, ApiError, type AssetRow } from './lib/api';
 /** 侧边栏 IA 与 Demo（output/HitFrame_demo.html）保持一致；Agent 在 M1 为禁用占位，M2a 开放 */
 export type NavKey = 'home' | 'generate' | 'agent' | 'assets';
 export type GenMode = 'i2i' | 't2i' | 'template';
-export type AuthState = 'checking' | 'ok' | 'unauthorized';
+export type AuthState = 'checking' | 'ok' | 'unauthorized' | 'error';
 
 interface AppState {
   nav: NavKey;
@@ -13,6 +13,8 @@ interface AppState {
 
   auth: AuthState;
   bootstrap: () => Promise<void>;
+  /** 环境异常诊断（auth=error 时展示，区分"功能没做"与"环境跑错") */
+  bootError: string | null;
 
   genMode: GenMode;
   setGenMode: (mode: GenMode) => void;
@@ -60,22 +62,40 @@ export const useAppStore = create<AppState>((set, get) => ({
   setNav: (nav) => set({ nav }),
 
   auth: 'checking',
+  bootError: null,
   bootstrap: async () => {
+    // 分步鉴别失败环节：/me 401 → Token 无效；/me 网络/非2xx → API 未连接；
+    // templates 单独失败 → seed/模板端点问题。全部区分开，避免空数据被误判为"功能没做"。
+    let me;
     try {
-      const me = await api.me();
-      const [templates, assets, projects] = await Promise.all([
-        api.templates(),
-        api.assets(),
-        api.projects(),
-      ]);
-      set({ auth: 'ok', balance: me.pointsBalance, templates, assets, projects });
+      me = await api.me();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) set({ auth: 'unauthorized' });
-      else {
-        set({ auth: 'ok' });
-        get().showToast(`加载失败：${(err as Error).message}`);
+      if (err instanceof ApiError && err.status === 401) {
+        set({ auth: 'unauthorized' });
+      } else if (err instanceof ApiError) {
+        set({
+          auth: 'error',
+          bootError: `API 返回异常（HTTP ${err.status}）：可能连到了错误的后端。请确认 /api/v1 指向 HitFrame API（检查端口归属，不要只看浏览器能打开）。`,
+        });
+      } else {
+        set({
+          auth: 'error',
+          bootError: `API 未连接：${(err as Error).message}。请确认 HitFrame API 正在运行且 Vite 代理指向正确端口。`,
+        });
       }
+      return;
     }
+
+    // /me 通过 → 鉴权正常；后续数据失败不再打回 unauthorized，仅提示对应资源
+    const [templates, assets, projects] = await Promise.all([
+      api.templates().catch((e) => {
+        get().showToast(`模板加载失败：${(e as Error).message}（检查 API/seed）`);
+        return [] as TemplateSummaryDto[];
+      }),
+      api.assets().catch(() => [] as AssetRow[]),
+      api.projects().catch(() => [] as ProjectDto[]),
+    ]);
+    set({ auth: 'ok', bootError: null, balance: me.pointsBalance, templates, assets, projects });
   },
 
   genMode: 'i2i',

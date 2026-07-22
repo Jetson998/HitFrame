@@ -19,7 +19,7 @@ const NAV_ITEMS: Array<{ key: NavKey; icon: string; label: string; disabled?: bo
 ];
 
 export default function App() {
-  const { nav, setNav, auth, bootstrap, balance, assets, genMode, activeTplId, toast } =
+  const { nav, setNav, auth, bootError, bootstrap, balance, assets, genMode, activeTplId, toast } =
     useAppStore();
 
   useEffect(() => {
@@ -29,6 +29,25 @@ export default function App() {
   if (auth === 'unauthorized') return <TokenGate />;
   if (auth === 'checking')
     return <div className="grid h-screen place-items-center text-[12.5px] text-faint">加载中…</div>;
+  if (auth === 'error')
+    return (
+      <div className="grid h-screen place-items-center bg-bg px-6">
+        <div className="w-[440px] rounded-2xl border border-err/40 bg-panel p-6 text-center shadow-[0_8px_30px_rgba(23,43,77,0.08)]">
+          <div className="mb-2 text-[15px] font-bold text-err">环境异常 · 无法连接 HitFrame API</div>
+          <p className="mb-4 text-[12.5px] leading-relaxed text-dim">{bootError}</p>
+          <button
+            type="button"
+            onClick={() => void bootstrap()}
+            className="rounded-[9px] border border-accent/40 bg-accent/15 px-4 py-2 text-[12.5px] font-semibold text-ink hover:bg-accent/25"
+          >
+            重新检测
+          </button>
+          <p className="mt-3 text-[11px] text-faint">
+            这是环境/后端连接问题，不是功能缺失。请核对 API 进程与端口（见 README 启动口径）。
+          </p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg text-ink">

@@ -11,9 +11,9 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "dev:api": "npm run dev -w @hitframe/api",
+    "dev:api": "npm run build -w @hitframe/api && node --env-file=.env apps/api/dist/main.js",
     "dev:web": "npm run dev -w @hitframe/web",
-    "dev:worker": "node apps/api/dist/worker-main.js"
+    "dev:worker": "npm run build -w @hitframe/api && node --env-file=.env apps/api/dist/worker-main.js"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

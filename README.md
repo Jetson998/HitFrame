@@ -23,14 +23,41 @@ packages/image-provider ImageProvider 适配接口 + MuskapisProvider（gpt-imag
 ```bash
 npm install
 cp .env.example .env        # 填 IMAGE_API_KEY（密钥只存服务端）
-docker compose up -d        # PostgreSQL（需本机安装 docker）
+docker compose up -d        # PostgreSQL + Valkey + SeaweedFS（需本机安装 docker）
 npm run build               # 全仓构建
-node --env-file=.env scripts/seed.mjs   # 种子：默认租户点数 + 商品换背景模板
-npm run dev:api             # API :3001（GET /api/v1/health）
+node --env-file=.env scripts/seed.mjs   # 种子：默认租户点数 + 三场景模板
+npm run dev:api             # API :3001（node --env-file=.env apps/api/dist/main.js）
 npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
+npm run dev:worker          # Worker（后台队列消费，node --env-file=.env apps/api/dist/worker-main.js）
 ```
 
-打开 <http://localhost:5173>，首屏粘贴服务端 `.env` 的 `API_TOKEN`（或在 `apps/web/.env.local` 配 `VITE_API_TOKEN` 免粘贴）。引擎密钥只存服务端，前端只持有本系统 API 令牌。
+打开 <http://localhost:5173>，首屏粘贴服务端 `.env` 的 `API_TOKEN`（dev 环境默认 `dev-token-change-me`）。引擎密钥只存服务端，前端只持有本系统 API 令牌。
+
+### 验收/测试启动口径（重要）
+
+启动前**必须检查端口归属**，避免前端代理连到错误后端：
+
+```bash
+# 检查端口归属（macOS/Linux）
+lsof -i :3001 -i :5173 -i :8333
+
+# 预期输出示例（确保 3001 是 HitFrame node 进程，不是其他项目）
+# node    12345  user   23u  IPv4  TCP *:3001 (LISTEN)   # HitFrame API
+# node    12346  user   24u  IPv4  TCP *:5173 (LISTEN)   # Vite dev server
+# seaweedf 12347 user   25u  IPv4  TCP *:8333 (LISTEN)   # SeaweedFS S3 gateway
+```
+
+如果 3001 被其他项目占用，先停掉该进程或改 HitFrame 端口（`apps/api/src/main.ts` + `apps/web/vite.config.ts` proxy target）。
+
+验收记录模板（每次跑验收时记录实际进程/端口）：
+
+```
+启动环境：
+- API    : node --env-file=.env apps/api/dist/main.js (PID 12345, :3001)
+- Worker : node --env-file=.env apps/api/dist/worker-main.js (PID 12346)
+- Web    : npm run dev:web (Vite :5173, proxy → :3001)
+- Docker : postgres:5432, valkey:6379, seaweedfs:8333
+```
 
 ## M1 阶段进度
 
@@ -53,8 +80,8 @@ npm run dev:web             # Web :5173（/api、/files 代理到 :3001）
 - [x] S2 BullMQ/Valkey/Worker 迁移（CAS 抢占 + FOR UPDATE reconcile 两 P1 阶段门关闭；EXECUTION_MODE=queue|inline 互斥回滚开关；破坏性验收 10/10：`scripts/accept/s2-queue.mjs`，记录 `docs/M2a_S1_S2_验收记录.md`）
 - [x] S2.1 评审修正（claim 后 Run queued→running 条件更新；queue 模式关闭轮询孤儿判定，交由 BullMQ stalled+Reconciler；at-least-once 执行语义入档，风险 R11）
 - [x] S3 StorageAdapter 双驱动（Local/S3）+ SeaweedFS/客户 OSS + 稳定网关 `/files/{key}`（s3 302→短时效签名，过期即刷新）+ 存量迁移（幂等+校验和+三方一致）；验收 9/9：`scripts/accept/s3-storage.mjs`，迁移 `scripts/migrate/local-to-s3.mjs`，记录 `docs/M2a_S3_验收记录.md`
-- [ ] S4 重试/死信/恢复/观测 + 错误码收敛实现
-- [ ] S5 三模板 + Agent 规则路由
+- [x] S4 errorCode 收敛 + 脱敏（API 只返 errorCode/文案，路径/堆栈/密钥只进日志）+ 死信/恢复/观测（logEvent 单行 JSON，死信重放仅诊断不改账）+ 孤儿对象巡检回收（StorageReclaimService）；验收记录 `docs/M2a_S4_验收记录.md`
+- [x] S5 三模板（tpl_bg/tpl_model/tpl_poster）+ Agent 规则路由（意图→模板，比例/数量/质量解析，16:9→4:3 映射，无副作用 route）+ 前端集成（模板分类筛选、Agent 页、缺图门禁、确认才建 Run、错误态诊断补齐）；验收 18/18：`scripts/accept/s5-templates-agent.mjs`
 - [ ] S6 种子客户验收
 - [ ] S7 （可选）Socket.IO/SSE
 

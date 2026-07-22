@@ -135,8 +135,16 @@ export function TemplateCards() {
           ))}
       </div>
 
-      {filtered.length === 0 && (
-        <div className="mt-8 text-center text-[12.5px] text-faint">该分类下暂无模板</div>
+      {templates.length === 0 ? (
+        <div className="mt-8 rounded-xl border border-warn/40 bg-warn/10 px-4 py-6 text-center text-[12.5px] text-warn">
+          模板数据未加载。这通常是 API 未连接或数据库未 seed，
+          <br />
+          请检查 HitFrame API 是否运行并执行过 <code className="text-ink">node scripts/seed.mjs</code>。
+        </div>
+      ) : (
+        filtered.length === 0 && (
+          <div className="mt-8 text-center text-[12.5px] text-faint">该分类下暂无模板</div>
+        )
       )}
     </div>
   );

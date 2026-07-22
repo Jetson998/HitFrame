@@ -111,8 +111,11 @@ export class AgentService {
     const clean = input
       .replace(/(\d+)\s*[:比xX×]\s*(\d+)/g, '') // 去比例
       .replace(/(\d+|一|两|二|三|四)\s*[张个幅份]/g, '') // 去数量
-      .replace(/高清|hd|标准|质量/gi, '') // 去质量
+      .replace(/高清|hd|标准|质量|精修|高质量/gi, '') // 去质量
       .replace(/换背景|模特|上身|海报|封面/g, '') // 去模板关键词
+      // 清理去词后残留的标点：连续标点合一 + 去首尾标点/空白
+      .replace(/[，,、。.\s]{2,}/g, '，')
+      .replace(/^[，,、。.\s]+|[，,、。.\s]+$/g, '')
       .trim();
     return clean.length > 5 ? clean : undefined; // 剩余有效内容才返回
   }
