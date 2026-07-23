@@ -30,6 +30,40 @@ const TEMPLATE_CARDS = [
   },
 ];
 
+/**
+ * 获取资产商业展示名
+ * - template-* → 对应模板标题
+ * - t2i-* → 文生图作品
+ * - i2i-* → 参考图创作
+ * - 其他 → 未命名作品
+ */
+function getAssetDisplayName(asset: { name: string; type: string }, templates: { id: string; title: string }[]): string {
+  const name = asset.name;
+
+  // 模板生成作品 - 查找模板标题
+  if (name.startsWith('template-')) {
+    const tplId = name.substring(0, name.lastIndexOf('-'));
+    const template = templates.find((t) => t.id === tplId);
+    if (template) {
+      return template.title;
+    }
+    return '场景模板作品';
+  }
+
+  // 文生图作品
+  if (name.startsWith('t2i-')) {
+    return '文生图作品';
+  }
+
+  // 图生图作品
+  if (name.startsWith('i2i-')) {
+    return '参考图创作';
+  }
+
+  // 其他
+  return name || '未命名作品';
+}
+
 export function HomePage() {
   const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail, balance } = useAppStore();
   const results = assets.filter((a) => a.type === 'result').slice(0, 4);
@@ -52,8 +86,8 @@ export function HomePage() {
 
   return (
     <div className="min-h-full">
-      {/* 首页浮动导航 */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-hero-bg/95 backdrop-blur-sm border-b border-hero-line">
+      {/* 首页浮动导航 - 桌面显示完整导航,移动端只显示品牌 */}
+      <nav className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-hero-bg/95 backdrop-blur-sm border-b border-hero-line">
         <div
           className="mx-auto flex items-center justify-between py-3 px-5 md:px-8 lg:px-12"
           style={{
@@ -97,9 +131,9 @@ export function HomePage() {
       </nav>
 
       {/* Hero - 深色区，需要 pt 为导航留空间 */}
-      <section className="bg-hero-bg border-b border-hero-line pt-[64px] px-5 md:px-8 lg:px-12">
+      <section className="bg-hero-bg border-b border-hero-line md:pt-[64px] px-5 md:px-8 lg:px-12">
         <div
-          className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center py-16 md:py-20"
+          className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center py-12 md:py-16 lg:py-16"
           style={{
             maxWidth: 'var(--spacing-contentMax)',
           }}
@@ -147,8 +181,8 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* 右侧：三图组合（暂用占位） */}
-          <div className="hidden md:grid grid-cols-2 gap-3">
+          {/* 右侧：三图组合（暂用占位） - 桌面版 */}
+          <div className="hidden lg:grid grid-cols-2 gap-3 max-w-[500px]">
             <div className="space-y-3">
               <Card
                 variant="hero"
@@ -202,6 +236,42 @@ export function HomePage() {
               </Card>
             </div>
           </div>
+
+          {/* 移动端：精简效果图（原图 → 换背景） */}
+          <div className="lg:hidden grid grid-cols-2 gap-3 max-w-[400px] mx-auto mt-8">
+            <Card
+              variant="hero"
+              padding="none"
+              className="aspect-square overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-hero-surface to-hero-bg flex items-center justify-center text-hero-text-dim text-[11px]">
+                原图占位
+              </div>
+              <Badge
+                variant="hero"
+                size="sm"
+                className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+              >
+                原图
+              </Badge>
+            </Card>
+            <Card
+              variant="hero"
+              padding="none"
+              className="aspect-square overflow-hidden relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-hero-text-dim text-[11px]">
+                换背景占位
+              </div>
+              <Badge
+                variant="hero"
+                size="sm"
+                className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+              >
+                场景模板
+              </Badge>
+            </Card>
+          </div>
         </div>
       </section>
 
@@ -215,6 +285,12 @@ export function HomePage() {
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mb-8">
           {TEMPLATE_CARDS.map((tpl) => {
             const actual = templates.find((t) => t.id === tpl.id);
+            const totalSlots = actual?.slots?.length ?? tpl.slots;
+            const requiredSlots = actual?.slots?.filter((s: any) => s.required).length ?? tpl.slots;
+            const slotsText = requiredSlots === totalSlots
+              ? `${requiredSlots} 个必填素材`
+              : `${requiredSlots} 个必填素材 · ${totalSlots} 个图片槽位`;
+
             return (
               <Card
                 key={tpl.id}
@@ -239,7 +315,7 @@ export function HomePage() {
                     {tpl.description}
                   </p>
                   <div className="flex items-center justify-between text-[12px] text-faint mb-3">
-                    <span>{tpl.slots} 个必填素材</span>
+                    <span>{slotsText}</span>
                     <span>{tpl.pointsFrom} 点起</span>
                   </div>
                   <Button variant="primary" size="default" className="w-full">
@@ -300,11 +376,25 @@ export function HomePage() {
               >
                 <img
                   src={a.url}
-                  alt={a.name}
+                  alt={getAssetDisplayName(a, templates)}
                   className="aspect-square w-full object-cover bg-panel-muted"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    img.style.display = 'none';
+                    const fallback = img.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.display = 'grid';
+                  }}
                 />
+                <div className="hidden aspect-square w-full place-items-center bg-panel-muted text-faint">
+                  <div className="text-center">
+                    <ImageIcon size={32} className="mx-auto mb-2 opacity-40" />
+                    <div className="text-[11px]">图片暂不可用</div>
+                  </div>
+                </div>
                 <div className="p-3">
-                  <div className="text-[13px] text-ink font-medium truncate mb-0.5">{a.name}</div>
+                  <div className="text-[13px] text-ink font-medium truncate mb-0.5">
+                    {getAssetDisplayName(a, templates)}
+                  </div>
                   <div className="text-[11px] text-faint">
                     {new Date(a.createdAt).toLocaleDateString('zh-CN', {
                       month: 'short',

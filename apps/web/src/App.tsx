@@ -130,7 +130,7 @@ export default function App() {
       </aside>
       )}
 
-      {/* 移动端顶部栏 (<768px) */}
+      {/* 移动端顶部栏 (<768px) - 首页时不显示三个页面入口 */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between bg-hero-bg border-b border-hero-line px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="grid h-7 w-7 place-items-center rounded-[8px] hf-gradient-primary text-[13px] font-extrabold text-white">
