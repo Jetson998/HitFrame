@@ -1,108 +1,340 @@
-import { useAppStore, type GenMode } from '@/store';
-import { ShowcaseWall } from '@/components/ShowcaseWall';
+import { Sparkles, MessageSquare, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { useAppStore } from '@/store';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { homeCopy } from '@/design-tokens';
 
-const QUICK: Array<{ icon: string; label: string; mode?: GenMode; nav?: 'assets' }> = [
-  { icon: '✨', label: '空白文生图', mode: 't2i' },
-  { icon: '🖼️', label: '参考图生图', mode: 'i2i' },
-  { icon: '🧩', label: '场景模板出图', mode: 'template' },
-  { icon: '🗂️', label: '最近生成结果', nav: 'assets' },
+const TEMPLATE_CARDS = [
+  {
+    id: 'tpl_bg',
+    title: '商品换背景',
+    description: '上传商品图，选择背景与光线风格',
+    badge: '最常用',
+    slots: 1,
+    pointsFrom: 2,
+  },
+  {
+    id: 'tpl_model',
+    title: '模特上身 / 真人试穿',
+    description: '服装平铺图生成真人试穿效果',
+    slots: 2,
+    pointsFrom: 2,
+  },
+  {
+    id: 'tpl_poster',
+    title: '电商海报 / 小红书封面',
+    description: '产品图 + 文案生成营销封面',
+    slots: 1,
+    pointsFrom: 2,
+  },
 ];
 
 export function HomePage() {
   const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail } = useAppStore();
-  const results = assets.filter((a) => a.type === 'result').slice(0, 8);
+  const results = assets.filter((a) => a.type === 'result').slice(0, 4);
 
-  const go = (item: (typeof QUICK)[number]) => {
-    if (item.nav) {
-      setNav(item.nav);
-      return;
-    }
-    setGenMode(item.mode!);
+  const goTemplate = (tplId?: string) => {
+    setGenMode('template');
+    setActiveTplId(tplId || null);
+    setNav('generate');
+  };
+
+  const goAgent = () => {
+    setNav('agent');
+  };
+
+  const goMode = (mode: 'i2i' | 't2i') => {
+    setGenMode(mode);
     setActiveTplId(null);
     setNav('generate');
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1100px] px-8 py-10">
-      <h1 className="m-0 text-[24px] font-bold">告诉 HitFrame 你要做什么</h1>
-      <p className="mt-2 mb-6 text-[14px] leading-relaxed text-dim">
-        素材 → 场景 → 出图：上传商品图或底图，选一种出图方式，分钟级拿到可用成图。
-      </p>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {QUICK.map((q) => (
-          <button
-            key={q.label}
-            type="button"
-            onClick={() => go(q)}
-            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-line bg-panel px-4 py-4 text-left text-[13px] transition-all hover:-translate-y-0.5 hover:border-accent"
-          >
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-accent to-vio text-base">
-              {q.icon}
-            </span>
-            {q.label}
-            <span className="ml-auto text-faint">→</span>
-          </button>
-        ))}
-      </div>
-
-      {/* 已登录但还没有产出：案例墙提到最显眼位置 */}
-      {results.length === 0 && (
-        <div className="mt-9">
-          <ShowcaseWall />
-        </div>
-      )}
-
-      <div className="mt-9 mb-3.5 text-[12px] font-semibold tracking-wider text-faint uppercase">
-        推荐模板
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {templates.map((tpl) => (
-          <button
-            key={tpl.id}
-            type="button"
-            onClick={() => {
-              setGenMode('template');
-              setActiveTplId(tpl.id);
-              setNav('generate');
-            }}
-            className="cursor-pointer rounded-2xl border border-line bg-panel p-4 text-left transition-all hover:-translate-y-0.5 hover:border-accent"
-          >
-            <div className="text-[14.5px] font-bold">🎨 {tpl.title}</div>
-            <div className="mt-1.5 text-[12px] leading-relaxed text-dim">{tpl.description}</div>
-          </button>
-        ))}
-      </div>
-
-      {results.length > 0 && (
-        <>
-          <div className="mt-9 mb-3.5 text-[12px] font-semibold tracking-wider text-faint uppercase">
-            最近生成
-          </div>
-          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-            {results.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                onClick={() => openDetail(a)}
-                className="cursor-pointer overflow-hidden rounded-xl border border-line bg-panel transition-colors hover:border-accent"
+    <div className="min-h-full">
+      {/* Hero - 深色区 */}
+      <section className="bg-hero-bg border-b border-hero-line">
+        <div
+          className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center"
+          style={{
+            maxWidth: 'var(--spacing-contentMax)',
+            padding: 'var(--spacing-heroY) var(--spacing-pageX)',
+          }}
+        >
+          {/* 左侧：价值定位 */}
+          <div>
+            <Badge variant="hero" size="default" className="mb-4">
+              {homeCopy.badge}
+            </Badge>
+            <h1
+              className="text-hero-text font-bold mb-5"
+              style={{
+                fontSize: 'clamp(32px, 5vw, 52px)',
+                lineHeight: 1.08,
+                letterSpacing: '-0.035em',
+              }}
+            >
+              {homeCopy.heroTitle}
+            </h1>
+            <p className="text-hero-text-dim text-[17px] leading-[1.7] mb-8">
+              {homeCopy.heroSubtitle}
+            </p>
+            <div className="flex flex-wrap gap-3 mb-6">
+              <Button variant="primary" size="xl" onClick={() => goTemplate()}>
+                <Sparkles size={18} />
+                {homeCopy.heroPrimaryCTA}
+              </Button>
+              <Button
+                variant="secondary"
+                size="xl"
+                onClick={goAgent}
+                className="bg-hero-surface border-hero-line text-hero-text hover:bg-hero-surface-hover hover:border-hero-line"
               >
-                <img src={a.url} alt={a.name} className="aspect-square w-full object-cover" />
-                <div className="truncate px-2.5 py-2 text-left text-[11.5px] text-dim">
-                  {a.name}
+                <MessageSquare size={18} />
+                {homeCopy.heroSecondaryCTA}
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[13px] text-hero-text-dim">
+              {homeCopy.heroProof.map((text, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <span className="h-1 w-1 rounded-full bg-primary" />
+                  {text}
                 </div>
-              </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 右侧：三图组合（暂用占位） */}
+          <div className="hidden lg:grid grid-cols-2 gap-3">
+            <div className="space-y-3">
+              <Card
+                variant="hero"
+                padding="none"
+                className="aspect-square overflow-hidden relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-hero-surface to-hero-bg flex items-center justify-center text-hero-text-dim text-[12px]">
+                  原图占位
+                </div>
+                <Badge
+                  variant="hero"
+                  size="sm"
+                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+                >
+                  原图
+                </Badge>
+              </Card>
+              <Card
+                variant="hero"
+                padding="none"
+                className="aspect-square overflow-hidden relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-hero-text-dim text-[12px]">
+                  换背景占位
+                </div>
+                <Badge
+                  variant="hero"
+                  size="sm"
+                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+                >
+                  场景模板
+                </Badge>
+              </Card>
+            </div>
+            <div className="flex items-center">
+              <Card
+                variant="hero"
+                padding="none"
+                className="w-full aspect-[3/4] overflow-hidden relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center text-hero-text-dim text-[12px]">
+                  营销封面占位
+                </div>
+                <Badge
+                  variant="hero"
+                  size="sm"
+                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+                >
+                  营销封面
+                </Badge>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 快速开始 - 浅色区 */}
+      <section
+        className="mx-auto"
+        style={{
+          maxWidth: 'var(--spacing-contentMax)',
+          padding: 'var(--spacing-section) var(--spacing-pageX)',
+        }}
+      >
+        <div className="mb-6">
+          <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.quickStartTitle}</h2>
+          <p className="text-[14px] text-dim">{homeCopy.quickStartSubtitle}</p>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {TEMPLATE_CARDS.map((tpl) => {
+            const actual = templates.find((t) => t.id === tpl.id);
+            return (
+              <Card
+                key={tpl.id}
+                variant="default"
+                padding="none"
+                interactive
+                className="flex flex-col overflow-hidden"
+                onClick={() => goTemplate(tpl.id)}
+              >
+                {/* 封面占位 */}
+                <div className="aspect-[16/10] bg-panel-muted flex items-center justify-center border-b border-line">
+                  <ImageIcon size={48} className="text-faint" />
+                </div>
+                <div className="p-4 flex-1 flex flex-col">
+                  {tpl.badge && (
+                    <Badge variant="primary" size="sm" className="mb-2 self-start">
+                      {tpl.badge}
+                    </Badge>
+                  )}
+                  <h3 className="text-[16px] font-semibold mb-1.5">{tpl.title}</h3>
+                  <p className="text-[13px] text-dim leading-relaxed mb-3 flex-1">
+                    {tpl.description}
+                  </p>
+                  <div className="flex items-center justify-between text-[12px] text-faint mb-3">
+                    <span>{tpl.slots} 个必填素材</span>
+                    <span>{tpl.pointsFrom} 点起</span>
+                  </div>
+                  <Button variant="primary" size="default" className="w-full">
+                    使用模板
+                    <ArrowRight size={16} />
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* 其他创作方式 */}
+        <div className="flex flex-wrap items-center gap-3 text-[13px]">
+          <span className="text-dim">其他创作方式</span>
+          <button
+            type="button"
+            onClick={() => goMode('t2i')}
+            className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
+          >
+            空白文生图
+            <ArrowRight size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={() => goMode('i2i')}
+            className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
+          >
+            参考图生图
+            <ArrowRight size={14} />
+          </button>
+        </div>
+      </section>
+
+      {/* 最近创作 */}
+      {results.length > 0 && (
+        <section
+          className="mx-auto border-t border-line"
+          style={{
+            maxWidth: 'var(--spacing-contentMax)',
+            padding: 'var(--spacing-section) var(--spacing-pageX)',
+          }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[24px] font-bold">{homeCopy.recentTitle}</h2>
+            <button
+              type="button"
+              onClick={() => setNav('assets')}
+              className="flex items-center gap-1 text-[13px] text-primary hover:text-primary-hover transition-colors"
+            >
+              查看全部
+              <ArrowRight size={14} />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {results.map((a) => (
+              <Card
+                key={a.id}
+                variant="default"
+                padding="none"
+                interactive
+                className="overflow-hidden"
+                onClick={() => openDetail(a)}
+              >
+                <img
+                  src={a.url}
+                  alt={a.name}
+                  className="aspect-square w-full object-cover bg-panel-muted"
+                />
+                <div className="p-3">
+                  <div className="text-[13px] text-ink font-medium truncate mb-0.5">{a.name}</div>
+                  <div className="text-[11px] text-faint">
+                    {new Date(a.createdAt).toLocaleDateString('zh-CN', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </div>
+                </div>
+              </Card>
             ))}
           </div>
-        </>
+        </section>
       )}
 
-      {/* 有产出时案例墙沉底常显 */}
-      {results.length > 0 && (
-        <div className="mt-9">
-          <ShowcaseWall />
-        </div>
+      {/* 空状态 */}
+      {results.length === 0 && (
+        <section
+          className="mx-auto border-t border-line"
+          style={{
+            maxWidth: 'var(--spacing-contentMax)',
+            padding: 'var(--spacing-section) var(--spacing-pageX)',
+          }}
+        >
+          <Card variant="muted" padding="lg" className="text-center">
+            <ImageIcon size={48} className="mx-auto mb-3 text-faint" />
+            <p className="text-[14px] text-dim">{homeCopy.emptyState.noAssets}</p>
+          </Card>
+        </section>
       )}
+
+      {/* 精选案例（暂用占位） */}
+      <section
+        className="mx-auto border-t border-line bg-panel-muted/50"
+        style={{
+          maxWidth: 'var(--spacing-contentMax)',
+          padding: 'var(--spacing-section) var(--spacing-pageX)',
+        }}
+      >
+        <div className="mb-6">
+          <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.showcaseTitle}</h2>
+          <p className="text-[14px] text-dim">{homeCopy.showcaseSubtitle}</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} variant="default" padding="default">
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="aspect-square rounded-[--radius-image] bg-panel-muted flex items-center justify-center">
+                  <span className="text-[11px] text-faint">原始素材</span>
+                </div>
+                <div className="aspect-square rounded-[--radius-image] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                  <span className="text-[11px] text-faint">生成结果</span>
+                </div>
+              </div>
+              <h3 className="text-[14px] font-semibold mb-1">案例 {i} 占位</h3>
+              <p className="text-[12px] text-dim mb-3">商品换背景 · 1:1</p>
+              <Button variant="secondary" size="sm" className="w-full">
+                使用这个模板
+              </Button>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

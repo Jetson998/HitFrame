@@ -1,31 +1,80 @@
 @import 'tailwindcss';
 
-/* 白色浅色主题（参考 deevid.ai/app）：白底卡片 + 蓝色主色 + 柔和投影 */
+/**
+ * HitFrame S6-UX 设计系统
+ * 深色品牌外壳与首页 Hero，浅色高效率创作区，蓝紫品牌色
+ */
+
 @theme {
-  --color-bg: #f5f7fb;
+  /* 品牌深色区 */
+  --color-hero-bg: #0b0f19;
+  --color-hero-surface: #141a28;
+  --color-hero-surface-hover: #1a2233;
+  --color-hero-text: #f8fafc;
+  --color-hero-text-dim: #a8b1c3;
+  --color-hero-line: rgba(255, 255, 255, 0.1);
+
+  /* 浅色工作区 */
+  --color-workspace-bg: #f4f6fa;
   --color-panel: #ffffff;
-  --color-panel2: #f3f5f9;
-  --color-line: #e3e8f0;
-  --color-line-soft: #edf0f6;
-  --color-ink: #1b2430;
-  --color-dim: #5b6b7f;
-  --color-faint: #93a0b4;
-  --color-accent: #2f7cf6;
-  --color-accent-hov: #1f6ae0;
-  --color-ok: #22a06b;
-  --color-warn: #d97a08;
-  --color-err: #e5484d;
-  --color-vio: #8b5cf6;
-  --color-stage: #eef1f6; /* 图片展示区底色 */
+  --color-panel-muted: #f8f9fc;
+
+  /* 品牌色 */
+  --color-primary: #635bff;
+  --color-primary-hover: #5148e5;
+  --color-primary-soft: #eeedff;
+  --color-accent: #3b82f6;
+
+  /* 文字 */
+  --color-ink: #111827;
+  --color-dim: #5b6475;
+  --color-faint: #8b95a7;
+  --color-disabled: #b7bfcc;
+
+  /* 边框 */
+  --color-line: #e3e7ef;
+  --color-line-soft: #eef1f6;
+  --color-line-strong: #cbd2de;
+
+  /* 状态 */
+  --color-success: #16a36a;
+  --color-warn: #d97706;
+  --color-err: #dc3545;
+  --color-ok: #16a36a;
+  --color-info: #2563eb;
+
+  /* 圆角 */
+  --radius-button: 10px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-image: 12px;
+  --radius-modal: 16px;
+  --radius-hero-visual: 18px;
+  --radius-pill: 999px;
+
+  /* 阴影 */
+  --shadow-card: 0 2px 8px rgba(18, 27, 44, 0.05);
+  --shadow-card-hover: 0 18px 44px -20px rgba(18, 27, 44, 0.3);
+  --shadow-floating: 0 12px 36px -16px rgba(18, 27, 44, 0.28);
+  --shadow-modal: 0 28px 90px -24px rgba(8, 15, 30, 0.45);
+  --shadow-primary: 0 12px 30px -12px rgba(99, 91, 255, 0.65);
 }
 
 body {
-  background: var(--color-bg);
+  background: var(--color-workspace-bg);
   color: var(--color-ink);
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 13px;
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 数字优先使用 Inter */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* 结果卡进度条（不确定进度动画） */
@@ -39,4 +88,23 @@ body {
 }
 .hf-progress {
   animation: hf-indeterminate 1.6s ease-in-out infinite;
+}
+
+/* Hero 悬浮动效（轻微） */
+@keyframes hf-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.hf-float {
+  animation: hf-float 6s ease-in-out infinite;
+}
+
+/* 渐变背景 */
+.hf-gradient-primary {
+  background: linear-gradient(135deg, #635bff 0%, #3b82f6 100%);
 }
