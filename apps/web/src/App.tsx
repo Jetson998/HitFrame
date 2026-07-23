@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore, type NavKey } from '@/store';
+import { Logo } from '@/components/Logo';
 import { TokenGate } from '@/components/TokenGate';
 import { AssetDetailDialog } from '@/components/AssetDetailDialog';
 import { ProjectSwitcher } from '@/components/ProjectSwitcher';
@@ -70,9 +71,7 @@ export default function App() {
         >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 lg:px-5 pt-5 pb-4">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] hf-gradient-primary text-[14px] font-extrabold text-white">
-            H
-          </span>
+          <Logo size={32} />
           <span className={cn('text-[17px] font-bold text-hero-text', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
             HitFrame
           </span>
@@ -133,9 +132,7 @@ export default function App() {
       {/* 移动端顶部栏 (<768px) - 首页时不显示三个页面入口 */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between bg-hero-bg border-b border-hero-line px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="grid h-7 w-7 place-items-center rounded-[8px] hf-gradient-primary text-[13px] font-extrabold text-white">
-            H
-          </span>
+          <Logo size={28} />
           <span className="text-[15px] font-bold text-hero-text">HitFrame</span>
         </div>
         <div className="flex items-center gap-3">

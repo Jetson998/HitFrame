@@ -4,6 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { homeCopy } from '@/design-tokens';
+import { Logo } from '@/components/Logo';
+
+/** 首页演示素材（真实引擎生成/真实上传，存于 public/demo/） */
+const DEMO = {
+  heroMain: '/demo/d2-street-bg-1-fixed.png',
+  streetOrigin: '/demo/user-street-pick.png',
+  streetBg: '/demo/d2-street-bg-1-fixed.png',
+  tryonModel: '/demo/ref-model2.png',
+  tryonResult: '/demo/tryon-real3-full.png',
+  chanelOrigin: '/demo/chanel-origin.png',
+  chanelModel: '/demo/chanel-model.png',
+};
 
 const TEMPLATE_CARDS = [
   {
@@ -13,6 +25,7 @@ const TEMPLATE_CARDS = [
     badge: '最常用',
     slots: 1,
     pointsFrom: 2,
+    cover: DEMO.streetBg,
   },
   {
     id: 'tpl_model',
@@ -20,6 +33,7 @@ const TEMPLATE_CARDS = [
     description: '服装平铺图生成真人试穿效果',
     slots: 2,
     pointsFrom: 2,
+    cover: DEMO.tryonResult,
   },
   {
     id: 'tpl_poster',
@@ -27,6 +41,30 @@ const TEMPLATE_CARDS = [
     description: '产品图 + 文案生成营销封面',
     slots: 1,
     pointsFrom: 2,
+    cover: DEMO.chanelModel,
+  },
+];
+
+/** 精选案例：真实前后对比（原图 → 生成结果） */
+const SHOWCASE_CASES = [
+  {
+    title: '街头人像换背景',
+    meta: '商品换背景 · 1:1',
+    before: DEMO.streetOrigin,
+    after: DEMO.streetBg,
+  },
+  {
+    title: '真人试穿换装',
+    meta: '模特上身 · 1:1',
+    before: DEMO.tryonModel,
+    after: DEMO.tryonResult,
+  },
+  {
+    title: '高端护肤营销封面',
+    meta: '电商海报 · 1:1',
+    before: DEMO.chanelOrigin,
+    beforeContain: true,
+    after: DEMO.chanelModel,
   },
 ];
 
@@ -95,9 +133,7 @@ export function HomePage() {
           }}
         >
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-[10px] hf-gradient-primary text-[14px] font-extrabold text-white">
-              H
-            </span>
+            <Logo size={38} animated />
             <span className="text-[17px] font-bold text-hero-text">HitFrame</span>
           </div>
           <div className="flex items-center gap-4">
@@ -181,94 +217,46 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* 右侧：三图组合（暂用占位） - 桌面版 */}
-          <div className="hidden lg:grid grid-cols-2 gap-3 max-w-[500px]">
-            <div className="space-y-3">
-              <Card
-                variant="hero"
-                padding="none"
-                className="aspect-square overflow-hidden relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-hero-surface to-hero-bg flex items-center justify-center text-hero-text-dim text-[12px]">
-                  原图占位
-                </div>
-                <Badge
-                  variant="hero"
-                  size="sm"
-                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
-                >
-                  原图
-                </Badge>
-              </Card>
-              <Card
-                variant="hero"
-                padding="none"
-                className="aspect-square overflow-hidden relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-hero-text-dim text-[12px]">
-                  换背景占位
-                </div>
-                <Badge
-                  variant="hero"
-                  size="sm"
-                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
-                >
-                  场景模板
-                </Badge>
-              </Card>
-            </div>
-            <div className="flex items-center">
-              <Card
-                variant="hero"
-                padding="none"
-                className="w-full aspect-[3/4] overflow-hidden relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center text-hero-text-dim text-[12px]">
-                  营销封面占位
-                </div>
-                <Badge
-                  variant="hero"
-                  size="sm"
-                  className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
-                >
-                  营销封面
-                </Badge>
-              </Card>
-            </div>
-          </div>
-
-          {/* 移动端：精简效果图（原图 → 换背景） */}
-          <div className="lg:hidden grid w-full max-w-[400px] grid-cols-2 gap-3 mx-auto mt-8">
+          {/* 右侧：主视觉单图（方案A）- 桌面版 */}
+          <div className="hidden lg:block max-w-[500px] ml-auto">
             <Card
               variant="hero"
               padding="none"
-              className="aspect-square overflow-hidden relative"
+              className="aspect-square overflow-hidden relative shadow-2xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-hero-surface to-hero-bg flex items-center justify-center text-hero-text-dim text-[11px]">
-                原图占位
-              </div>
+              <img
+                src={DEMO.heroMain}
+                alt="AI 生成商业视觉示例"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <Badge
                 variant="hero"
                 size="sm"
-                className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
+                className="absolute top-3 left-3 backdrop-blur-sm bg-hero-bg/80"
               >
-                原图
+                AI 生成 · 换背景
               </Badge>
             </Card>
+          </div>
+
+          {/* 移动端：主视觉单图 */}
+          <div className="lg:hidden w-full max-w-[400px] mx-auto mt-8">
             <Card
               variant="hero"
               padding="none"
-              className="aspect-square overflow-hidden relative"
+              className="aspect-square overflow-hidden relative shadow-xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-hero-text-dim text-[11px]">
-                换背景占位
-              </div>
+              <img
+                src={DEMO.heroMain}
+                alt="AI 生成商业视觉示例"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <Badge
                 variant="hero"
                 size="sm"
                 className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
               >
-                场景模板
+                AI 生成 · 换背景
               </Badge>
             </Card>
           </div>
@@ -300,9 +288,17 @@ export function HomePage() {
                 className="flex flex-col overflow-hidden"
                 onClick={() => goTemplate(tpl.id)}
               >
-                {/* 封面占位 */}
-                <div className="aspect-[16/10] bg-panel-muted flex items-center justify-center border-b border-line">
-                  <ImageIcon size={48} className="text-faint" />
+                {/* 封面图 - 1:1 与素材一致 */}
+                <div className="aspect-square bg-panel-muted border-b border-line overflow-hidden">
+                  <img
+                    src={tpl.cover}
+                    alt={tpl.title}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      img.style.display = 'none';
+                    }}
+                  />
                 </div>
                 <div className="p-4 flex-1 flex flex-col">
                   {tpl.badge && (
@@ -425,19 +421,33 @@ export function HomePage() {
           <p className="text-[14px] text-dim">{homeCopy.showcaseSubtitle}</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} variant="default" padding="default">
+          {SHOWCASE_CASES.map((c) => (
+            <Card key={c.title} variant="default" padding="default">
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="aspect-square rounded-[--radius-image] bg-panel-muted flex items-center justify-center">
-                  <span className="text-[11px] text-faint">原始素材</span>
+                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-panel-muted relative">
+                  <img
+                    src={c.before}
+                    alt={`${c.title} 原始素材`}
+                    className={c.beforeContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
+                  />
+                  <Badge variant="default" size="sm" className="absolute top-2 right-2 bg-panel/90">
+                    原图
+                  </Badge>
                 </div>
-                <div className="aspect-square rounded-[--radius-image] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                  <span className="text-[11px] text-faint">生成结果</span>
+                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-panel-muted relative">
+                  <img
+                    src={c.after}
+                    alt={`${c.title} 生成结果`}
+                    className="h-full w-full object-cover"
+                  />
+                  <Badge variant="primary" size="sm" className="absolute top-2 right-2">
+                    生成
+                  </Badge>
                 </div>
               </div>
-              <h3 className="text-[14px] font-semibold mb-1">案例 {i} 占位</h3>
-              <p className="text-[12px] text-dim mb-3">商品换背景 · 1:1</p>
-              <Button variant="secondary" size="sm" className="w-full">
+              <h3 className="text-[14px] font-semibold mb-1">{c.title}</h3>
+              <p className="text-[12px] text-dim mb-3">{c.meta}</p>
+              <Button variant="secondary" size="sm" className="w-full" onClick={() => goTemplate()}>
                 使用这个模板
               </Button>
             </Card>
