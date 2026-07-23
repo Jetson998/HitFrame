@@ -55,16 +55,27 @@ export default function App() {
       </div>
     );
 
+  // 首页时侧边栏完全隐藏,让 Hero 区占据主视觉
+  const sidebarCollapsed = nav === 'home';
+
   return (
     <div className="flex h-screen overflow-hidden bg-workspace-bg text-ink">
-      {/* 桌面/平板侧边栏 (≥768px) */}
-      <aside className="hidden md:flex md:w-[72px] lg:w-[224px] shrink-0 flex-col bg-hero-bg border-r border-hero-line">
+      {/* 桌面/平板侧边栏 (≥768px) - 首页时完全隐藏 */}
+      {!sidebarCollapsed && (
+        <aside
+          className={cn(
+            'hidden md:flex shrink-0 flex-col bg-hero-bg border-r border-hero-line transition-all',
+            'md:w-[72px] lg:w-[224px]',
+          )}
+        >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 lg:px-5 pt-5 pb-4">
           <span className="grid h-8 w-8 place-items-center rounded-[10px] hf-gradient-primary text-[14px] font-extrabold text-white">
             H
           </span>
-          <span className="hidden lg:block text-[17px] font-bold text-hero-text">HitFrame</span>
+          <span className={cn('text-[17px] font-bold text-hero-text', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
+            HitFrame
+          </span>
         </div>
 
         {/* 导航 */}
@@ -81,13 +92,15 @@ export default function App() {
                   nav === item.key
                     ? 'bg-hero-surface text-hero-text font-semibold'
                     : 'text-hero-text-dim hover:bg-hero-surface hover:text-hero-text',
-                  'lg:justify-start justify-center',
+                  sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
                 )}
               >
                 <Icon size={20} className="shrink-0" />
-                <span className="hidden lg:block text-[14px]">{item.label}</span>
+                <span className={cn('text-[14px]', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
+                  {item.label}
+                </span>
                 {item.key === 'assets' && assets.length > 0 && (
-                  <span className="hidden lg:block ml-auto text-[11px] text-hero-text-dim tabular-nums">
+                  <span className={cn('ml-auto text-[11px] text-hero-text-dim tabular-nums', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
                     {assets.length}
                   </span>
                 )}
@@ -98,21 +111,24 @@ export default function App() {
 
         {/* 底部：项目切换 + 余额 */}
         <div className="p-3 border-t border-hero-line">
-          <div className="hidden lg:block mb-3">
+          <div className={cn('mb-3', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
             <ProjectSwitcher />
           </div>
           <div
             className={cn(
               'flex items-center gap-2 rounded-[10px] bg-hero-surface px-3 py-2.5 text-[13px] text-hero-text',
-              'lg:justify-start justify-center',
+              sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
             )}
           >
             <Coins size={16} className="shrink-0 text-warn" />
-            <span className="hidden lg:inline">余额</span>
-            <b className="hidden lg:inline ml-auto tabular-nums">{balance ?? '—'}</b>
+            <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>余额</span>
+            <b className={cn('tabular-nums', sidebarCollapsed ? 'hidden' : 'hidden lg:inline ml-auto')}>
+              {balance ?? '—'}
+            </b>
           </div>
         </div>
       </aside>
+      )}
 
       {/* 移动端顶部栏 (<768px) */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between bg-hero-bg border-b border-hero-line px-4 py-3">

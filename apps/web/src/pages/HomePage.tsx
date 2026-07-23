@@ -31,7 +31,7 @@ const TEMPLATE_CARDS = [
 ];
 
 export function HomePage() {
-  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail } = useAppStore();
+  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail, balance } = useAppStore();
   const results = assets.filter((a) => a.type === 'result').slice(0, 4);
 
   const goTemplate = (tplId?: string) => {
@@ -52,13 +52,56 @@ export function HomePage() {
 
   return (
     <div className="min-h-full">
-      {/* Hero - 深色区 */}
-      <section className="bg-hero-bg border-b border-hero-line">
+      {/* 首页浮动导航 */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-hero-bg/95 backdrop-blur-sm border-b border-hero-line">
         <div
-          className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center"
+          className="mx-auto flex items-center justify-between py-3 px-5 md:px-8 lg:px-12"
           style={{
             maxWidth: 'var(--spacing-contentMax)',
-            padding: 'var(--spacing-heroY) var(--spacing-pageX)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-[10px] hf-gradient-primary text-[14px] font-extrabold text-white">
+              H
+            </span>
+            <span className="text-[17px] font-bold text-hero-text">HitFrame</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setNav('generate')}
+              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
+            >
+              AI 图片
+            </button>
+            <button
+              type="button"
+              onClick={() => setNav('agent')}
+              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
+            >
+              Agent
+            </button>
+            <button
+              type="button"
+              onClick={() => setNav('assets')}
+              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
+            >
+              资产库
+            </button>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-[--radius-pill] bg-hero-surface text-[13px] text-hero-text">
+              <Sparkles size={14} className="text-warn" />
+              <b className="tabular-nums">{balance ?? '—'}</b>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero - 深色区，需要 pt 为导航留空间 */}
+      <section className="bg-hero-bg border-b border-hero-line pt-[64px] px-5 md:px-8 lg:px-12">
+        <div
+          className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center py-16 md:py-20"
+          style={{
+            maxWidth: 'var(--spacing-contentMax)',
           }}
         >
           {/* 左侧：价值定位 */}
@@ -105,7 +148,7 @@ export function HomePage() {
           </div>
 
           {/* 右侧：三图组合（暂用占位） */}
-          <div className="hidden lg:grid grid-cols-2 gap-3">
+          <div className="hidden md:grid grid-cols-2 gap-3">
             <div className="space-y-3">
               <Card
                 variant="hero"
@@ -163,13 +206,7 @@ export function HomePage() {
       </section>
 
       {/* 快速开始 - 浅色区 */}
-      <section
-        className="mx-auto"
-        style={{
-          maxWidth: 'var(--spacing-contentMax)',
-          padding: 'var(--spacing-section) var(--spacing-pageX)',
-        }}
-      >
+      <section className="mx-auto px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
         <div className="mb-6">
           <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.quickStartTitle}</h2>
           <p className="text-[14px] text-dim">{homeCopy.quickStartSubtitle}</p>
@@ -239,13 +276,7 @@ export function HomePage() {
 
       {/* 最近创作 */}
       {results.length > 0 && (
-        <section
-          className="mx-auto border-t border-line"
-          style={{
-            maxWidth: 'var(--spacing-contentMax)',
-            padding: 'var(--spacing-section) var(--spacing-pageX)',
-          }}
-        >
+        <section className="mx-auto border-t border-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[24px] font-bold">{homeCopy.recentTitle}</h2>
             <button
@@ -289,13 +320,7 @@ export function HomePage() {
 
       {/* 空状态 */}
       {results.length === 0 && (
-        <section
-          className="mx-auto border-t border-line"
-          style={{
-            maxWidth: 'var(--spacing-contentMax)',
-            padding: 'var(--spacing-section) var(--spacing-pageX)',
-          }}
-        >
+        <section className="mx-auto border-t border-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
           <Card variant="muted" padding="lg" className="text-center">
             <ImageIcon size={48} className="mx-auto mb-3 text-faint" />
             <p className="text-[14px] text-dim">{homeCopy.emptyState.noAssets}</p>
@@ -304,13 +329,7 @@ export function HomePage() {
       )}
 
       {/* 精选案例（暂用占位） */}
-      <section
-        className="mx-auto border-t border-line bg-panel-muted/50"
-        style={{
-          maxWidth: 'var(--spacing-contentMax)',
-          padding: 'var(--spacing-section) var(--spacing-pageX)',
-        }}
-      >
+      <section className="mx-auto border-t border-line bg-panel-muted/50 px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
         <div className="mb-6">
           <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.showcaseTitle}</h2>
           <p className="text-[14px] text-dim">{homeCopy.showcaseSubtitle}</p>
