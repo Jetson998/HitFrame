@@ -238,7 +238,7 @@ export function HomePage() {
           </div>
 
           {/* 移动端：精简效果图（原图 → 换背景） */}
-          <div className="lg:hidden grid grid-cols-2 gap-3 max-w-[400px] mx-auto mt-8">
+          <div className="lg:hidden grid w-full max-w-[400px] grid-cols-2 gap-3 mx-auto mt-8">
             <Card
               variant="hero"
               padding="none"
