@@ -13,8 +13,8 @@ export function Chip({ active, className, type = 'button', ...props }: ChipProps
       className={cn(
         'cursor-pointer rounded-full border px-2.5 py-1 text-[11px] transition-colors',
         active
-          ? 'border-accent/50 bg-accent/15 font-semibold text-ink'
-          : 'border-line-soft bg-panel2 text-dim hover:border-line hover:text-ink',
+          ? 'border-primary/50 bg-primary/10 font-semibold text-ink'
+          : 'border-line-soft bg-panel-muted text-dim hover:border-line hover:text-ink',
         className,
       )}
       {...props}

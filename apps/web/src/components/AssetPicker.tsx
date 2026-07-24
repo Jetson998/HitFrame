@@ -38,7 +38,7 @@ export function AssetPicker({ label, required, value, onChange }: AssetPickerPro
   return (
     <div>
       <div className="mb-2 text-[11.5px] font-semibold text-dim">
-        {label} {required && <span className="text-accent">*</span>}
+        {label} {required && <span className="text-primary">*</span>}
       </div>
       <input
         ref={fileRef}
@@ -55,7 +55,7 @@ export function AssetPicker({ label, required, value, onChange }: AssetPickerPro
         type="button"
         onClick={() => fileRef.current?.click()}
         className={cn(
-          'grid aspect-[16/9] w-full cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-line bg-panel2 text-[11.5px] text-faint transition-colors hover:border-accent hover:text-dim',
+          'grid aspect-[16/9] w-full cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-line bg-panel-muted text-[11.5px] text-faint transition-colors hover:border-primary hover:text-dim',
           selected && 'border-solid',
         )}
       >
@@ -80,7 +80,7 @@ export function AssetPicker({ label, required, value, onChange }: AssetPickerPro
               onClick={() => onChange(a.id === value ? null : a.id)}
               className={cn(
                 'h-11 w-11 cursor-pointer overflow-hidden rounded-lg border transition-colors',
-                a.id === value ? 'border-accent' : 'border-line-soft hover:border-line',
+                a.id === value ? 'border-primary' : 'border-line-soft hover:border-line',
               )}
             >
               <img src={a.url} alt={a.name} className="h-full w-full object-cover" />

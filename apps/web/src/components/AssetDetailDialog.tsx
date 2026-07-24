@@ -94,7 +94,7 @@ export function AssetDetailDialog() {
               value={asset.projectId ?? ''}
               disabled={busy}
               onChange={(e) => void reassign(e.target.value || null)}
-              className="w-full cursor-pointer rounded-[9px] border border-line bg-panel2 px-2.5 py-2 text-[12.5px] text-ink focus:border-accent focus:outline-none"
+              className="w-full cursor-pointer rounded-[9px] border border-line bg-panel-muted px-2.5 py-2 text-[12.5px] text-ink focus:border-primary focus:outline-none"
             >
               <option value="">未归类</option>
               {projects.map((p) => (

@@ -21,7 +21,7 @@ export function TokenGate() {
   return (
     <div className="min-h-screen overflow-y-auto bg-bg">
       <div className="mx-auto flex w-full max-w-[1000px] flex-col items-center px-6 py-12">
-        <div className="w-[360px] rounded-2xl border border-line bg-panel p-6 shadow-[0_8px_30px_rgba(23,43,77,0.08)]">
+        <div className="w-[360px] rounded-[--radius-card] border border-line bg-panel p-6 shadow-[0_8px_30px_rgba(23,43,77,0.08)]">
           <div className="mb-1 flex items-center gap-2.5">
             <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-vio text-[13px] font-extrabold text-white">
               H
@@ -38,7 +38,7 @@ export function TokenGate() {
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && void submit()}
             placeholder="API Token"
-            className="mb-3 w-full rounded-[9px] border border-line bg-panel2 px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+            className="mb-3 w-full rounded-[9px] border border-line bg-panel-muted px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
           />
           <Button
             variant="primary"

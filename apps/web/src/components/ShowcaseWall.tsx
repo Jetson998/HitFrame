@@ -40,7 +40,7 @@ export function ShowcaseWall({ interactive = true, compact = false }: ShowcaseWa
         {showcase.map((s) => (
           <div
             key={s.id}
-            className="group relative overflow-hidden rounded-xl border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_8px_24px_rgba(23,43,77,0.12)]"
+            className="group relative overflow-hidden rounded-xl border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-[0_8px_24px_rgba(23,43,77,0.12)]"
           >
             <img src={s.url} alt={s.title} className="aspect-square w-full bg-stage object-cover" />
             <div className="px-2.5 py-2 text-[11.5px] font-medium text-ink">{s.title}</div>
@@ -53,7 +53,7 @@ export function ShowcaseWall({ interactive = true, compact = false }: ShowcaseWa
                   <button
                     type="button"
                     onClick={() => tryPrompt(s.prompt!)}
-                    className="inline-flex cursor-pointer items-center gap-1 self-start rounded-full bg-accent px-2.5 py-1 text-[10.5px] font-semibold text-white hover:bg-accent-hov"
+                    className="inline-flex cursor-pointer items-center gap-1 self-start rounded-full bg-primary px-2.5 py-1 text-[10.5px] font-semibold text-white hover:bg-primary-hover"
                   >
                     <Sparkles size={11} /> 用这个提示词
                   </button>

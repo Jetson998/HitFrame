@@ -17,13 +17,13 @@ export const DialogContent = forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-full max-w-[720px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_12px_40px_rgba(23,43,77,0.16)] focus:outline-none',
+        'fixed top-1/2 left-1/2 z-50 max-h-[90vh] w-full max-w-[720px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[--radius-card] border border-line bg-panel shadow-[0_12px_40px_rgba(23,43,77,0.16)] focus:outline-none',
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-3 right-3 cursor-pointer rounded-md p-1 text-faint hover:bg-panel2 hover:text-ink">
+      <DialogPrimitive.Close className="absolute top-3 right-3 cursor-pointer rounded-md p-1 text-faint hover:bg-panel-muted hover:text-ink">
         <X size={16} />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

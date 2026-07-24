@@ -23,11 +23,11 @@ export function OutputSettings({
 }: OutputSettingsProps) {
   return (
     <div className="my-3.5 grid grid-cols-2 gap-2">
-      <div className="rounded-[10px] border border-line-soft bg-panel2 px-3 py-2.5">
+      <div className="rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2.5">
         <span className="mb-1.5 block text-[10.5px] text-faint">模型</span>
         <span className="text-[12px] text-dim">GPT Image 2（锁定）</span>
       </div>
-      <div className="rounded-[10px] border border-line-soft bg-panel2 px-3 py-2.5">
+      <div className="rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2.5">
         <span className="mb-1.5 block text-[10.5px] text-faint">比例（按方向生效）</span>
         <div className="flex flex-wrap gap-1">
           {RATIOS.map((r) => (
@@ -37,7 +37,7 @@ export function OutputSettings({
           ))}
         </div>
       </div>
-      <div className="rounded-[10px] border border-line-soft bg-panel2 px-3 py-2.5">
+      <div className="rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2.5">
         <span className="mb-1.5 block text-[10.5px] text-faint">清晰度</span>
         <div className="flex flex-wrap gap-1">
           {(Object.keys(POINTS_PER_IMAGE) as Quality[]).map((q) => (
@@ -47,7 +47,7 @@ export function OutputSettings({
           ))}
         </div>
       </div>
-      <div className="rounded-[10px] border border-line-soft bg-panel2 px-3 py-2.5">
+      <div className="rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2.5">
         <span className="mb-1.5 block text-[10.5px] text-faint">数量（候选张数）</span>
         <div className="flex flex-wrap gap-1">
           {[1, 2, 3, 4].map((n) => (

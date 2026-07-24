@@ -44,7 +44,7 @@ export function ResultPanel({ run, submitting, expectedCount, ratio, onRetry }: 
     run?.jobs ?? Array.from({ length: expectedCount }, () => null);
 
   return (
-    <div className="rounded-2xl border border-line bg-panel p-4">
+    <div className="rounded-[--radius-card] border border-line bg-panel p-4">
       <div className="mb-3 flex items-baseline justify-between">
         <span className="text-[12.5px] font-bold">生成结果</span>
         <span className="text-[11px] text-faint">
