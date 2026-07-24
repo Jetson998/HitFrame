@@ -55,14 +55,14 @@ export function AssetPicker({ label, required, value, onChange }: AssetPickerPro
         type="button"
         onClick={() => fileRef.current?.click()}
         className={cn(
-          'grid aspect-[16/9] w-full cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-line bg-panel-muted text-[11.5px] text-faint transition-colors hover:border-primary hover:text-dim',
+          'grid aspect-[4/3] w-full cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-line bg-panel-muted text-[11.5px] text-faint transition-colors hover:border-primary hover:text-dim',
           selected && 'border-solid',
         )}
       >
         {uploading ? (
           <span>上传中…</span>
         ) : selected ? (
-          <img src={selected.url} alt={selected.name} className="h-full w-full object-contain" />
+          <img src={selected.url} alt={selected.name} className="max-h-full max-w-full object-contain" />
         ) : (
           <span className="flex flex-col items-center gap-1.5">
             <Upload size={18} />

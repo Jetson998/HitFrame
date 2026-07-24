@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore, type NavKey } from '@/store';
@@ -23,10 +23,16 @@ export default function App() {
   const { nav, setNav, auth, bootError, bootstrap, balance, assets, genMode, activeTplId, toast } =
     useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     void bootstrap();
   }, [bootstrap]);
+
+  // 页面/模板切换时主滚动容器复位到顶部，避免继承上一页滚动位置
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+  }, [nav, genMode, activeTplId]);
 
   if (auth === 'unauthorized') return <TokenGate />;
   if (auth === 'checking')
@@ -249,7 +255,7 @@ export default function App() {
       </div>
 
       {/* 主内容区 */}
-      <main className="flex-1 overflow-y-auto pt-[54px] pb-[64px] md:pt-0 md:pb-0">
+      <main ref={mainRef} className="flex-1 overflow-y-auto pt-[54px] pb-[64px] md:pt-0 md:pb-0">
         {nav === 'home' && <HomePage />}
         {nav === 'generate' &&
           (genMode === 'template' && activeTplId ? (

@@ -5,6 +5,13 @@ import { cn } from '@/lib/utils';
 
 const SCENE_ICON: Record<string, string> = { bg: '🎨', poster: '📕', model: '👗' };
 
+/** 正式模板封面（复用首页真实图，按模板 id 映射）；未映射的回退 emoji 占位 */
+const TEMPLATE_COVER: Record<string, string> = {
+  tpl_bg: '/demo/d2-street-bg-1-fixed.png',
+  tpl_model: '/demo/tryon-real3-full.png',
+  tpl_poster: '/demo/chanel-model.png',
+};
+
 /** 场景分类：sceneType → 分类键（S5 模板卡筛选） */
 const SCENE_CATEGORY: Record<string, CategoryKey> = {
   bg: 'product',
@@ -76,8 +83,21 @@ export function TemplateCards() {
               key={tpl.id}
               className="flex flex-col overflow-hidden rounded-[--radius-card] border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-primary"
             >
-              <div className="relative grid aspect-[16/10] place-items-center bg-panel-muted text-4xl">
-                {SCENE_ICON[tpl.sceneType] ?? '🧩'}
+              <div className="relative aspect-square overflow-hidden bg-panel-muted">
+                {TEMPLATE_COVER[tpl.id] ? (
+                  <img
+                    src={TEMPLATE_COVER[tpl.id]}
+                    alt={tpl.title}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="grid h-full w-full place-items-center text-4xl">
+                    {SCENE_ICON[tpl.sceneType] ?? '🧩'}
+                  </div>
+                )}
                 <span className="absolute top-2.5 right-2.5 rounded-full border border-line bg-white/85 px-2 py-0.5 text-[10.5px] text-dim backdrop-blur-sm">
                   图片槽位 × {tpl.slots.length}
                   {optionalSlots > 0 && `（${requiredSlots} 必填）`}

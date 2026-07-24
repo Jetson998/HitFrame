@@ -217,8 +217,8 @@ export function HomePage() {
             </div>
           </div>
 
-          {/* 右侧：主视觉单图（方案A）- 桌面版 */}
-          <div className="hidden lg:block max-w-[500px] ml-auto">
+          {/* 右侧：主视觉单图（方案A）- 桌面版。w-full 必需:内部 img 绝对定位无固有宽度,不撑则容器塌成0 */}
+          <div className="hidden lg:block w-full max-w-[500px] ml-auto">
             <Card
               variant="hero"
               padding="none"
