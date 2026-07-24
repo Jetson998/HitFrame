@@ -107,7 +107,7 @@ export function TemplateConfigPage() {
 
       <div className="grid items-start gap-5 lg:grid-cols-[1fr_420px]">
         <div className="flex flex-col gap-4">
-          <div className="rounded-2xl border border-line bg-panel p-4">
+          <div className="rounded-[--radius-card] border border-line bg-panel p-4">
             {tpl.slots.map((slot, i) => (
               <AssetPicker
                 key={slot.key}
@@ -119,21 +119,21 @@ export function TemplateConfigPage() {
             ))}
           </div>
 
-          <div className="rounded-2xl border border-line bg-panel p-4">
+          <div className="rounded-[--radius-card] border border-line bg-panel p-4">
             <div className="mb-3 text-[11.5px] font-semibold text-dim">
               🎛️ 业务变量（填空 + 选项，不暴露 prompt）
             </div>
             {tpl.varsSchema.map((v) => (
               <div key={v.key} className="mb-3 last:mb-0">
                 <div className="mb-1.5 text-[11.5px] text-dim">
-                  {v.label} {v.required && <span className="text-accent">*</span>}
+                  {v.label} {v.required && <span className="text-primary">*</span>}
                 </div>
                 {v.type === 'text' ? (
                   <input
                     value={vars[v.key] ?? ''}
                     onChange={(e) => setVars((s) => ({ ...s, [v.key]: e.target.value }))}
                     placeholder={v.placeholder}
-                    className="w-full rounded-[9px] border border-line bg-panel2 px-3 py-2 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+                    className="w-full rounded-[9px] border border-line bg-panel-muted px-3 py-2 text-[12.5px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
                   />
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
@@ -152,13 +152,13 @@ export function TemplateConfigPage() {
             ))}
           </div>
 
-          <div className="rounded-2xl border border-line bg-panel p-4">
+          <div className="rounded-[--radius-card] border border-line bg-panel p-4">
             <div className="mb-2 text-[11.5px] font-semibold text-dim">💬 补充描述（可选）</div>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="用一句话补充想要的效果，可留空"
-              className="min-h-[56px] w-full resize-y rounded-[10px] border border-line bg-panel2 px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+              className="min-h-[56px] w-full resize-y rounded-[10px] border border-line bg-panel-muted px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
             />
             <OutputSettings
               ratio={ratio}

@@ -121,14 +121,14 @@ export function GeneratePage() {
         <TemplateCards />
       ) : (
         <div className="grid items-start gap-5 lg:grid-cols-[360px_1fr]">
-          <div className="rounded-2xl border border-line bg-panel p-4">
+          <div className="rounded-[--radius-card] border border-line bg-panel p-4">
             {genMode === 'i2i' && (
               <div className="mb-3.5">
                 <AssetPicker label="参考图" required value={refAssetId} onChange={setRefAssetId} />
               </div>
             )}
             <div className="mb-2 text-[11.5px] font-semibold text-dim">
-              提示词 {genMode === 't2i' && <span className="text-accent">*</span>}
+              提示词 {genMode === 't2i' && <span className="text-primary">*</span>}
               {genMode === 'i2i' && (
                 <span className="font-normal text-faint">（可留空，默认同风格新图）</span>
               )}
@@ -137,7 +137,7 @@ export function GeneratePage() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="主体 + 场景 + 光影 + 风格，例如：霓虹雨夜的赛博朋克街头，机车女骑手回眸，电影感构图"
-              className="min-h-[72px] w-full resize-y rounded-[10px] border border-line bg-panel2 px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+              className="min-h-[72px] w-full resize-y rounded-[10px] border border-line bg-panel-muted px-3 py-2.5 text-[12.5px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
             />
             <div className="mt-2 flex flex-wrap gap-1.5">
               {SUGGESTIONS.map((s) => (

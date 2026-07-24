@@ -101,7 +101,7 @@ export function AgentPage() {
   return (
     <div className="mx-auto w-full max-w-[1100px] px-8 py-8">
       <div className="mb-1 flex items-center gap-2 text-[18px] font-bold">
-        <Wand2 size={18} className="text-accent" /> Agent 创作
+        <Wand2 size={18} className="text-primary" /> Agent 创作
       </div>
       <p className="mt-0 mb-5 text-[12.5px] text-dim">
         低门槛意图入口：说清目标，Agent 解析素材、选模板与参数，确认后统一生成。
@@ -110,12 +110,12 @@ export function AgentPage() {
       <div className="grid items-start gap-5 lg:grid-cols-[1fr_420px]">
         <div className="flex flex-col gap-4">
           {/* 输入区 */}
-          <div className="rounded-2xl border border-line bg-panel p-4">
+          <div className="rounded-[--radius-card] border border-line bg-panel p-4">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="例如：帮我把这个口红换成大理石背景，1:1，两张，标准质量"
-              className="min-h-[90px] w-full resize-y rounded-[10px] border border-line bg-panel2 px-3 py-2.5 text-[13px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+              className="min-h-[90px] w-full resize-y rounded-[10px] border border-line bg-panel-muted px-3 py-2.5 text-[13px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
             />
             <div className="mt-3 flex items-center gap-3">
               <div className="flex-1">
@@ -139,7 +139,7 @@ export function AgentPage() {
 
           {/* 方案卡 */}
           {plan && (
-            <div className="rounded-2xl border border-line bg-panel p-4">
+            <div className="rounded-[--radius-card] border border-line bg-panel p-4">
               <div className="mb-3 text-[12.5px] font-bold">Agent 方案（待确认）</div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <PlanField label="推荐路径" value={MODE_LABEL[plan.mode]} />
@@ -158,7 +158,7 @@ export function AgentPage() {
               </div>
 
               {plan.additionalPrompt && (
-                <div className="mt-3 rounded-[10px] border border-line-soft bg-panel2 px-3 py-2 text-[11.5px] text-dim">
+                <div className="mt-3 rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2 text-[11.5px] text-dim">
                   <span className="text-faint">补充描述：</span>
                   {plan.additionalPrompt}
                 </div>
@@ -209,7 +209,7 @@ export function AgentPage() {
 
 function PlanField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[10px] border border-line-soft bg-panel2 px-3 py-2.5">
+    <div className="rounded-[10px] border border-line-soft bg-panel-muted px-3 py-2.5">
       <div className="mb-1 text-[10.5px] text-faint">{label}</div>
       <div className="text-[12.5px] font-medium text-ink">{value}</div>
     </div>

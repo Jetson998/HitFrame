@@ -27,14 +27,14 @@ export function ProjectSwitcher() {
   return (
     <div className="px-3 pt-3 pb-1">
       <div className="mb-2 flex items-center justify-between px-0.5">
-        <span className="text-[11px] font-semibold text-hero-text-dim uppercase tracking-wider">
+        <span className="text-[11px] font-semibold text-dim uppercase tracking-wider">
           项目
         </span>
         <button
           type="button"
           title="新建项目"
           onClick={() => setCreating((v) => !v)}
-          className="cursor-pointer rounded-md p-1 text-hero-text-dim hover:bg-hero-surface-hover hover:text-hero-text"
+          className="cursor-pointer rounded-md p-1 text-dim hover:bg-panel-muted hover:text-ink"
         >
           <FolderPlus size={14} />
         </button>
@@ -47,7 +47,7 @@ export function ProjectSwitcher() {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && void submit()}
             placeholder="项目名称"
-            className="h-8 min-w-0 flex-1 rounded-[--radius-control] border border-hero-line bg-hero-surface px-2.5 text-[12px] text-hero-text placeholder:text-hero-text-dim focus:border-primary focus:outline-none"
+            className="h-8 min-w-0 flex-1 rounded-[--radius-control] border border-line bg-panel-muted px-2.5 text-[12px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
           />
           <Button
             size="sm"
@@ -62,7 +62,7 @@ export function ProjectSwitcher() {
       <select
         value={currentProjectId ?? ''}
         onChange={(e) => setCurrentProject(e.target.value || null)}
-        className="w-full cursor-pointer rounded-[--radius-control] border border-hero-line bg-hero-surface px-2.5 py-2 text-[12px] text-hero-text focus:border-primary focus:outline-none"
+        className="w-full cursor-pointer rounded-[--radius-control] border border-line bg-panel-muted px-2.5 py-2 text-[12px] text-ink focus:border-primary focus:outline-none"
       >
         <option value="">未归类</option>
         {projects.map((p) => (

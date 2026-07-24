@@ -123,7 +123,7 @@ export function HomePage() {
   };
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full bg-hero-bg">
       {/* 首页浮动导航 - 桌面显示完整导航,移动端只显示品牌 */}
       <nav className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-hero-bg/95 backdrop-blur-sm border-b border-hero-line">
         <div
@@ -167,7 +167,7 @@ export function HomePage() {
       </nav>
 
       {/* Hero - 深色区，需要 pt 为导航留空间 */}
-      <section className="bg-hero-bg border-b border-hero-line md:pt-[64px] px-5 md:px-8 lg:px-12">
+      <section className="bg-hero-bg md:pt-[64px] px-5 md:px-8 lg:px-12">
         <div
           className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center py-12 md:py-16 lg:py-16"
           style={{
@@ -263,11 +263,11 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* 快速开始 - 浅色区 */}
+      {/* 快速开始 */}
       <section className="mx-auto px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
         <div className="mb-6">
-          <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.quickStartTitle}</h2>
-          <p className="text-[14px] text-dim">{homeCopy.quickStartSubtitle}</p>
+          <h2 className="text-[24px] font-bold mb-1.5 text-hero-text">{homeCopy.quickStartTitle}</h2>
+          <p className="text-[14px] text-hero-text-dim">{homeCopy.quickStartSubtitle}</p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -282,14 +282,14 @@ export function HomePage() {
             return (
               <Card
                 key={tpl.id}
-                variant="default"
+                variant="hero"
                 padding="none"
                 interactive
-                className="flex flex-col overflow-hidden"
+                className="flex flex-col overflow-hidden hover:border-primary/40 transition-colors"
                 onClick={() => goTemplate(tpl.id)}
               >
                 {/* 封面图 - 1:1 与素材一致 */}
-                <div className="aspect-square bg-panel-muted border-b border-line overflow-hidden">
+                <div className="aspect-square bg-hero-bg border-b border-hero-line overflow-hidden">
                   <img
                     src={tpl.cover}
                     alt={tpl.title}
@@ -306,11 +306,11 @@ export function HomePage() {
                       {tpl.badge}
                     </Badge>
                   )}
-                  <h3 className="text-[16px] font-semibold mb-1.5">{tpl.title}</h3>
-                  <p className="text-[13px] text-dim leading-relaxed mb-3 flex-1">
+                  <h3 className="text-[16px] font-semibold mb-1.5 text-hero-text">{tpl.title}</h3>
+                  <p className="text-[13px] text-hero-text-dim leading-relaxed mb-3 flex-1">
                     {tpl.description}
                   </p>
-                  <div className="flex items-center justify-between text-[12px] text-faint mb-3">
+                  <div className="flex items-center justify-between text-[12px] text-hero-text-dim/70 mb-3">
                     <span>{slotsText}</span>
                     <span>{tpl.pointsFrom} 点起</span>
                   </div>
@@ -326,7 +326,7 @@ export function HomePage() {
 
         {/* 其他创作方式 */}
         <div className="flex flex-wrap items-center gap-3 text-[13px]">
-          <span className="text-dim">其他创作方式</span>
+          <span className="text-hero-text-dim">其他创作方式</span>
           <button
             type="button"
             onClick={() => goMode('t2i')}
@@ -348,9 +348,9 @@ export function HomePage() {
 
       {/* 最近创作 */}
       {results.length > 0 && (
-        <section className="mx-auto border-t border-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+        <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-[24px] font-bold">{homeCopy.recentTitle}</h2>
+            <h2 className="text-[24px] font-bold text-hero-text">{homeCopy.recentTitle}</h2>
             <button
               type="button"
               onClick={() => setNav('assets')}
@@ -364,16 +364,16 @@ export function HomePage() {
             {results.map((a) => (
               <Card
                 key={a.id}
-                variant="default"
+                variant="hero"
                 padding="none"
                 interactive
-                className="overflow-hidden"
+                className="overflow-hidden hover:border-primary/40 transition-colors"
                 onClick={() => openDetail(a)}
               >
                 <img
                   src={a.url}
                   alt={getAssetDisplayName(a, templates)}
-                  className="aspect-square w-full object-cover bg-panel-muted"
+                  className="aspect-square w-full object-cover bg-hero-bg"
                   onError={(e) => {
                     const img = e.currentTarget;
                     img.style.display = 'none';
@@ -381,17 +381,17 @@ export function HomePage() {
                     if (fallback) fallback.style.display = 'grid';
                   }}
                 />
-                <div className="hidden aspect-square w-full place-items-center bg-panel-muted text-faint">
+                <div className="hidden aspect-square w-full place-items-center bg-hero-bg text-hero-text-dim">
                   <div className="text-center">
                     <ImageIcon size={32} className="mx-auto mb-2 opacity-40" />
                     <div className="text-[11px]">图片暂不可用</div>
                   </div>
                 </div>
                 <div className="p-3">
-                  <div className="text-[13px] text-ink font-medium truncate mb-0.5">
+                  <div className="text-[13px] text-hero-text font-medium truncate mb-0.5">
                     {getAssetDisplayName(a, templates)}
                   </div>
-                  <div className="text-[11px] text-faint">
+                  <div className="text-[11px] text-hero-text-dim/70">
                     {new Date(a.createdAt).toLocaleDateString('zh-CN', {
                       month: 'short',
                       day: 'numeric',
@@ -406,35 +406,35 @@ export function HomePage() {
 
       {/* 空状态 */}
       {results.length === 0 && (
-        <section className="mx-auto border-t border-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
-          <Card variant="muted" padding="lg" className="text-center">
-            <ImageIcon size={48} className="mx-auto mb-3 text-faint" />
-            <p className="text-[14px] text-dim">{homeCopy.emptyState.noAssets}</p>
+        <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+          <Card variant="hero" padding="lg" className="text-center">
+            <ImageIcon size={48} className="mx-auto mb-3 text-hero-text-dim" />
+            <p className="text-[14px] text-hero-text-dim">{homeCopy.emptyState.noAssets}</p>
           </Card>
         </section>
       )}
 
-      {/* 精选案例（暂用占位） */}
-      <section className="mx-auto border-t border-line bg-panel-muted/50 px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+      {/* 精选案例 */}
+      <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
         <div className="mb-6">
-          <h2 className="text-[24px] font-bold mb-1.5">{homeCopy.showcaseTitle}</h2>
-          <p className="text-[14px] text-dim">{homeCopy.showcaseSubtitle}</p>
+          <h2 className="text-[24px] font-bold mb-1.5 text-hero-text">{homeCopy.showcaseTitle}</h2>
+          <p className="text-[14px] text-hero-text-dim">{homeCopy.showcaseSubtitle}</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {SHOWCASE_CASES.map((c) => (
-            <Card key={c.title} variant="default" padding="default">
+            <Card key={c.title} variant="hero" padding="default" className="hover:border-primary/40 transition-colors">
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-panel-muted relative">
+                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-hero-bg relative">
                   <img
                     src={c.before}
                     alt={`${c.title} 原始素材`}
                     className={c.beforeContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
                   />
-                  <Badge variant="default" size="sm" className="absolute top-2 right-2 bg-panel/90">
+                  <Badge variant="hero" size="sm" className="absolute top-2 right-2 backdrop-blur-sm bg-hero-bg/80">
                     原图
                   </Badge>
                 </div>
-                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-panel-muted relative">
+                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-hero-bg relative">
                   <img
                     src={c.after}
                     alt={`${c.title} 生成结果`}
@@ -445,9 +445,14 @@ export function HomePage() {
                   </Badge>
                 </div>
               </div>
-              <h3 className="text-[14px] font-semibold mb-1">{c.title}</h3>
-              <p className="text-[12px] text-dim mb-3">{c.meta}</p>
-              <Button variant="secondary" size="sm" className="w-full" onClick={() => goTemplate()}>
+              <h3 className="text-[14px] font-semibold mb-1 text-hero-text">{c.title}</h3>
+              <p className="text-[12px] text-hero-text-dim mb-3">{c.meta}</p>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full bg-hero-surface-hover border-hero-line text-hero-text hover:bg-hero-surface hover:border-primary/40"
+                onClick={() => goTemplate()}
+              >
                 使用这个模板
               </Button>
             </Card>

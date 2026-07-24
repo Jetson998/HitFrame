@@ -58,8 +58,8 @@ export function TemplateCards() {
             className={cn(
               'rounded-full border px-3.5 py-1.5 text-[12px] transition-colors',
               category === c.key
-                ? 'border-accent/40 bg-accent/15 font-semibold text-ink'
-                : 'border-line bg-panel text-dim hover:border-accent/30 hover:text-ink',
+                ? 'border-primary/40 bg-primary/15 font-semibold text-ink'
+                : 'border-line bg-panel text-dim hover:border-primary/30 hover:text-ink',
             )}
           >
             {c.label}
@@ -74,9 +74,9 @@ export function TemplateCards() {
           return (
             <div
               key={tpl.id}
-              className="flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-accent"
+              className="flex flex-col overflow-hidden rounded-[--radius-card] border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-primary"
             >
-              <div className="relative grid aspect-[16/10] place-items-center bg-panel2 text-4xl">
+              <div className="relative grid aspect-[16/10] place-items-center bg-panel-muted text-4xl">
                 {SCENE_ICON[tpl.sceneType] ?? '🧩'}
                 <span className="absolute top-2.5 right-2.5 rounded-full border border-line bg-white/85 px-2 py-0.5 text-[10.5px] text-dim backdrop-blur-sm">
                   图片槽位 × {tpl.slots.length}
@@ -93,7 +93,7 @@ export function TemplateCards() {
                   {tpl.varsSchema.slice(0, 4).map((v) => (
                     <span
                       key={v.key}
-                      className="rounded border border-line-soft bg-panel2 px-1.5 py-0.5 text-[10px] text-faint"
+                      className="rounded border border-line-soft bg-panel-muted px-1.5 py-0.5 text-[10px] text-faint"
                     >
                       {v.label}
                       {v.required ? ' *' : ''}
@@ -112,9 +112,9 @@ export function TemplateCards() {
           SOON.map((s) => (
             <div
               key={s.name}
-              className="flex flex-col overflow-hidden rounded-2xl border border-line bg-panel opacity-55"
+              className="flex flex-col overflow-hidden rounded-[--radius-card] border border-line bg-panel opacity-55"
             >
-              <div className="grid aspect-[16/10] place-items-center bg-panel2 text-4xl">
+              <div className="grid aspect-[16/10] place-items-center bg-panel-muted text-4xl">
                 {s.icon}
               </div>
               <div className="flex flex-1 flex-col p-4">

@@ -44,7 +44,7 @@ export function AssetsPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="🔍 搜索资产名称…"
-            className="h-9 w-52 rounded-[9px] border border-line bg-panel2 px-3 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+            className="h-9 w-52 rounded-[9px] border border-line bg-panel-muted px-3 text-[12.5px] text-ink placeholder:text-faint focus:border-primary focus:outline-none"
           />
           <input
             ref={fileRef}
@@ -97,7 +97,7 @@ export function AssetsPage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="grid h-48 place-items-center rounded-2xl border border-dashed border-line text-[12.5px] text-faint">
+        <div className="grid h-48 place-items-center rounded-[--radius-card] border border-dashed border-line text-[12.5px] text-faint">
           没有符合条件的资产，先上传一张素材或生成一张图
         </div>
       ) : (
@@ -107,7 +107,7 @@ export function AssetsPage() {
               key={a.id}
               type="button"
               onClick={() => openDetail(a)}
-              className="cursor-pointer overflow-hidden rounded-xl border border-line bg-panel text-left transition-colors hover:border-accent"
+              className="cursor-pointer overflow-hidden rounded-xl border border-line bg-panel text-left transition-colors hover:border-primary"
             >
               <img
                 src={a.url}
