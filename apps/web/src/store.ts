@@ -7,6 +7,24 @@ export type NavKey = 'home' | 'generate' | 'agent' | 'assets';
 export type GenMode = 'i2i' | 't2i' | 'template';
 export type AuthState = 'checking' | 'ok' | 'unauthorized' | 'error';
 
+const NAV_KEYS: NavKey[] = ['home', 'generate', 'agent', 'assets'];
+
+/**
+ * 使用 hash 保存当前主页面：刷新后留在原页面，同时无需服务端配置 SPA 路由回退。
+ * 例：#/assets、#/generate；空 hash 视为首页。
+ */
+export function navFromLocation(): NavKey {
+  if (typeof window === 'undefined') return 'home';
+  const key = window.location.hash.replace(/^#\/?/, '').split(/[?&]/)[0];
+  return NAV_KEYS.includes(key as NavKey) ? (key as NavKey) : 'home';
+}
+
+function syncNavHash(nav: NavKey) {
+  if (typeof window === 'undefined') return;
+  const next = nav === 'home' ? '#/' : `#/${nav}`;
+  if (window.location.hash !== next) window.location.hash = next;
+}
+
 interface AppState {
   nav: NavKey;
   setNav: (nav: NavKey) => void;
@@ -58,8 +76,11 @@ interface AppState {
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 export const useAppStore = create<AppState>((set, get) => ({
-  nav: 'home',
-  setNav: (nav) => set({ nav }),
+  nav: navFromLocation(),
+  setNav: (nav) => {
+    syncNavHash(nav);
+    set({ nav });
+  },
 
   auth: 'checking',
   bootError: null,

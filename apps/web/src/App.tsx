@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAppStore, type NavKey } from '@/store';
+import { useAppStore, navFromLocation, type NavKey } from '@/store';
 import { Logo } from '@/components/Logo';
 import { TokenGate } from '@/components/TokenGate';
 import { AssetDetailDialog } from '@/components/AssetDetailDialog';
@@ -28,6 +28,13 @@ export default function App() {
   useEffect(() => {
     void bootstrap();
   }, [bootstrap]);
+
+  // 浏览器后退/前进或手动修改 hash 时，同步到应用导航
+  useEffect(() => {
+    const handleHashChange = () => setNav(navFromLocation());
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [setNav]);
 
   // 页面/模板切换时主滚动容器复位到顶部，避免继承上一页滚动位置
   useEffect(() => {
