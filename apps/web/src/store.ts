@@ -125,14 +125,17 @@ export const useAppStore = create<AppState>((set, get) => ({
   setActiveTplId: (activeTplId) => set({ activeTplId }),
   refAssetId: null,
   setRefAssetId: (refAssetId) => set({ refAssetId }),
-  referAsset: (assetId) =>
+  referAsset: (assetId) => {
+    // 经 syncNavHash 而非直接 set nav：否则 hash 停在 #/assets，刷新后跳回资产库
+    syncNavHash('generate');
     set({
       refAssetId: assetId,
       genMode: 'i2i',
       activeTplId: null,
       nav: 'generate',
       detailAsset: null,
-    }),
+    });
+  },
 
   balance: null,
   assets: [],
@@ -190,8 +193,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
   pendingPrompt: null,
-  tryPrompt: (prompt) =>
-    set({ pendingPrompt: prompt, genMode: 't2i', activeTplId: null, nav: 'generate' }),
+  tryPrompt: (prompt) => {
+    syncNavHash('generate');
+    set({ pendingPrompt: prompt, genMode: 't2i', activeTplId: null, nav: 'generate' });
+  },
   consumePendingPrompt: () => {
     const p = get().pendingPrompt;
     if (p) set({ pendingPrompt: null });
