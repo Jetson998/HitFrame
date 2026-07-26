@@ -1,4 +1,4 @@
-import { Sparkles, MessageSquare, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, MessageSquare, ArrowRight, Image as ImageIcon, HelpCircle } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -103,7 +103,8 @@ function getAssetDisplayName(asset: { name: string; type: string }, templates: {
 }
 
 export function HomePage() {
-  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail, balance } = useAppStore();
+  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail, balance, setHelpOpen } =
+    useAppStore();
   const results = assets.filter((a) => a.type === 'result').slice(0, 4);
 
   const goTemplate = (tplId?: string) => {
@@ -157,6 +158,14 @@ export function HomePage() {
               className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
             >
               资产库
+            </button>
+            <button
+              type="button"
+              onClick={() => setHelpOpen(true)}
+              className="flex items-center gap-1 text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
+            >
+              <HelpCircle size={14} />
+              帮助
             </button>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-[--radius-pill] bg-hero-surface text-[13px] text-hero-text">
               <Sparkles size={14} className="text-warn" />

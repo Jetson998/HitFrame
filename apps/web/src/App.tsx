@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins } from 'lucide-react';
+import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore, navFromLocation, type NavKey } from '@/store';
 import { Logo } from '@/components/Logo';
 import { TokenGate } from '@/components/TokenGate';
 import { AssetDetailDialog } from '@/components/AssetDetailDialog';
+import { HelpDialog } from '@/components/HelpDialog';
 import { ProjectSwitcher } from '@/components/ProjectSwitcher';
 import { HomePage } from '@/pages/HomePage';
 import { GeneratePage } from '@/pages/GeneratePage';
@@ -20,8 +21,19 @@ const NAV_ITEMS: Array<{ key: NavKey; icon: typeof Home; label: string }> = [
 ];
 
 export default function App() {
-  const { nav, setNav, auth, bootError, bootstrap, balance, assets, genMode, activeTplId, toast } =
-    useAppStore();
+  const {
+    nav,
+    setNav,
+    auth,
+    bootError,
+    bootstrap,
+    balance,
+    assets,
+    genMode,
+    activeTplId,
+    toast,
+    setHelpOpen,
+  } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -122,8 +134,20 @@ export default function App() {
           })}
         </nav>
 
-        {/* 底部：项目切换 + 余额 */}
+        {/* 底部：帮助 + 项目切换 + 余额 */}
         <div className="p-3 border-t border-line">
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            title="快速上手"
+            className={cn(
+              'mb-2 flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-[13px] text-dim transition-colors hover:bg-panel-muted hover:text-ink',
+              sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
+            )}
+          >
+            <HelpCircle size={16} className="shrink-0" />
+            <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>快速上手</span>
+          </button>
           <div className={cn('mb-3', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
             <ProjectSwitcher />
           </div>
@@ -275,6 +299,7 @@ export default function App() {
       </main>
 
       <AssetDetailDialog />
+      <HelpDialog />
       {toast && (
         <div
           className="fixed bottom-20 md:bottom-6 left-1/2 z-[70] -translate-x-1/2 rounded-full border border-line bg-panel px-4 py-2 text-[12px]"

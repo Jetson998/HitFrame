@@ -71,6 +71,10 @@ interface AppState {
 
   toast: string | null;
   showToast: (msg: string) => void;
+
+  /** 帮助面板（首页导航 + 子页侧边栏共用同一个入口/状态） */
+  helpOpen: boolean;
+  setHelpOpen: (open: boolean) => void;
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
@@ -209,4 +213,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ toast });
     toastTimer = setTimeout(() => set({ toast: null }), 2600);
   },
+
+  helpOpen: false,
+  setHelpOpen: (helpOpen) => set({ helpOpen }),
 }));
