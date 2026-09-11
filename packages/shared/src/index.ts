@@ -3,17 +3,28 @@
  * 口径来源：HitFrame_技术架构方案.md v3.0.2 §四·五 A0 / §五。
  */
 
+import type { ReferenceInput } from './creative';
+
 // ---- 业务枚举 ----
 
 export type GenerationMode = 't2i' | 'i2i' | 'template';
 
+/** 未指定项目时，新上传与新生成资产统一归入此项目。 */
+export const DEFAULT_PROJECT_ID = 'proj_default';
+
 /** 生成来源（非执行器类型）；M1 仅写入 quick | template，其余为保留值 */
 export type RunOrigin = 'quick' | 'template' | 'agent' | 'plan' | 'workflow';
 
-/** 画质内部枚举；引擎参数映射由 Provider 内部消化（standard→medium, high→high） */
-export type Quality = 'standard' | 'high';
+/**
+ * 画质内部枚举；引擎参数映射由 Provider 内部消化。
+ * preview / standard / high 分别对应供应商 low / medium / high。
+ */
+export type Quality = 'preview' | 'standard' | 'high';
 
 export type Ratio = '1:1' | '3:4' | '4:3' | '9:16';
+
+/** 图生图参考图上限：控制上传体积与多图融合延迟，前后端共用。 */
+export const MAX_REFERENCE_IMAGES = 6;
 
 export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
 export type RunStatus = 'queued' | 'running' | 'partial' | 'succeeded' | 'failed';
@@ -82,8 +93,9 @@ export function classifyJobError(signal: {
 
 // ---- 唯一口径映射 ----
 
-/** 画质 → 点数/张（技术方案 A0 画质档位映射表） */
+/** 画质 → 点数/张：预览 1、标准 2、高清 4。 */
 export const POINTS_PER_IMAGE: Record<Quality, number> = {
+  preview: 1,
   standard: 2,
   high: 4,
 };
@@ -104,15 +116,18 @@ export function objectKey(projectId: string, runId: string, jobId: string, ext: 
 // ---- A0 契约 DTO ----
 
 export interface GenerationOptionsDto {
-  ratio: Ratio;
+  /** 省略时由图像引擎自动决定画面比例 */
+  ratio?: Ratio;
   quality: Quality;
   /** 本次 Run 生成的候选数（≠ 最终交付数；taskCount/finalOutputCount 属 M2b 计划层） */
   candidateCount: number;
 }
 
 export interface GenerationInputsDto {
-  /** 图片槽位：资产 id 列表（mode=i2i/template） */
+  /** 图片槽位：资产 id 列表（mode=i2i/template）；数组顺序即引擎 Image N 顺序 */
   slots?: string[];
+  /** 带业务语义的参考图；存在时优先于仅有 slots 的旧调用。 */
+  references?: ReferenceInput[];
   /** 业务变量（mode=template） */
   vars?: Record<string, string>;
   /** 补充描述，一律可选 */
@@ -123,6 +138,8 @@ export interface GenerationInputsDto {
 export interface GenerationRequestDto {
   mode: GenerationMode;
   templateId?: string;
+  /** 已确认的提示词编译快照；编译本身不创建 Run。 */
+  promptCompilationId?: string;
   inputs: GenerationInputsDto;
   options: GenerationOptionsDto;
   projectId?: string;
@@ -221,6 +238,10 @@ export interface ShowcaseItemDto {
 
 /** POST /api/v1/agent/route 响应（S5.4）：Agent 规则路由方案卡（无副作用） */
 export interface AgentPlanDto {
+  /** 自动推荐或用户明确选择的图片 Skill。 */
+  skillId?: string;
+  /** 单图或图片组；图片组的执行语义由后续 generation-set 能力承接。 */
+  outputType?: 'image' | 'image_set';
   /** 推荐路径：t2i(文生图) / i2i(图生图，无模板) / template(模板) */
   mode: 't2i' | 'i2i' | 'template';
   /** 模板 ID（mode=template 时） */
@@ -233,8 +254,24 @@ export interface AgentPlanDto {
   };
   /** 槽位缺失提示（有值时前端只允许补图，不允许提交） */
   missingSlots?: string[];
+  /** 当前 Skill 是否允许用户明确选择无参考图创作。 */
+  allowsTextOnly?: boolean;
   /** 预计点数 */
   estimatedPoints: number;
   /** 补充描述（用户模糊表达，进 prompt 不结构化） */
   additionalPrompt?: string;
 }
+
+export type AgentReferencePreference = 'auto' | 'with_reference' | 'without_reference';
+
+/** POST /api/v1/agent/route 请求；references 优先，uploadedImages 保留旧客户端兼容。 */
+export interface AgentRouteRequestDto {
+  userInput: string;
+  uploadedImages?: string[];
+  references?: ReferenceInput[];
+  skillId?: string;
+  /** 可选参考图 Skill 的用户选择；auto 时由 Agent 先询问。 */
+  referencePreference?: AgentReferencePreference;
+}
+
+export * from './creative';

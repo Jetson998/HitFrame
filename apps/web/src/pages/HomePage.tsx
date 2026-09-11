@@ -1,4 +1,4 @@
-import { Sparkles, MessageSquare, ArrowRight, Image as ImageIcon, HelpCircle } from 'lucide-react';
+import { Sparkles, MessageSquare, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,26 +45,26 @@ const TEMPLATE_CARDS = [
   },
 ];
 
+// 模板入口暂时隐藏，待首页信息层级确认后再恢复。
+const SHOW_QUICK_START = false;
+
 /** 精选案例：真实前后对比（原图 → 生成结果） */
 const SHOWCASE_CASES = [
   {
-    title: '街头人像换背景',
-    meta: '商品换背景 · 1:1',
-    before: DEMO.streetOrigin,
-    after: DEMO.streetBg,
+    title: '美妆电商主图',
+    before: DEMO.chanelOrigin,
+    beforeContain: true,
+    after: DEMO.chanelModel,
   },
   {
-    title: '真人试穿换装',
-    meta: '模特上身 · 1:1',
+    title: '模特穿搭效果',
     before: DEMO.tryonModel,
     after: DEMO.tryonResult,
   },
   {
-    title: '高端护肤营销封面',
-    meta: '电商海报 · 1:1',
-    before: DEMO.chanelOrigin,
-    beforeContain: true,
-    after: DEMO.chanelModel,
+    title: '动漫形象生成',
+    before: DEMO.streetOrigin,
+    after: DEMO.streetBg,
   },
 ];
 
@@ -75,7 +75,10 @@ const SHOWCASE_CASES = [
  * - i2i-* → 参考图创作
  * - 其他 → 未命名作品
  */
-function getAssetDisplayName(asset: { name: string; type: string }, templates: { id: string; title: string }[]): string {
+function getAssetDisplayName(
+  asset: { name: string; type: string },
+  templates: { id: string; title: string }[],
+): string {
   const name = asset.name;
 
   // 模板生成作品 - 查找模板标题
@@ -103,8 +106,7 @@ function getAssetDisplayName(asset: { name: string; type: string }, templates: {
 }
 
 export function HomePage() {
-  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail, balance, setHelpOpen } =
-    useAppStore();
+  const { setNav, setGenMode, setActiveTplId, assets, templates, openDetail } = useAppStore();
   const results = assets.filter((a) => a.type === 'result').slice(0, 4);
 
   const goTemplate = (tplId?: string) => {
@@ -123,59 +125,29 @@ export function HomePage() {
     setNav('generate');
   };
 
+  const [heroTitleLead, heroTitleTail] = homeCopy.heroTitle.split('，');
+
   return (
     <div className="min-h-full bg-hero-bg">
       {/* 首页浮动导航 - 桌面显示完整导航,移动端只显示品牌 */}
       <nav className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-hero-bg/95 backdrop-blur-sm border-b border-hero-line">
-        <div
-          className="mx-auto flex items-center justify-between py-3 px-5 md:px-8 lg:px-12"
-          style={{
-            maxWidth: 'var(--spacing-contentMax)',
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <Logo size={38} animated />
-            <span className="text-[17px] font-bold text-hero-text">HitFrame</span>
-          </div>
-          <div className="flex items-center gap-4">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-5">
+          <Logo variant="mark" size={32} className="lg:hidden" />
+          <Logo variant="wordmark" size={32} className="hidden lg:block" />
+          <div className="flex items-center">
             <button
               type="button"
               onClick={() => setNav('generate')}
-              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
+              className="inline-flex h-9 items-center gap-1.5 rounded-[var(--radius-control)] border border-hero-line bg-hero-surface px-3.5 text-[13px] font-medium text-hero-text transition-colors hover:bg-hero-surface-hover"
             >
-              AI 图片
+              <ArrowRight size={14} />
+              快速开始
             </button>
-            <button
-              type="button"
-              onClick={() => setNav('agent')}
-              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
-            >
-              Agent
-            </button>
-            <button
-              type="button"
-              onClick={() => setNav('assets')}
-              className="text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
-            >
-              资产库
-            </button>
-            <button
-              type="button"
-              onClick={() => setHelpOpen(true)}
-              className="flex items-center gap-1 text-[14px] text-hero-text-dim hover:text-hero-text transition-colors"
-            >
-              <HelpCircle size={14} />
-              帮助
-            </button>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-[--radius-pill] bg-hero-surface text-[13px] text-hero-text">
-              <Sparkles size={14} className="text-warn" />
-              <b className="tabular-nums">{balance ?? '—'}</b>
-            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero - 深色区，需要 pt 为导航留空间 */}
+      {/* Hero - 白色品牌区，需要 pt 为导航留空间 */}
       <section className="bg-hero-bg md:pt-[64px] px-5 md:px-8 lg:px-12">
         <div
           className="mx-auto grid gap-12 lg:grid-cols-[54fr_46fr] items-center py-12 md:py-16 lg:py-16"
@@ -185,26 +157,34 @@ export function HomePage() {
         >
           {/* 左侧：价值定位 */}
           <div>
-            <Badge variant="hero" size="default" className="mb-4">
-              {homeCopy.badge}
-            </Badge>
             <h1
-              className="text-hero-text font-bold mb-5"
+              className="mb-5 max-w-[680px] font-bold text-hero-text"
               style={{
                 fontSize: 'clamp(32px, 5vw, 52px)',
                 lineHeight: 1.08,
-                letterSpacing: '-0.035em',
+                letterSpacing: '0',
               }}
             >
-              {homeCopy.heroTitle}
+              <span className="block whitespace-nowrap">{heroTitleLead}，</span>
+              <span className="block whitespace-nowrap">{heroTitleTail}</span>
             </h1>
-            <p className="text-hero-text-dim text-[17px] leading-[1.7] mb-8">
+            <p className="mb-8 max-w-[580px] text-[17px] leading-[1.7] text-hero-text-dim">
               {homeCopy.heroSubtitle}
             </p>
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Button variant="primary" size="xl" onClick={() => goTemplate()}>
+            <div className="mb-0 flex flex-wrap gap-3">
+              <Button
+                variant="primary"
+                size="xl"
+                className="min-w-[190px]"
+                onClick={() => goMode('t2i')}
+              >
                 <Sparkles size={18} />
-                {homeCopy.heroPrimaryCTA}
+                <span className="flex flex-col items-start gap-0.5 leading-tight">
+                  <span>{homeCopy.heroPrimaryCTA}</span>
+                  <span className="whitespace-nowrap text-[11px] font-normal text-white/75">
+                    {homeCopy.heroPrimaryNote}
+                  </span>
+                </span>
               </Button>
               <Button
                 variant="secondary"
@@ -216,14 +196,6 @@ export function HomePage() {
                 {homeCopy.heroSecondaryCTA}
               </Button>
             </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[13px] text-hero-text-dim">
-              {homeCopy.heroProof.map((text, i) => (
-                <div key={i} className="flex items-center gap-1.5">
-                  <span className="h-1 w-1 rounded-full bg-primary" />
-                  {text}
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* 右侧：主视觉单图（方案A）- 桌面版。w-full 必需:内部 img 绝对定位无固有宽度,不撑则容器塌成0 */}
@@ -231,20 +203,13 @@ export function HomePage() {
             <Card
               variant="hero"
               padding="none"
-              className="aspect-square overflow-hidden relative shadow-2xl"
+              className="aspect-square overflow-hidden relative shadow-[var(--shadow-floating)]"
             >
               <img
                 src={DEMO.heroMain}
                 alt="AI 生成商业视觉示例"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <Badge
-                variant="hero"
-                size="sm"
-                className="absolute top-3 left-3 backdrop-blur-sm bg-hero-bg/80"
-              >
-                AI 生成 · 换背景
-              </Badge>
             </Card>
           </div>
 
@@ -253,111 +218,115 @@ export function HomePage() {
             <Card
               variant="hero"
               padding="none"
-              className="aspect-square overflow-hidden relative shadow-xl"
+              className="aspect-square overflow-hidden relative shadow-[var(--shadow-floating)]"
             >
               <img
                 src={DEMO.heroMain}
                 alt="AI 生成商业视觉示例"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <Badge
-                variant="hero"
-                size="sm"
-                className="absolute top-2 left-2 backdrop-blur-sm bg-hero-bg/80"
-              >
-                AI 生成 · 换背景
-              </Badge>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* 快速开始 */}
-      <section className="mx-auto px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
-        <div className="mb-6">
-          <h2 className="text-[24px] font-bold mb-1.5 text-hero-text">{homeCopy.quickStartTitle}</h2>
-          <p className="text-[14px] text-hero-text-dim">{homeCopy.quickStartSubtitle}</p>
-        </div>
+      {/* 快速开始：暂时隐藏，保留实现以便后续恢复 */}
+      {SHOW_QUICK_START && (
+        <section
+          className="mx-auto px-5 md:px-8 lg:px-12 py-16 md:py-20"
+          style={{ maxWidth: 'var(--spacing-contentMax)' }}
+        >
+          <div className="mb-6">
+            <h2 className="text-[24px] font-bold mb-1.5 text-hero-text">
+              {homeCopy.quickStartTitle}
+            </h2>
+            <p className="text-[14px] text-hero-text-dim">{homeCopy.quickStartSubtitle}</p>
+          </div>
 
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          {TEMPLATE_CARDS.map((tpl) => {
-            const actual = templates.find((t) => t.id === tpl.id);
-            const totalSlots = actual?.slots?.length ?? tpl.slots;
-            const requiredSlots = actual?.slots?.filter((s: any) => s.required).length ?? tpl.slots;
-            const slotsText = requiredSlots === totalSlots
-              ? `${requiredSlots} 个必填素材`
-              : `${requiredSlots} 个必填素材 · ${totalSlots} 个图片槽位`;
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            {TEMPLATE_CARDS.map((tpl) => {
+              const actual = templates.find((t) => t.id === tpl.id);
+              const totalSlots = actual?.slots?.length ?? tpl.slots;
+              const requiredSlots = actual?.slots?.filter((s) => s.required).length ?? tpl.slots;
+              const slotsText =
+                requiredSlots === totalSlots
+                  ? `${requiredSlots} 个必填素材`
+                  : `${requiredSlots} 个必填素材 · ${totalSlots} 个图片槽位`;
 
-            return (
-              <Card
-                key={tpl.id}
-                variant="hero"
-                padding="none"
-                interactive
-                className="flex flex-col overflow-hidden hover:border-primary/40 transition-colors"
-                onClick={() => goTemplate(tpl.id)}
-              >
-                {/* 封面图 - 1:1 与素材一致 */}
-                <div className="aspect-square bg-hero-bg border-b border-hero-line overflow-hidden">
-                  <img
-                    src={tpl.cover}
-                    alt={tpl.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      img.style.display = 'none';
-                    }}
-                  />
-                </div>
-                <div className="p-4 flex-1 flex flex-col">
-                  {tpl.badge && (
-                    <Badge variant="primary" size="sm" className="mb-2 self-start">
-                      {tpl.badge}
-                    </Badge>
-                  )}
-                  <h3 className="text-[16px] font-semibold mb-1.5 text-hero-text">{tpl.title}</h3>
-                  <p className="text-[13px] text-hero-text-dim leading-relaxed mb-3 flex-1">
-                    {tpl.description}
-                  </p>
-                  <div className="flex items-center justify-between text-[12px] text-hero-text-dim/70 mb-3">
-                    <span>{slotsText}</span>
-                    <span>{tpl.pointsFrom} 点起</span>
+              return (
+                <Card
+                  key={tpl.id}
+                  variant="hero"
+                  padding="none"
+                  interactive
+                  className="flex flex-col overflow-hidden hover:border-primary/40 transition-colors"
+                  onClick={() => goTemplate(tpl.id)}
+                >
+                  {/* 封面图 - 1:1 与素材一致 */}
+                  <div className="aspect-square bg-hero-bg border-b border-hero-line overflow-hidden">
+                    <img
+                      src={tpl.cover}
+                      alt={tpl.title}
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        img.style.display = 'none';
+                      }}
+                    />
                   </div>
-                  <Button variant="primary" size="default" className="w-full">
-                    使用模板
-                    <ArrowRight size={16} />
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                  <div className="p-4 flex-1 flex flex-col">
+                    {tpl.badge && (
+                      <Badge variant="primary" size="sm" className="mb-2 self-start">
+                        {tpl.badge}
+                      </Badge>
+                    )}
+                    <h3 className="text-[16px] font-semibold mb-1.5 text-hero-text">{tpl.title}</h3>
+                    <p className="text-[13px] text-hero-text-dim leading-relaxed mb-3 flex-1">
+                      {tpl.description}
+                    </p>
+                    <div className="flex items-center justify-between text-[12px] text-hero-text-dim/70 mb-3">
+                      <span>{slotsText}</span>
+                      <span>{tpl.pointsFrom} 点起</span>
+                    </div>
+                    <Button variant="primary" size="default" className="w-full">
+                      使用模板
+                      <ArrowRight size={16} />
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
 
-        {/* 其他创作方式 */}
-        <div className="flex flex-wrap items-center gap-3 text-[13px]">
-          <span className="text-hero-text-dim">其他创作方式</span>
-          <button
-            type="button"
-            onClick={() => goMode('t2i')}
-            className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
-          >
-            空白文生图
-            <ArrowRight size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => goMode('i2i')}
-            className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
-          >
-            参考图生图
-            <ArrowRight size={14} />
-          </button>
-        </div>
-      </section>
+          {/* 其他创作方式 */}
+          <div className="flex flex-wrap items-center gap-3 text-[13px]">
+            <span className="text-hero-text-dim">其他创作方式</span>
+            <button
+              type="button"
+              onClick={() => goMode('t2i')}
+              className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
+            >
+              空白文生图
+              <ArrowRight size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => goMode('i2i')}
+              className="flex items-center gap-1.5 text-primary hover:text-primary-hover transition-colors"
+            >
+              参考图生图
+              <ArrowRight size={14} />
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* 最近创作 */}
       {results.length > 0 && (
-        <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+        <section
+          className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20"
+          style={{ maxWidth: 'var(--spacing-contentMax)' }}
+        >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[24px] font-bold text-hero-text">{homeCopy.recentTitle}</h2>
             <button
@@ -415,7 +384,10 @@ export function HomePage() {
 
       {/* 空状态 */}
       {results.length === 0 && (
-        <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+        <section
+          className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20"
+          style={{ maxWidth: 'var(--spacing-contentMax)' }}
+        >
           <Card variant="hero" padding="lg" className="text-center">
             <ImageIcon size={48} className="mx-auto mb-3 text-hero-text-dim" />
             <p className="text-[14px] text-hero-text-dim">{homeCopy.emptyState.noAssets}</p>
@@ -424,26 +396,41 @@ export function HomePage() {
       )}
 
       {/* 精选案例 */}
-      <section className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20" style={{ maxWidth: 'var(--spacing-contentMax)' }}>
+      <section
+        className="mx-auto border-t border-hero-line px-5 md:px-8 lg:px-12 py-16 md:py-20"
+        style={{ maxWidth: 'var(--spacing-contentMax)' }}
+      >
         <div className="mb-6">
-          <h2 className="text-[24px] font-bold mb-1.5 text-hero-text">{homeCopy.showcaseTitle}</h2>
-          <p className="text-[14px] text-hero-text-dim">{homeCopy.showcaseSubtitle}</p>
+          <h2 className="text-[24px] font-bold text-hero-text">{homeCopy.showcaseTitle}</h2>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {SHOWCASE_CASES.map((c) => (
-            <Card key={c.title} variant="hero" padding="default" className="hover:border-primary/40 transition-colors">
+            <Card
+              key={c.title}
+              variant="hero"
+              padding="default"
+              className="hover:border-primary/40 transition-colors"
+            >
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-hero-bg relative">
+                <div className="relative aspect-square overflow-hidden rounded-[var(--radius-image)] bg-hero-bg">
                   <img
                     src={c.before}
                     alt={`${c.title} 原始素材`}
-                    className={c.beforeContain ? 'h-full w-full object-contain' : 'h-full w-full object-cover'}
+                    className={
+                      c.beforeContain
+                        ? 'h-full w-full object-contain'
+                        : 'h-full w-full object-cover'
+                    }
                   />
-                  <Badge variant="hero" size="sm" className="absolute top-2 right-2 backdrop-blur-sm bg-hero-bg/80">
+                  <Badge
+                    variant="hero"
+                    size="sm"
+                    className="absolute top-2 right-2 backdrop-blur-sm bg-hero-bg/80"
+                  >
                     原图
                   </Badge>
                 </div>
-                <div className="aspect-square rounded-[--radius-image] overflow-hidden bg-hero-bg relative">
+                <div className="relative aspect-square overflow-hidden rounded-[var(--radius-image)] bg-hero-bg">
                   <img
                     src={c.after}
                     alt={`${c.title} 生成结果`}
@@ -454,15 +441,14 @@ export function HomePage() {
                   </Badge>
                 </div>
               </div>
-              <h3 className="text-[14px] font-semibold mb-1 text-hero-text">{c.title}</h3>
-              <p className="text-[12px] text-hero-text-dim mb-3">{c.meta}</p>
+              <h3 className="mb-3 text-[14px] font-semibold text-hero-text">{c.title}</h3>
               <Button
                 variant="secondary"
                 size="sm"
                 className="w-full bg-hero-surface-hover border-hero-line text-hero-text hover:bg-hero-surface hover:border-primary/40"
                 onClick={() => goTemplate()}
               >
-                使用这个模板
+                使用此效果
               </Button>
             </Card>
           ))}

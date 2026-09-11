@@ -3,10 +3,11 @@ import { DbModule } from './db/db.module';
 import { StorageService } from './storage/storage.service';
 import { CreditsService } from './credits/credits.service';
 import { JobRunnerService } from './generations/job-runner.service';
+import { GenerationLogsService } from './generations/generation-logs.service';
 
 /** Worker 独立进程的最小 DI 容器：无 HTTP、无守卫，只有执行内核依赖 */
 @Module({
   imports: [DbModule],
-  providers: [StorageService, CreditsService, JobRunnerService],
+  providers: [StorageService, CreditsService, GenerationLogsService, JobRunnerService],
 })
 export class WorkerModule {}

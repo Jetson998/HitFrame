@@ -8,10 +8,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-primary text-white hover:bg-primary-hover rounded-[--radius-button] shadow-[--shadow-primary]',
+          'rounded-[var(--radius-button)] bg-primary text-white shadow-[var(--shadow-primary)] hover:bg-primary-hover',
         secondary:
-          'border border-line bg-panel text-ink hover:border-line-strong hover:bg-panel-muted rounded-[--radius-button]',
-        ghost: 'text-dim hover:bg-panel-muted hover:text-ink rounded-[--radius-button]',
+          'rounded-[var(--radius-button)] border border-line bg-panel text-ink hover:border-line-strong hover:bg-panel-muted',
+        ghost:
+          'rounded-[var(--radius-button)] text-dim hover:bg-panel-muted hover:text-ink',
         link: 'text-primary hover:text-primary-hover underline-offset-4 hover:underline',
       },
       size: {

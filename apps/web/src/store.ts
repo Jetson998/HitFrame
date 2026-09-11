@@ -1,11 +1,42 @@
 import { create } from 'zustand';
-import type { ProjectDto, ShowcaseItemDto, TemplateSummaryDto } from '@hitframe/shared';
+import {
+  DEFAULT_PROJECT_ID,
+  type Quality,
+  type Ratio,
+  type ProjectDto,
+  type ShowcaseItemDto,
+  type TemplateSummaryDto,
+} from '@hitframe/shared';
 import { api, ApiError, type AssetRow } from './lib/api';
 
 /** 侧边栏 IA 与 Demo（output/HitFrame_demo.html）保持一致；Agent 在 M1 为禁用占位，M2a 开放 */
 export type NavKey = 'home' | 'generate' | 'agent' | 'assets';
 export type GenMode = 'i2i' | 't2i' | 'template';
 export type AuthState = 'checking' | 'ok' | 'unauthorized' | 'error';
+
+export interface GenerationDraft {
+  mode: GenMode;
+  templateId?: string;
+  prompt?: string;
+  slots: string[];
+  vars?: Record<string, string>;
+  ratio?: Ratio;
+  quality: Quality;
+  count: number;
+  projectId?: string | null;
+}
+
+export interface AgentDraft {
+  input: string;
+  referenceAssetIds: string[];
+  source: 'generate' | 'template';
+  skillId?: string;
+  templateId?: string;
+  ratio?: Ratio;
+  quality: Quality;
+  count: number;
+  projectId?: string | null;
+}
 
 const NAV_KEYS: NavKey[] = ['home', 'generate', 'agent', 'assets'];
 
@@ -43,12 +74,18 @@ interface AppState {
   refAssetId: string | null;
   setRefAssetId: (id: string | null) => void;
   referAsset: (assetId: string) => void;
+  pendingGenerationDraft: GenerationDraft | null;
+  openGenerationDraft: (draft: GenerationDraft) => void;
+  consumeGenerationDraft: () => GenerationDraft | null;
+  pendingAgentDraft: AgentDraft | null;
+  openAgentDraft: (draft: AgentDraft) => void;
+  consumeAgentDraft: () => AgentDraft | null;
 
   balance: number | null;
   assets: AssetRow[];
   templates: TemplateSummaryDto[];
   projects: ProjectDto[];
-  /** 当前项目：新上传/新生成的归属；null = 未归类 */
+  /** 当前项目：新上传/新生成的归属；未选择时由后端归入默认项目 */
   currentProjectId: string | null;
   setCurrentProject: (id: string | null) => void;
   createProject: (name: string) => Promise<void>;
@@ -120,7 +157,18 @@ export const useAppStore = create<AppState>((set, get) => ({
       api.assets().catch(() => [] as AssetRow[]),
       api.projects().catch(() => [] as ProjectDto[]),
     ]);
-    set({ auth: 'ok', bootError: null, balance: me.pointsBalance, templates, assets, projects });
+    const defaultProjectId = projects.some((project) => project.id === DEFAULT_PROJECT_ID)
+      ? DEFAULT_PROJECT_ID
+      : null;
+    set({
+      auth: 'ok',
+      bootError: null,
+      balance: me.pointsBalance,
+      templates,
+      assets,
+      projects,
+      currentProjectId: get().currentProjectId ?? defaultProjectId,
+    });
   },
 
   genMode: 'i2i',
@@ -139,6 +187,48 @@ export const useAppStore = create<AppState>((set, get) => ({
       nav: 'generate',
       detailAsset: null,
     });
+  },
+  pendingGenerationDraft: null,
+  openGenerationDraft: (pendingGenerationDraft) => {
+    syncNavHash('generate');
+    set({
+      pendingGenerationDraft,
+      pendingPrompt: null,
+      genMode: pendingGenerationDraft.mode,
+      activeTplId:
+        pendingGenerationDraft.mode === 'template'
+          ? (pendingGenerationDraft.templateId ?? null)
+          : null,
+      currentProjectId:
+        pendingGenerationDraft.projectId === undefined
+          ? get().currentProjectId
+          : pendingGenerationDraft.projectId,
+      nav: 'generate',
+      detailAsset: null,
+    });
+  },
+  consumeGenerationDraft: () => {
+    const draft = get().pendingGenerationDraft;
+    if (draft) set({ pendingGenerationDraft: null });
+    return draft;
+  },
+  pendingAgentDraft: null,
+  openAgentDraft: (pendingAgentDraft) => {
+    syncNavHash('agent');
+    set({
+      pendingAgentDraft,
+      nav: 'agent',
+      detailAsset: null,
+      currentProjectId:
+        pendingAgentDraft.projectId === undefined
+          ? get().currentProjectId
+          : pendingAgentDraft.projectId,
+    });
+  },
+  consumeAgentDraft: () => {
+    const draft = get().pendingAgentDraft;
+    if (draft) set({ pendingAgentDraft: null });
+    return draft;
   },
 
   balance: null,

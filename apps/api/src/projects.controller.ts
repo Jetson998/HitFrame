@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { ProjectDto } from '@hitframe/shared';
 import { DB, Db } from './db/db.module';
 import { projects } from './db/schema';
+import { ensureDefaultProject } from './default-project';
 
 const TENANT = 'default'; // M1 单租户
 
@@ -14,6 +15,7 @@ export class ProjectsController {
 
   @Get()
   async list() {
+    await ensureDefaultProject(this.db);
     const rows = await this.db.query.projects.findMany({ orderBy: desc(projects.createdAt) });
     const data: ProjectDto[] = rows.map((p) => ({
       id: p.id,

@@ -19,6 +19,7 @@ import { randomUUID } from 'node:crypto';
 import { DB, Db } from '../db/db.module';
 import { assets, projects } from '../db/schema';
 import { StorageService } from '../storage/storage.service';
+import { ensureDefaultProject } from '../default-project';
 
 const TENANT = 'default';
 const ALLOWED = new Map([
@@ -42,6 +43,7 @@ export class AssetsController {
     const ext = ALLOWED.get(file.mimetype);
     if (!ext)
       throw new BadRequestException({ code: 400, message: `不支持的类型：${file.mimetype}` });
+    const resolvedProjectId = projectId ?? (await ensureDefaultProject(this.db));
     if (projectId) await this.assertProject(projectId);
 
     const assetId = `asset_${randomUUID()}`;
@@ -50,7 +52,7 @@ export class AssetsController {
     await this.db.insert(assets).values({
       id: assetId,
       tenantId: TENANT,
-      projectId: projectId || null,
+      projectId: resolvedProjectId,
       type: 'source',
       url: stored.url,
       name: file.originalname || assetId,
@@ -75,17 +77,34 @@ export class AssetsController {
     return { code: 0, message: 'ok', data: rows };
   }
 
-  /** 改归属：projectId 传 null 即移回「未归档」 */
+  /** 改归属：projectId 传 null 即移回「未归档」；favorite 用于持久化收藏状态。 */
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: { projectId?: string | null }) {
+  async update(
+    @Param('id') id: string,
+    @Body() body: { projectId?: string | null; favorite?: boolean },
+  ) {
     const asset = await this.db.query.assets.findFirst({ where: eq(assets.id, id) });
     if (!asset) throw new NotFoundException({ code: 404, message: '资产不存在' });
-    if (!('projectId' in body))
+    if (!('projectId' in body) && !('favorite' in body))
       throw new BadRequestException({ code: 400, message: '无可更新字段' });
+
+    const update: { projectId?: string | null; meta?: Record<string, unknown> } = {};
     const projectId = body.projectId || null;
-    if (projectId) await this.assertProject(projectId);
-    await this.db.update(assets).set({ projectId }).where(eq(assets.id, id));
-    return { code: 0, message: 'ok', data: { id, projectId } };
+    if ('projectId' in body) {
+      if (projectId) await this.assertProject(projectId);
+      update.projectId = projectId;
+    }
+    if ('favorite' in body) {
+      if (typeof body.favorite !== 'boolean')
+        throw new BadRequestException({ code: 400, message: 'favorite 必须是布尔值' });
+      update.meta = { ...((asset.meta ?? {}) as Record<string, unknown>), favorite: body.favorite };
+    }
+    await this.db.update(assets).set(update).where(eq(assets.id, id));
+    return {
+      code: 0,
+      message: 'ok',
+      data: { id, projectId: 'projectId' in update ? update.projectId : asset.projectId, favorite: update.meta?.favorite },
+    };
   }
 
   /**

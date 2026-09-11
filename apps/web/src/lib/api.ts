@@ -1,5 +1,7 @@
 import type {
   AgentPlanDto,
+  AgentRouteRequestDto,
+  CreationSkillSummaryDto,
   GenerationAcceptedDto,
   GenerationRequestDto,
   MeDto,
@@ -7,6 +9,9 @@ import type {
   RunStatusDto,
   ShowcaseItemDto,
   TemplateSummaryDto,
+  PromptCompileRequestDto,
+  PromptCompileResponseDto,
+  RunOrigin,
 } from '@hitframe/shared';
 
 export type AgentPlan = AgentPlanDto;
@@ -20,8 +25,16 @@ export interface AssetRow {
   projectId?: string | null;
   sourceJobId?: string | null;
   genParams?: Record<string, unknown> | null;
-  meta?: { storageKey?: string; bytes?: number; mimetype?: string } | null;
+  meta?: { storageKey?: string; bytes?: number; mimetype?: string; favorite?: boolean } | null;
   createdAt: string;
+}
+
+/** 资产名称用于紧凑型图片卡片：最多展示 8 个字符（含省略号）。 */
+export function compactAssetName(value: string, maxLength = 8): string {
+  const name = value.trim();
+  const chars = Array.from(name);
+  if (chars.length <= maxLength) return name;
+  return `${chars.slice(0, Math.max(1, maxLength - 1)).join('')}…`;
 }
 
 const TOKEN_KEY = 'hf_api_token';
@@ -87,6 +100,7 @@ function relUrl(url: string): string {
 export const api = {
   me: () => req<MeDto>('/me'),
   templates: () => req<TemplateSummaryDto[]>('/templates'),
+  creationSkills: () => req<CreationSkillSummaryDto[]>('/creation-skills'),
   assets: async () => {
     const rows = await req<AssetRow[]>('/assets');
     return rows.map((a) => ({ ...a, url: relUrl(a.url) }));
@@ -97,7 +111,7 @@ export const api = {
     if (projectId) form.append('projectId', projectId);
     return req<{ assetId: string; url: string }>('/assets/uploads', { method: 'POST', body: form });
   },
-  updateAsset: (id: string, patch: { projectId: string | null }) =>
+  updateAsset: (id: string, patch: { projectId?: string | null; favorite?: boolean }) =>
     req<{ id: string }>(`/assets/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
   deleteAsset: (id: string) => req<{ id: string }>(`/assets/${id}`, { method: 'DELETE' }),
   projects: () => req<ProjectDto[]>('/projects'),
@@ -111,13 +125,33 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ name }),
     }),
-  createGeneration: (dto: GenerationRequestDto) =>
-    req<GenerationAcceptedDto>('/generations', { method: 'POST', body: JSON.stringify(dto) }),
+  createGeneration: (dto: GenerationRequestDto, origin?: RunOrigin) =>
+    req<GenerationAcceptedDto>('/generations', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+      headers: origin ? { 'x-hitframe-origin': origin } : undefined,
+    }),
   /** Agent 规则路由（S5.4）：无副作用，只返回方案卡；用户确认后再调 createGeneration */
-  agentRoute: (userInput: string, uploadedImages?: string[]) =>
+  agentRoute: (
+    userInput: string,
+    references?: NonNullable<AgentRouteRequestDto['references']>,
+    skillId?: string,
+    referencePreference?: AgentRouteRequestDto['referencePreference'],
+  ) =>
     req<AgentPlan>('/agent/route', {
       method: 'POST',
-      body: JSON.stringify({ userInput, uploadedImages }),
+      body: JSON.stringify({
+        userInput,
+        references,
+        uploadedImages: references?.map((reference) => reference.assetId),
+        skillId,
+        referencePreference,
+      } satisfies AgentRouteRequestDto),
+    }),
+  compilePrompt: (dto: PromptCompileRequestDto) =>
+    req<PromptCompileResponseDto>('/prompts/compile', {
+      method: 'POST',
+      body: JSON.stringify(dto),
     }),
   getRun: async (runId: string) => {
     const run = await req<RunStatusDto>(`/runs/${runId}`);

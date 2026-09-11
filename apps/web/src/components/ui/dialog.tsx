@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
+export const DialogClose = DialogPrimitive.Close;
 export const DialogTitle = DialogPrimitive.Title;
 export const DialogDescription = DialogPrimitive.Description;
 
@@ -23,7 +24,10 @@ export const DialogContent = forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-3 right-3 cursor-pointer rounded-md p-1 text-faint hover:bg-panel-muted hover:text-ink">
+      <DialogPrimitive.Close
+        aria-label="关闭"
+        className="absolute top-3 right-3 cursor-pointer rounded-md p-1 text-faint hover:bg-panel-muted hover:text-ink"
+      >
         <X size={16} />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

@@ -7,6 +7,7 @@ import {
   unique,
   uniqueIndex,
   integer,
+  index,
 } from 'drizzle-orm/pg-core';
 
 /**
@@ -51,9 +52,11 @@ export const generationRuns = pgTable(
   {
     id: text('id').primaryKey(),
     tenantId: tenantId(),
+    actorId: text('actor_id'), // 预留多用户身份；M2a 单租户时为空
     projectId: text('project_id'),
     mode: text('mode').notNull(), // t2i | i2i | template
     templateId: text('template_id'),
+    promptCompilationId: text('prompt_compilation_id'),
     origin: text('origin').notNull(), // quick | template（预留 agent|plan|workflow）
     candidateCount: integer('candidate_count').notNull(), // 候选数 ≠ 最终交付数
     rerunOfRunId: text('rerun_of_run_id'),
@@ -70,9 +73,11 @@ export const generationJobs = pgTable('generation_jobs', {
   id: text('id').primaryKey(),
   runId: text('run_id').notNull(),
   tenantId: tenantId(),
+  actorId: text('actor_id'), // 从 Run 透传，预留多用户身份
   projectId: text('project_id'),
   mode: text('mode').notNull(),
   templateId: text('template_id'),
+  promptCompilationId: text('prompt_compilation_id'),
   endpoint: text('endpoint').notNull(), // generations | edits
   inputParams: jsonb('input_params').notNull(), // 参数快照（槽位/变量/prompt/上游图）
   status: text('status').notNull(), // queued|running|succeeded|failed
@@ -87,6 +92,29 @@ export const generationJobs = pgTable('generation_jobs', {
   enqueueState: text('enqueue_state').notNull().default('pending'), // pending|enqueued（Reconciler 只扫 pending+queued）
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   finishedAt: timestamp('finished_at', { withTimezone: true }),
+});
+
+/** Immutable, user-visible prompt compilation snapshot. It has no billing side effects. */
+export const promptCompilations = pgTable('prompt_compilations', {
+  id: text('id').primaryKey(),
+  tenantId: tenantId(),
+  mode: text('mode').notNull(), // raw | enhance | director
+  generationMode: text('generation_mode').notNull(), // t2i | i2i | template
+  skillId: text('skill_id'),
+  templateId: text('template_id'),
+  rawPrompt: text('raw_prompt').notNull(),
+  normalizedBrief: jsonb('normalized_brief').notNull(),
+  compiledPrompt: text('compiled_prompt').notNull(),
+  creativeControls: jsonb('creative_controls'),
+  referenceRoles: jsonb('reference_roles'),
+  changeSummary: jsonb('change_summary').notNull(),
+  warnings: jsonb('warnings').notNull(),
+  directorSuggestions: jsonb('director_suggestions'),
+  compilerProvider: text('compiler_provider').notNull(),
+  compilerModel: text('compiler_model'),
+  compilerVersion: text('compiler_version').notNull(),
+  requestHash: text('request_hash').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const assets = pgTable('assets', {
@@ -140,5 +168,69 @@ export const creditTransactions = pgTable(
   (t) => [
     // NULLS NOT DISTINCT（PG15+）：同一 Run 的 hold（jobId 为空）也只允许一条
     unique('credit_tx_uq').on(t.tenantId, t.runId, t.jobId, t.type).nullsNotDistinct(),
+  ],
+);
+
+/**
+ * 生成调用排障日志（M2a）：追加写入，每个生命周期事件一行。
+ * Run/Job 仍是状态机权威，CreditTransaction 仍是点数账；日志写入失败不得影响生成主流程。
+ * 原始 prompt 和错误仅供内部排障接口使用，不应下发给普通业务 API。
+ */
+export const generationLogs = pgTable(
+  'generation_logs',
+  {
+    id: text('id').primaryKey(),
+    tenantId: tenantId(),
+    actorId: text('actor_id'), // 多用户接入后由认证上下文填充
+    runId: text('run_id'),
+    jobId: text('job_id'),
+    requestId: text('request_id'),
+    event: text('event').notNull(), // accepted|enqueued|enqueue_failed|claimed|provider_started|provider_response|provider_failed|retry|succeeded|failed
+    status: text('status'), // queued|running|succeeded|failed|retrying
+    mode: text('mode'),
+    templateId: text('template_id'),
+    endpoint: text('endpoint'),
+    attemptNo: integer('attempt_no'),
+    provider: text('provider'),
+    model: text('model'),
+    userPrompt: text('user_prompt'),
+    compiledPrompt: text('compiled_prompt'),
+    inputParams: jsonb('input_params'),
+    resultAssetId: text('result_asset_id'),
+    resultUrl: text('result_url'),
+    resultBytes: integer('result_bytes'),
+    providerUsage: jsonb('provider_usage'),
+    inputTokens: integer('input_tokens'),
+    outputTokens: integer('output_tokens'),
+    cacheReadTokens: integer('cache_read_tokens'),
+    cacheWriteTokens: integer('cache_write_tokens'),
+    // Backward-compatible alias for relay_request_id (response body requestId).
+    providerRequestId: text('provider_request_id'),
+    relayRequestId: text('relay_request_id'),
+    providerTraceId: text('provider_trace_id'),
+    providerHttpStatus: integer('provider_http_status'),
+    errorKind: text('error_kind'),
+    errorCode: text('error_code'),
+    errorMessage: text('error_message'), // 内部排障用；不向普通业务 API 回显
+    requestIp: text('request_ip'),
+    channelId: text('channel_id'),
+    groupId: text('group_id'),
+    rateMultiplier: numeric('rate_multiplier'),
+    priceVersion: text('price_version'),
+    estimatedCost: numeric('estimated_cost'),
+    currency: text('currency'),
+    pointsCost: integer('points_cost'),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    finishedAt: timestamp('finished_at', { withTimezone: true }),
+    durationMs: integer('duration_ms'),
+    providerDurationMs: integer('provider_duration_ms'),
+    metadata: jsonb('metadata'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('generation_logs_run_created_idx').on(t.runId, t.createdAt),
+    index('generation_logs_job_created_idx').on(t.jobId, t.createdAt),
+    index('generation_logs_event_created_idx').on(t.event, t.createdAt),
+    index('generation_logs_actor_created_idx').on(t.actorId, t.createdAt),
   ],
 );

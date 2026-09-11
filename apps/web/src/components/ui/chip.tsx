@@ -11,7 +11,7 @@ export function Chip({ active, className, type = 'button', ...props }: ChipProps
     <button
       type={type}
       className={cn(
-        'cursor-pointer rounded-full border px-2.5 py-1 text-[11px] transition-colors',
+        'cursor-pointer rounded-[var(--radius-control)] border px-2.5 py-1 text-[11px] transition-colors',
         active
           ? 'border-primary/50 bg-primary/10 font-semibold text-ink'
           : 'border-line-soft bg-panel-muted text-dim hover:border-line hover:text-ink',

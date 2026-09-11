@@ -12,19 +12,24 @@ import { JobRunnerService } from './generations/job-runner.service';
 import { QueueDispatcherService } from './queue/dispatcher.service';
 import { GenerationsController } from './generations/generations.controller';
 import { RunsController } from './generations/runs.controller';
+import { GenerationLogsController } from './generations/generation-logs.controller';
+import { GenerationLogsService } from './generations/generation-logs.service';
 import { AssetsController } from './assets/assets.controller';
 import { TemplatesController } from './templates.controller';
 import { MeController } from './me.controller';
 import { ProjectsController } from './projects.controller';
 import { ShowcaseController } from './showcase.controller';
 import { AgentModule } from './agent/agent.module';
+import { CreativeModule } from './creative/creative.module';
+import { PromptCompilerModule } from './prompt-compiler/prompt-compiler.module';
 
 @Module({
-  imports: [DbModule, AgentModule],
+  imports: [DbModule, AgentModule, CreativeModule, PromptCompilerModule],
   controllers: [
     HealthController,
     GenerationsController,
     RunsController,
+    GenerationLogsController,
     AssetsController,
     TemplatesController,
     MeController,
@@ -40,6 +45,7 @@ import { AgentModule } from './agent/agent.module';
     JobRunnerService,
     ExecutorService,
     QueueDispatcherService,
+    GenerationLogsService,
   ],
 })
 export class AppModule {}

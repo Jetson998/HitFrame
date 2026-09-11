@@ -2,12 +2,14 @@ import { forwardRef, type HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const cardVariants = cva('rounded-[--radius-card] border transition-all', {
+const cardVariants = cva('rounded-[var(--radius-card)] border transition-all', {
   variants: {
     variant: {
-      default: 'border-line bg-panel shadow-[--shadow-card] hover:shadow-[--shadow-card-hover]',
+      default:
+        'border-line bg-panel shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]',
       muted: 'border-line-soft bg-panel-muted',
-      hero: 'border-hero-line bg-hero-surface',
+      hero:
+        'border-hero-line bg-hero-surface shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]',
       flat: 'border-line bg-panel',
     },
     padding: {

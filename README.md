@@ -82,6 +82,8 @@ lsof -i :3001 -i :5173 -i :8333
 - [x] S3 StorageAdapter 双驱动（Local/S3）+ SeaweedFS/客户 OSS + 稳定网关 `/files/{key}`（s3 302→短时效签名，过期即刷新）+ 存量迁移（幂等+校验和+三方一致）；验收 9/9：`scripts/accept/s3-storage.mjs`，迁移 `scripts/migrate/local-to-s3.mjs`，记录 `docs/M2a_S3_验收记录.md`
 - [x] S4 errorCode 收敛 + 脱敏（API 只返 errorCode/文案，路径/堆栈/密钥只进日志）+ 死信/恢复/观测（logEvent 单行 JSON，死信重放仅诊断不改账）+ 孤儿对象巡检回收（StorageReclaimService）；验收记录 `docs/M2a_S4_验收记录.md`
 - [x] S5 三模板（tpl_bg/tpl_model/tpl_poster）+ Agent 规则路由（意图→模板，比例/数量/质量解析，16:9→4:3 映射，无副作用 route）+ 前端集成（模板分类筛选、Agent 页、缺图门禁、确认才建 Run、错误态诊断补齐）；验收 18/18：`scripts/accept/s5-templates-agent.mjs`
+- [x] 生成调用日志库（迁移 0005：`generation_logs` 生命周期事件、提示词/错误/耗时快照、未来多用户 `actorId` 字段）+ 内部查询接口 `/api/v1/internal/generation-logs`；开发与排障口径见 [`docs/M2a_日志库与调用审计.md`](docs/M2a_日志库与调用审计.md)
+- [ ] S6-Creation Agent 创意导演：Creation.1 已完成模块边界、Skill、参考图角色、提示词编译/追溯与确认后接入原队列；多轮追问、独立图片组分镜/执行和确定性文字合成仍未完成，见 [`docs/S6_Creation_1_验收记录.md`](docs/S6_Creation_1_验收记录.md)
 - [ ] S6 种子客户验收
 - [ ] S7 （可选）Socket.IO/SSE
 

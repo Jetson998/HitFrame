@@ -4,8 +4,10 @@ import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { UnrecoverableError, Worker } from 'bullmq';
 import { ProviderError } from '@hitframe/image-provider';
+import { getImageProvider } from './provider.factory';
 import { WorkerModule } from './worker.module';
 import { JobRunnerService } from './generations/job-runner.service';
+import { GenerationLogsService } from './generations/generation-logs.service';
 import {
   GENERATION_QUEUE,
   GenerationJobData,
@@ -26,6 +28,8 @@ async function bootstrap() {
   const log = new Logger('Worker');
   const app = await NestFactory.createApplicationContext(WorkerModule);
   const runner = app.get(JobRunnerService);
+  const logs = app.get(GenerationLogsService);
+  const provider = getImageProvider();
   const concurrency = Math.max(1, Number(process.env.WORKER_CONCURRENCY ?? 2) || 2);
 
   const worker = new Worker<GenerationJobData>(
@@ -55,8 +59,38 @@ async function bootstrap() {
         if (kind === 'retryable' && !isLastAttempt) {
           // 让位下一次重试认领：running → queued，再抛错触发 BullMQ 退避
           await runner.releaseForRetry(jobId);
+          await logs.record({
+            event: 'retry',
+            tenantId: claimed.tenantId,
+            actorId: claimed.actorId ?? undefined,
+            runId,
+            jobId,
+            status: 'retrying',
+            mode: claimed.mode,
+            templateId: claimed.templateId ?? undefined,
+            endpoint: claimed.endpoint,
+            attemptNo: attemptNo,
+            provider: provider.name,
+            model: provider.model,
+            userPrompt: (claimed.inputParams as { userPrompt?: string }).userPrompt,
+            compiledPrompt: (claimed.inputParams as { prompt?: string }).prompt,
+            inputParams: claimed.inputParams,
+            requestId: (claimed.inputParams as { requestId?: string }).requestId,
+            providerRequestId: pe?.responseMeta?.relayRequestId,
+            relayRequestId: pe?.responseMeta?.relayRequestId,
+            providerTraceId: pe?.responseMeta?.providerTraceId,
+            providerHttpStatus: pe?.responseMeta?.httpStatus ?? pe?.httpStatus,
+            errorKind: kind,
+            errorCode: pe?.errorCode,
+            errorMessage: message,
+            metadata: pe?.responseMeta
+              ? { outcome: 'response_error', relayCode: pe.responseMeta.relayCode }
+              : { outcome: 'transport_error' },
+          });
           logEvent('retry', { jobId, runId, attempts: attemptNo, errorKind: kind });
-          log.warn(`job ${jobId} attempt ${attemptNo} failed (retryable): ${message.slice(0, 160)}`);
+          log.warn(
+            `job ${jobId} attempt ${attemptNo} failed (retryable): ${message.slice(0, 160)}`,
+          );
           throw err;
         }
         const finalCode = await runner.failJobWithRefund(claimed, message, kind, undefined, undefined, {

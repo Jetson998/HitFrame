@@ -1,0 +1,2736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: http://localhost:3001 https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Hitframe Product Structure</title>
+<style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;max-width:736px;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+</head>
+<body>
+<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="Hitframe Product Structure" srcdoc="&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
+&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: http://localhost:3001 https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: http://localhost:3001 https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
+&lt;title&gt;Hitframe Product Structure&lt;/title&gt;
+&lt;style&gt;:root {
+  color-scheme: light dark;
+  background-color: var(--background) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: light-dark(rgb(255 255 255), rgb(24 24 24));
+  --foreground: light-dark(rgb(26 28 31), rgb(255 255 255));
+  --card: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --card-foreground: var(--foreground);
+  --popover: light-dark(rgb(255 255 255), rgb(45 45 45));
+  --popover-foreground: var(--foreground);
+  --primary: light-dark(rgb(51 156 255), rgb(131 195 255));
+  --primary-foreground: light-dark(rgb(255 255 255), rgb(13 13 13));
+  --secondary: light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%));
+  --secondary-foreground: var(--foreground);
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: light-dark(
+    rgb(26 28 31 / 49.4%),
+    rgb(255 255 255 / 49.8%)
+  );
+  --accent: light-dark(rgb(229 242 255), rgb(13 39 63));
+  --accent-foreground: var(--primary);
+  --destructive: light-dark(rgb(226 85 7), rgb(255 133 73));
+  --border: light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%));
+  --input: light-dark(
+    rgb(26 28 31 / 11.8%),
+    color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+  );
+  --ring: light-dark(rgb(51 156 255), rgb(131 195 255 / 76%));
+  --font-size-base: 14px;
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans: -apple-system, system-ui, &quot;Segoe UI&quot;, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, &quot;Liberation Mono&quot;,
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 430;
+  --font-weight-medium: 500;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --radius: 12.5px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url(&quot;data:image/svg+xml,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 17 17&#x27;%3E%3Cpath d=&#x27;M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z&#x27;/%3E%3C/svg%3E&quot;);
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+  --color-background-primary: var(--background);
+  --color-text-primary: var(--foreground);
+  --color-border-secondary: var(--border);
+}
+
+:root[data-theme=&quot;light&quot;] {
+  color-scheme: light;
+}
+
+:root[data-theme=&quot;dark&quot;] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html &gt; body {
+  margin: 0;
+  padding: 5px;
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-normal);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: pointer;
+  font-weight: var(--viz-font-weight-medium);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+}
+
+b,
+strong,
+th {
+  font-weight: var(--font-weight-medium);
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table-responsive &gt; .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead th {
+  padding-block: 8px;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 6px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align=&quot;right&quot;]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align=&quot;center&quot;]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: superellipse(1.5);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+#widget &gt; :not(.card) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--popover-foreground);
+  background: var(--popover);
+  box-shadow: none;
+  font-size: var(--font-size-tooltip);
+  line-height: var(--line-height-tooltip);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.viz-badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  color: var(--accent-foreground);
+  background: var(--accent);
+  font-weight: var(--font-weight-medium);
+}
+
+small,
+.text-small,
+.viz-badge {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls &gt; .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls &gt; .form-label &gt; :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+.btn {
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn-primary {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: padding-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: padding-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background: var(--secondary);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type=&quot;file&quot;] {
+  padding: 0;
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control[type=&quot;file&quot;]::file-selector-button {
+  min-height: 26px;
+  margin-right: 8px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+}
+
+.form-control[type=&quot;file&quot;]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type=&quot;color&quot;] {
+  width: 40px;
+  height: 28px;
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: superellipse(1.5);
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 72px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 32px 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-lg);
+  corner-shape: superellipse(1.5);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 10px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-check {
+  display: flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
+  border-color: var(--input);
+  border-radius: var(--radius-sm);
+  corner-shape: superellipse(1.5);
+  background-color: var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;]:checked {
+  border-color: var(--primary);
+  background-color: var(--primary);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type=&quot;checkbox&quot;]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: &quot;&quot;;
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+}
+
+.form-check-input[type=&quot;radio&quot;] {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+}
+
+.form-check-input[type=&quot;radio&quot;]:checked {
+  border: 2px solid var(--primary);
+  background:
+    radial-gradient(circle, var(--primary-foreground) 0 2.5px, transparent 3px),
+    var(--primary);
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+  box-shadow: var(--shadow-sm);
+  content: &quot;&quot;;
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--primary);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 28px;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: 0;
+  accent-color: var(--primary);
+  background: linear-gradient(
+      color-mix(in srgb, var(--foreground) 7%, transparent),
+      color-mix(in srgb, var(--foreground) 7%, transparent)
+    )
+    center / 100% 2px no-repeat;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-webkit-slider-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range::-moz-range-track {
+  height: 28px;
+  background: transparent;
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: light-dark(var(--primary-foreground), var(--foreground));
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  border-color: var(--ring);
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+
+.form-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+    [aria-pressed=&quot;true&quot;],
+    [aria-selected=&quot;true&quot;],
+    .is-selected
+  ) {
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.btn.viz-tile:is([aria-pressed=&quot;true&quot;], [aria-selected=&quot;true&quot;], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget &gt; svg {
+  width: 100%;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html&gt;body{padding:0}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;hitframe-product-structure&quot;&gt;
+  &lt;style&gt;
+    #hitframe-product-structure {
+      color: var(--foreground);
+      background: transparent;
+      display: grid;
+      gap: 18px;
+    }
+    #hitframe-product-structure * { box-sizing: border-box; }
+    #hitframe-product-structure .hf-toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    #hitframe-product-structure .hf-view[hidden],
+    #hitframe-product-structure .hf-screen[hidden] { display: none; }
+    #hitframe-product-structure .hf-positioning {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    #hitframe-product-structure .hf-positioning .card { min-width: 0; }
+    #hitframe-product-structure .hf-positioning strong {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-stack {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+    #hitframe-product-structure .hf-node {
+      min-width: 0;
+      padding: 14px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--viz-series-1) 8%, transparent);
+      position: relative;
+    }
+    #hitframe-product-structure .hf-node + .hf-node::before {
+      content: &quot;→&quot;;
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-node strong {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    #hitframe-product-structure .hf-node span {
+      display: block;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-foundation {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-block: 1px solid var(--border);
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-foundation strong {
+      color: var(--foreground);
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-section-label {
+      margin: 0 0 8px;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-wire-controls { margin-bottom: 12px; }
+    #hitframe-product-structure .hf-app-shell {
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 154px minmax(0, 1fr);
+      overflow: hidden;
+      padding: 0;
+    }
+    #hitframe-product-structure .hf-sidebar {
+      padding: 16px 10px;
+      border-right: 1px solid var(--border);
+      background: color-mix(in srgb, var(--muted) 40%, transparent);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    #hitframe-product-structure .hf-brand {
+      font-weight: 500;
+      padding: 6px 8px 14px;
+    }
+    #hitframe-product-structure .hf-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px;
+      border-radius: 8px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-nav-item.is-active {
+      color: var(--primary-foreground);
+      background: var(--primary);
+    }
+    #hitframe-product-structure .hf-nav-spacer { flex: 1; }
+    #hitframe-product-structure .hf-main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    #hitframe-product-structure .hf-topbar {
+      min-height: 54px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    #hitframe-product-structure .hf-topbar strong { font-weight: 500; }
+    #hitframe-product-structure .hf-content {
+      padding: 18px;
+      min-width: 0;
+    }
+    #hitframe-product-structure .hf-home-grid {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 16px;
+      align-items: start;
+    }
+    #hitframe-product-structure .hf-agent-entry {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--viz-series-1) 8%, transparent);
+    }
+    #hitframe-product-structure .hf-prompt-box {
+      min-height: 100px;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--input);
+      border-radius: 10px;
+      color: var(--muted-foreground);
+      background: var(--background);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    #hitframe-product-structure .hf-prompt-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #hitframe-product-structure .hf-quick-list {
+      display: grid;
+      gap: 8px;
+    }
+    #hitframe-product-structure .hf-quick-row {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    #hitframe-product-structure .hf-generator {
+      display: grid;
+      grid-template-columns: minmax(230px, .8fr) minmax(0, 1.2fr);
+      gap: 16px;
+      min-height: 390px;
+    }
+    #hitframe-product-structure .hf-panel {
+      border-right: 1px solid var(--border);
+      padding-right: 16px;
+      min-width: 0;
+    }
+    #hitframe-product-structure .hf-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    #hitframe-product-structure .hf-upload {
+      min-height: 90px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: var(--muted-foreground);
+      margin-bottom: 12px;
+      text-align: center;
+      padding: 12px;
+    }
+    #hitframe-product-structure .hf-upload[hidden] { display: none; }
+    #hitframe-product-structure .hf-field {
+      margin-bottom: 12px;
+    }
+    #hitframe-product-structure .hf-field label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-input {
+      border: 1px solid var(--input);
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 10px;
+      background: var(--background);
+    }
+    #hitframe-product-structure .hf-input.hf-large { min-height: 86px; }
+    #hitframe-product-structure .hf-settings {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    #hitframe-product-structure .hf-setting {
+      padding: 9px;
+      border-bottom: 1px solid var(--border);
+    }
+    #hitframe-product-structure .hf-setting span {
+      display: block;
+      color: var(--muted-foreground);
+      margin-bottom: 3px;
+    }
+    #hitframe-product-structure .hf-results {
+      min-width: 0;
+    }
+    #hitframe-product-structure .hf-result-grid,
+    #hitframe-product-structure .hf-template-grid,
+    #hitframe-product-structure .hf-asset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #hitframe-product-structure .hf-placeholder {
+      aspect-ratio: 4 / 3;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--muted) 75%, transparent);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--muted-foreground);
+      text-align: center;
+      padding: 8px;
+    }
+    #hitframe-product-structure .hf-case-media {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--muted) 75%, transparent);
+    }
+    #hitframe-product-structure .hf-case-media img,
+    #hitframe-product-structure .hf-ref-thumb {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #hitframe-product-structure .hf-case-media img { transition: transform .2s ease; }
+    #hitframe-product-structure .hf-template-item:hover .hf-case-media img,
+    #hitframe-product-structure .hf-asset-item:hover .hf-case-media img { transform: scale(1.025); }
+    #hitframe-product-structure .hf-case-media .viz-badge {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      color: var(--primary-foreground);
+      background: color-mix(in srgb, var(--foreground) 76%, transparent);
+    }
+    #hitframe-product-structure .hf-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    #hitframe-product-structure .hf-card-foot strong { margin-top: 0; }
+    #hitframe-product-structure .hf-asset-id {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted-foreground);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-try-button {
+      min-height: 26px;
+      padding-inline: 9px;
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-example-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+    #hitframe-product-structure .hf-example-strip[hidden],
+    #hitframe-product-structure .hf-example-card[hidden] { display: none; }
+    #hitframe-product-structure .hf-example-card {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 9px;
+      align-items: center;
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--background);
+    }
+    #hitframe-product-structure .hf-example-card img {
+      width: 72px;
+      height: 54px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: var(--muted);
+    }
+    #hitframe-product-structure .hf-example-card-body { min-width: 0; }
+    #hitframe-product-structure .hf-example-card-body strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-example-card-body span {
+      display: block;
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--muted-foreground);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #hitframe-product-structure .hf-example-card-body .btn { margin-top: 5px; }
+    #hitframe-product-structure .hf-reference-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    #hitframe-product-structure .hf-reference-strip[hidden] { display: none; }
+    #hitframe-product-structure .hf-reference-strip > span {
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-ref-thumb {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      object-fit: cover;
+    }
+    #hitframe-product-structure .hf-template-item,
+    #hitframe-product-structure .hf-asset-item {
+      min-width: 0;
+    }
+    #hitframe-product-structure .hf-template-item strong,
+    #hitframe-product-structure .hf-asset-item strong {
+      display: block;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+    #hitframe-product-structure .hf-agent-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 18px;
+    }
+    #hitframe-product-structure .hf-agent-step {
+      padding: 10px;
+      border-top: 2px solid var(--viz-series-1);
+      background: color-mix(in srgb, var(--viz-series-1) 7%, transparent);
+    }
+    #hitframe-product-structure .hf-folderbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    #hitframe-product-structure .hf-caption {
+      color: var(--muted-foreground);
+      margin-top: 8px;
+    }
+    #hitframe-product-structure .hf-case-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    #hitframe-product-structure .hf-eyebrow {
+      margin: 0 0 4px;
+      color: var(--primary);
+      font-size: var(--font-size-small);
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-case-lead {
+      max-width: 720px;
+      margin-top: 6px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-case-rulebar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    #hitframe-product-structure .hf-case-rule {
+      min-width: 0;
+      padding: 10px 12px;
+      border-left: 2px solid var(--viz-series-1);
+      background: color-mix(in srgb, var(--viz-series-1) 7%, transparent);
+    }
+    #hitframe-product-structure .hf-case-rule strong {
+      display: block;
+      margin-bottom: 3px;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-case-rule span { color: var(--muted-foreground); }
+    #hitframe-product-structure .hf-case-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    #hitframe-product-structure .hf-case-tabs,
+    #hitframe-product-structure .hf-case-filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    #hitframe-product-structure .hf-case-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #hitframe-product-structure .hf-case-card {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--background);
+    }
+    #hitframe-product-structure .hf-case-card[hidden] { display: none; }
+    #hitframe-product-structure .hf-case-card.is-selected {
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    #hitframe-product-structure .hf-case-card-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      min-width: 0;
+    }
+    #hitframe-product-structure .hf-case-index {
+      display: grid;
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--primary-foreground);
+      background: var(--primary);
+      font-size: var(--font-size-small);
+      font-variant-numeric: tabular-nums;
+    }
+    #hitframe-product-structure .hf-case-title { min-width: 0; flex: 1; }
+    #hitframe-product-structure .hf-case-title strong {
+      display: block;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    #hitframe-product-structure .hf-case-old {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-case-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 10px;
+    }
+    #hitframe-product-structure .hf-case-meta span {
+      display: block;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-case-meta strong {
+      display: block;
+      margin-top: 2px;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    #hitframe-product-structure .hf-case-note {
+      min-height: 42px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--border);
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-case-note strong { color: var(--foreground); font-weight: 500; }
+    #hitframe-product-structure .hf-case-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    #hitframe-product-structure .hf-prompt-details {
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    #hitframe-product-structure .hf-prompt-details summary {
+      padding: 8px 0 2px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-prompt-block {
+      margin-top: 6px;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--muted) 35%, transparent);
+      color: var(--foreground);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-small);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    #hitframe-product-structure .hf-prompt-label {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted-foreground);
+      font-family: var(--font-sans);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-prompt-contract {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--viz-series-1) 5%, transparent);
+    }
+    #hitframe-product-structure .hf-prompt-contract-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    #hitframe-product-structure .hf-prompt-contract-head strong { font-weight: 500; }
+    #hitframe-product-structure .hf-prompt-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    #hitframe-product-structure .hf-prompt-tag {
+      padding: 3px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-asset-section {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    #hitframe-product-structure .hf-asset-lead {
+      margin-top: 5px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-asset-table {
+      margin-top: 10px;
+    }
+    #hitframe-product-structure .hf-asset-table td:first-child {
+      width: 20%;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-asset-table td:nth-child(2) { width: 17%; }
+    #hitframe-product-structure .hf-maintenance-section {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    #hitframe-product-structure .hf-maintenance-lead {
+      margin-top: 5px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-maintenance-table { margin-top: 10px; }
+    #hitframe-product-structure .hf-maintenance-table td:first-child {
+      width: 18%;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-maintenance-table td:nth-child(2) { width: 20%; }
+    #hitframe-product-structure .hf-asset-overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 14px 0;
+    }
+    #hitframe-product-structure .hf-asset-stat {
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--background);
+    }
+    #hitframe-product-structure .hf-asset-stat span {
+      display: block;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-asset-stat strong {
+      display: block;
+      margin-top: 3px;
+      font-size: var(--font-size-h3);
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-layer-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 14px 0 18px;
+    }
+    #hitframe-product-structure .hf-layer-step {
+      min-width: 0;
+      padding: 11px 12px;
+      border-top: 2px solid var(--viz-series-1);
+      background: color-mix(in srgb, var(--viz-series-1) 6%, transparent);
+      position: relative;
+    }
+    #hitframe-product-structure .hf-layer-step + .hf-layer-step::before {
+      content: &quot;→&quot;;
+      position: absolute;
+      left: -10px;
+      top: 14px;
+      color: var(--muted-foreground);
+    }
+    #hitframe-product-structure .hf-layer-step strong {
+      display: block;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-layer-step span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    #hitframe-product-structure .hf-asset-filter {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    #hitframe-product-structure .hf-prompt-asset-row[hidden] { display: none; }
+    #hitframe-product-structure .hf-prompt-asset-table td:first-child {
+      width: 22%;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-prompt-asset-table td:nth-child(2) { width: 13%; }
+    #hitframe-product-structure .hf-prompt-asset-table td:nth-child(3) { width: 19%; }
+    #hitframe-product-structure .hf-prompt-asset-table td:nth-child(4) { width: 10%; }
+    #hitframe-product-structure .hf-prompt-asset-table td:nth-child(5) { width: 14%; }
+    #hitframe-product-structure .hf-lifecycle {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+    #hitframe-product-structure .hf-lifecycle-step {
+      min-width: 0;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    #hitframe-product-structure .hf-lifecycle-step strong {
+      display: block;
+      font-weight: 500;
+    }
+    #hitframe-product-structure .hf-lifecycle-step span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted-foreground);
+      font-size: var(--font-size-small);
+    }
+    @media (max-width: 680px) {
+      #hitframe-product-structure .hf-positioning,
+      #hitframe-product-structure .hf-stack,
+      #hitframe-product-structure .hf-agent-flow,
+      #hitframe-product-structure .hf-case-rulebar,
+      #hitframe-product-structure .hf-case-grid,
+      #hitframe-product-structure .hf-asset-overview,
+      #hitframe-product-structure .hf-layer-flow,
+      #hitframe-product-structure .hf-lifecycle { grid-template-columns: 1fr; }
+      #hitframe-product-structure .hf-node + .hf-node::before { content: &quot;↓&quot;; left: 50%; top: -10px; transform: translateX(-50%); }
+      #hitframe-product-structure .hf-app-shell { grid-template-columns: 1fr; }
+      #hitframe-product-structure .hf-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      #hitframe-product-structure .hf-brand, #hitframe-product-structure .hf-nav-spacer { display: none; }
+      #hitframe-product-structure .hf-nav-item { white-space: nowrap; }
+      #hitframe-product-structure .hf-home-grid,
+      #hitframe-product-structure .hf-generator { grid-template-columns: 1fr; }
+      #hitframe-product-structure .hf-panel { border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 16px; }
+      #hitframe-product-structure .hf-result-grid,
+      #hitframe-product-structure .hf-template-grid,
+      #hitframe-product-structure .hf-asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #hitframe-product-structure .hf-example-strip { grid-template-columns: 1fr; }
+      #hitframe-product-structure .hf-layer-step + .hf-layer-step::before { content: &quot;↓&quot;; left: 50%; top: -12px; }
+    }
+  &lt;/style&gt;
+
+  &lt;div class=&quot;hf-toolbar&quot; role=&quot;tablist&quot; aria-label=&quot;方案视图&quot;&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-view=&quot;structure&quot; aria-selected=&quot;true&quot;&gt;产品结构&lt;/button&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-view=&quot;wireframes&quot; aria-selected=&quot;false&quot;&gt;交互线框&lt;/button&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-view=&quot;cases&quot; aria-selected=&quot;false&quot;&gt;案例评审&lt;/button&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-view=&quot;prompt-assets&quot; aria-selected=&quot;false&quot;&gt;Prompt 资产&lt;/button&gt;
+    &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-view=&quot;creative-director&quot; aria-selected=&quot;false&quot;&gt;创意导演方案&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;section class=&quot;hf-view&quot; data-view-panel=&quot;structure&quot;&gt;
+    &lt;div class=&quot;hf-positioning&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;strong&gt;产品定位&lt;/strong&gt;
+        &lt;span&gt;面向品牌、电商与内容创作者的一站式 AI 视觉创作工作台&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;strong&gt;核心价值&lt;/strong&gt;
+        &lt;span&gt;从“描述目标”到“可交付图片”，减少模型选择和提示词门槛&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;
+        &lt;strong&gt;差异化&lt;/strong&gt;
+        &lt;span&gt;Agent 编排 + 场景模板 + 资产复用，而不只是一个生图表单&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;创作路径&lt;/p&gt;
+    &lt;div class=&quot;hf-stack&quot; role=&quot;img&quot; aria-label=&quot;HitFrame 从创作入口到结果交付的五层产品结构&quot;&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;快速生成&lt;/strong&gt;&lt;span&gt;文生图、图生图、可控参数&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;场景模板&lt;/strong&gt;&lt;span&gt;输入槽位、业务变量、推荐模型&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;Agent&lt;/strong&gt;&lt;span&gt;理解目标、补全素材、自动路由&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;工作流&lt;/strong&gt;&lt;span&gt;生成、编辑、放大、批量交付&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;结果交付&lt;/strong&gt;&lt;span&gt;变体、下载、项目与版本管理&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-foundation&quot;&gt;
+      &lt;span&gt;&lt;strong&gt;统一任务&lt;/strong&gt; GenerationJob&lt;/span&gt;
+      &lt;span&gt;&lt;strong&gt;统一素材&lt;/strong&gt; Asset&lt;/span&gt;
+      &lt;span&gt;&lt;strong&gt;统一项目&lt;/strong&gt; Project&lt;/span&gt;
+      &lt;span&gt;&lt;strong&gt;统一计费&lt;/strong&gt; Credits&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;模块定位与首版范围&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;模块&lt;/th&gt;&lt;th&gt;定位&lt;/th&gt;&lt;th&gt;主要功能&lt;/th&gt;&lt;th&gt;首版建议&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;快速生成&lt;/td&gt;&lt;td&gt;专业可控入口&lt;/td&gt;&lt;td&gt;文生图、图生图、模型、比例、清晰度、数量&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;必须&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;场景模板&lt;/td&gt;&lt;td&gt;业务任务入口&lt;/td&gt;&lt;td&gt;产品拍摄、模特手持、试穿、海报、包装与社媒图&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;必须&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;Agent&lt;/td&gt;&lt;td&gt;低门槛意图入口&lt;/td&gt;&lt;td&gt;自然语言、@资产、追问缺失信息、推荐模板与参数&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;轻量&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;工作流&lt;/td&gt;&lt;td&gt;进阶批量生产&lt;/td&gt;&lt;td&gt;固定流程、节点串联、批量变体、放大、导出&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;二期&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;资产库&lt;/td&gt;&lt;td&gt;复用与连续创作底座&lt;/td&gt;&lt;td&gt;上传、生成结果、文件夹、项目、筛选、再次引用&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;必须&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;hf-view&quot; data-view-panel=&quot;cases&quot; hidden&gt;
+    &lt;div class=&quot;hf-case-header&quot;&gt;
+      &lt;div&gt;
+        &lt;p class=&quot;hf-eyebrow&quot;&gt;预置案例优化&lt;/p&gt;
+        &lt;h2&gt;从“风格名”改成“任务结果”&lt;/h2&gt;
+        &lt;p class=&quot;hf-case-lead&quot;&gt;文生图解决“没有参考图，先把想法做出来”；图生图解决“我有参考图，想改成什么”；场景模板解决“我要交付什么业务成品”。保留用户熟悉的旧名作为副标题，降低迁移成本。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;建议首发：文生图 2 · 图生图 2 · 模板 2&lt;/span&gt;
+    &lt;/div&gt;
+      &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;文生图&lt;/strong&gt;&lt;span&gt;无需参考图，先写清主体、用途和视觉方向&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;图生图&lt;/strong&gt;&lt;span&gt;必须先选参考图，突出保留什么、改造什么&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;场景模板&lt;/strong&gt;&lt;span&gt;用图片槽位 + 业务变量，减少提示词输入&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;命名原则&lt;/strong&gt;&lt;span&gt;标题写结果，标签写风格，避免两个入口互相抢用户&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-prompt-contract&quot;&gt;
+      &lt;div class=&quot;hf-prompt-contract-head&quot;&gt;&lt;strong&gt;统一 Prompt 编译顺序&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;三种模式共用 · 默认生成设置独立&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-block&quot;&gt;主体 / 参考角色 → 目标动作 → 场景与构图 → 光影与材质 → 风格标签 → 保留项 → 禁止项 → 使用场景&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-tags&quot;&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;文生图：主体描述&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;图生图：Image N 角色&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;模板：槽位变量&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;比例 / 清晰度 / 数量：独立设置&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;生成前：用户确认&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-case-toolbar&quot;&gt;
+      &lt;div class=&quot;hf-case-tabs&quot; role=&quot;tablist&quot; aria-label=&quot;案例类型&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-case-mode=&quot;t2i&quot; aria-selected=&quot;true&quot;&gt;文生图 4 个&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-mode=&quot;i2i&quot; aria-selected=&quot;false&quot;&gt;图生图 4 个&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-mode=&quot;template&quot; aria-selected=&quot;false&quot;&gt;场景模板 3 个&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;hf-case-filters&quot; role=&quot;group&quot; aria-label=&quot;案例筛选&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-case-filter=&quot;all&quot; aria-pressed=&quot;true&quot;&gt;全部&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-filter=&quot;p0&quot; aria-pressed=&quot;false&quot;&gt;首发&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-filter=&quot;p1&quot; aria-pressed=&quot;false&quot;&gt;后续&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-filter=&quot;input&quot; aria-pressed=&quot;false&quot;&gt;需要素材&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-case-grid&quot; data-case-grid&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;t2i&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;none&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T1&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;产品概念视觉&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;新增：文生图首发 · 无需参考图&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;产品描述 + 卖点&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;1:1 / 4:5 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;主体 / 构图 / 材质&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;定位：&lt;/strong&gt;从产品想法到第一版商业视觉；没有商品原图时使用，已有商品图应转到图生图或电商模板。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;主体：磨砂玻璃精华液瓶，半透明磨砂玻璃材质，银色瓶盖，浅粉色精华液；目标：生成用于电商首页的商业产品视觉；场景：浅色石台与干净背景；构图：正面三分之二视角，主体占画面 60%，上方预留标题留白；光影：柔和侧光；风格：高级美妆棚拍、真实摄影质感；材质纹理清晰、边缘干净、比例准确。不得擅自编造 Logo、价格、功效或包装文字。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;低清、主体变形、重复产品、漂浮结构、过度反光、脏污背景、乱码、无关文字、水印、未经提供的品牌标识。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：产品 · 概念 · 商业视觉&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;t2i&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;none&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T2&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;时尚人物概念&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;新增：文生图首发 · 从设定生成&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;人物设定 + 造型方向&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;人物 / 姿态 / 镜头&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;定位：&lt;/strong&gt;探索人物造型和镜头，不承诺复刻真实人物；有真人参考时切换到“人像风格焕新”。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;人物：28 岁女性，中性气质，短黑发，暖肤色，清晰面部轮廓；服装：黑色立体剪裁西装，哑光羊毛材质；动作：自然站姿，一手插袋，轻微侧脸，放松表情；场景：清晨落地窗前的极简室内；镜头：半身，平视，85mm 人像镜头感；光影：窗边自然光与轻微轮廓光；风格：当代时尚杂志、胶片摄影；人物比例自然、手部完整、服装结构清晰。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;额外人物、重复肢体、畸形手指、面部错位、塑料皮肤、过度磨皮、品牌 Logo、乱码、水印、低清、裁切头顶或脚部。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：时尚 · 人物 · 造型探索&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;t2i&quot; data-case-priority=&quot;p1&quot; data-case-input=&quot;none&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T3&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;品牌海报概念&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;新增：文生图后续 · 先做视觉草案&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;产品 + 标题/卖点&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;4:5 / 9:16 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;版式 / 留白 / 层级&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;定位：&lt;/strong&gt;文生图只负责海报视觉草案；精确正文和品牌资产在编辑器或海报模板中完成，避免把模型当排版工具。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;为「Luma Air」无线耳机设计小红书封面视觉草案；主题：「通勤降噪，安静一整天」；卖点：「主动降噪 / 轻量佩戴」；主体：银白色无线耳机与充电盒；版式：产品置于画面右下，左上预留标题和卖点安全区；色彩：深石墨灰搭配电光青；风格：克制的科技产品摄影；层级清楚、主体完整、留白可编辑。正文只生成可替换的文字区域，不要虚构小字。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;乱码、错别字、错误 Logo、文字贴脸、文字遮挡主体、边缘裁切、杂乱装饰、低清、过度渐变、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：品牌 · 海报 · 视觉草案&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;t2i&quot; data-case-priority=&quot;p1&quot; data-case-input=&quot;none&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T4&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;动漫角色设定&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;新增：文生图后续 · 从世界观开始&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;角色设定 + 世界观&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;特征锁定 / 姿势&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;定位：&lt;/strong&gt;先生成一个角色的 4 个姿势或表情；需要已有对象转动漫时，使用图生图“角色风格转化”。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;角色设定：17 岁星港学院见习导航员，冷静好奇；外观锁定：深蓝短发、琥珀色眼睛、白色短夹克、橙色肩章；世界观：近未来轨道空间站，蓝紫色环境光；动作组：站立、回头、挥手、持平板；画风：清晰日系动画、细线稿、柔和赛璐璐上色；角色在多张图中保持相同面部与服装特征，轮廓清晰、姿态自然。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;角色特征漂移、服装颜色变化、额外肢体、畸形手指、不同年龄、低清、乱码、水印、模仿在世艺术家。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：动漫 · IP · 角色一致性&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;i2i&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;required&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;01&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;商品质感升级&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：美妆主图 · 保留为图生图&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;商品图 1 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;1:1 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;产品锁定 / 光线&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;与“电商主图”有重叠，需明确这是已有商品图的质感改造，不是从零填业务字段。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是唯一商品主体；保持商品外观、比例、材质、包装文字、品牌标识和瓶身结构不变。将背景改为浅色石台，使用柔和侧光，主体占画面 60%，上方保留干净留白，画面用于电商首页，呈现高级商业棚拍质感，边缘干净、细节锐利。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;改变包装、改写文字、错误 Logo、产品变形、重复商品、漂浮、脏污、过度反光、低清、乱码、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：美妆 · 棚拍 · 高级感&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;i2i&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;required&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;02&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;人像风格焕新&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：时尚人像 · 保留为图生图&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;人像 + 风格参考&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;脸部锁定 / 姿态&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;需求清晰且复用频率高；标题写“焕新”，比“时尚人像”更像用户要完成的动作。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是人物主体，保持身份、脸部特征、肤色、发型和体态；Image 2 仅作为风格参考。将人物置于清晨落地窗前，穿着黑色立体剪裁西装，姿态为自然站姿与轻微侧脸，半身平视构图，85mm 人像镜头感，窗边自然光，现代时尚杂志风格，皮肤纹理自然，手部完整，服装结构清晰。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;换脸、年龄变化、额外人物、重复肢体、畸形手指、面部错位、过度磨皮、塑料皮肤、裁切头顶或脚部、低清、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：时尚 · 肖像 · 杂志感&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;i2i&quot; data-case-priority=&quot;p1&quot; data-case-input=&quot;required&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;03&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;品牌海报重构&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：科技海报 · 改名并放到后续&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;旧海报 + 产品 / Logo&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;4:5 / 9:16 · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;文字安全区 / 构图&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;“科技”只是风格标签，先覆盖更大的品牌海报需求；有固定字段时再引导到海报模板。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是旧海报的构图参考，保留主体层级与左上标题、右下产品的版式；Image 2 是银白色无线耳机与 Logo 参考，保持其外观和标识准确。为 Luma Air 制作小红书封面海报变体，标题为“通勤降噪，安静一整天”，卖点为“主动降噪 / 轻量佩戴”，使用深石墨灰与电光青配色，产品占画面 42%，为正文预留左上安全区。文字区域保持短句和可编辑留白，不生成虚构小字。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;乱码、错别字、错误 Logo、文字遮挡主体、文字贴边、构图溢出、杂乱装饰、低清、无关文字、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：科技 · 产品发布 · 视觉重构&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;i2i&quot; data-case-priority=&quot;p1&quot; data-case-input=&quot;required&quot;&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;04&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;角色风格转化&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：动漫形象 · 与模板区分&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入&lt;/span&gt;&lt;strong&gt;人物 / 物品 + 动漫参考&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 · 2K · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;核心控制&lt;/span&gt;&lt;strong&gt;身份锁定 / 风格强度&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;只处理“已有对象转动漫”；需要设定角色、批量姿势或连续故事时，转到动漫生成模板。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充正向 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是需要保留身份的角色人物，保持其轮廓、比例、深蓝短发、琥珀色眼睛和橙色肩章；Image 2 是日系动画风格参考。将 Image 1 转化为清晰日系动画风格，场景为近未来轨道空间站，姿态为回头挥手，表情为冷静好奇，线条清晰、色彩统一、主体完整。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;身份漂移、改变发型或服装、额外肢体、畸形手指、低清、噪点、乱码、错误 Logo、水印、模仿在世艺术家。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;标签：动漫 · 风格迁移 · 角色保留&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳命名&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;template&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;required&quot; hidden&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T1&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;电商主图换背景&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：电商主图 · 模板首发&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;必填槽位&lt;/span&gt;&lt;strong&gt;商品图 1 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;1:1 · 标准 · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;业务变量&lt;/span&gt;&lt;strong&gt;背景 / 光线 / 留白&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;与 i2i 的“商品质感升级”共存，但通过槽位和变量把它定义成可批量交付的业务任务。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充模板 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是必须准确保留的商品主体；保持外观、比例、材质、包装文字和品牌标识不变。将背景替换为浅色石台，使用柔和侧光，主体占比 60%，保留上方留白，面向电商首页制作商品主图。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;系统负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;改变商品外观、包装文字或 Logo；产品变形、重复商品、漂浮、脏污、过度反光、低清、乱码、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;适合：运营 · 上新 · 批量换版&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳模板&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;template&quot; data-case-priority=&quot;p0&quot; data-case-input=&quot;required&quot; hidden&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T2&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;模特穿搭试穿&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：模特穿搭 · 模板首发&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;必填槽位&lt;/span&gt;&lt;strong&gt;服装图 1 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 · 标准 · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;业务变量&lt;/span&gt;&lt;strong&gt;模特 / 姿势 / 场景&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;把“穿搭”落到“试穿”动作，用户能预期输入、结果和失败边界；模特参考作为可选第二槽位。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充模板 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;Image 1 是必须准确保留版型、颜色、材质、纹理与标识的黑色西装；Image 2 是模特参考，保持其身份、面部、发型与体态。让时尚女性模特自然穿着 Image 1，自然站姿、轻微侧身，置于极简室内，服装与人体结构贴合真实，采用半身时尚摄影构图，面向电商详情页制作成图。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;系统负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;改变服装版型、颜色、纹理或 Logo；穿透、肢体错位、额外手指、脸部漂移、衣物褶皱不自然、低清、乱码、水印。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;适合：服装 · 电商 · 社媒内容&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳模板&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+      &lt;article class=&quot;hf-case-card&quot; data-case-mode-card=&quot;template&quot; data-case-priority=&quot;p1&quot; data-case-input=&quot;optional&quot; hidden&gt;
+        &lt;div class=&quot;hf-case-card-head&quot;&gt;&lt;span class=&quot;hf-case-index&quot;&gt;T3&lt;/span&gt;&lt;div class=&quot;hf-case-title&quot;&gt;&lt;strong&gt;动漫角色生成&lt;/strong&gt;&lt;span class=&quot;hf-case-old&quot;&gt;原：动漫生成 · 模板后续&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-meta&quot;&gt;&lt;div&gt;&lt;span&gt;输入槽位&lt;/span&gt;&lt;strong&gt;文字设定 + 可选参考&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;默认输出&lt;/span&gt;&lt;strong&gt;3:4 / 9:16 · 4 张&lt;/strong&gt;&lt;/div&gt;&lt;div&gt;&lt;span&gt;业务变量&lt;/span&gt;&lt;strong&gt;角色 / 世界观 / 姿势&lt;/strong&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-note&quot;&gt;&lt;strong&gt;判断：&lt;/strong&gt;与 i2i 的“角色风格转化”用输入方式区分；先做单角色 + 4 姿势，再扩展连续角色一致性。&lt;/div&gt;
+        &lt;details class=&quot;hf-prompt-details&quot;&gt;&lt;summary&gt;查看完整 Prompt&lt;/summary&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;已填充模板 Prompt&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;根据角色设定生成一组统一角色视觉：17 岁星港学院见习导航员，深蓝短发、琥珀色眼睛、白色短夹克、橙色肩章，世界观为近未来轨道空间站，画风为清晰日系动画。生成站立、回头、挥手、持平板四个姿势，多张图中保持相同脸部、发型、服装主色与标志性配饰；构图完整，适合社媒连续内容。如提供参考图，按 Image N 的角色说明使用。&lt;/div&gt;
+          &lt;span class=&quot;hf-prompt-label&quot;&gt;系统负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot;&gt;角色特征漂移、服装颜色变化、年龄变化、额外肢体、畸形手指、低清、乱码、水印、模仿在世艺术家。&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div class=&quot;hf-case-actions&quot;&gt;&lt;span class=&quot;text-muted&quot;&gt;适合：IP · 社媒 · 连续内容&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot; data-case-select&gt;采纳模板&lt;/button&gt;&lt;/div&gt;
+      &lt;/article&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-asset-section&quot;&gt;
+      &lt;h3&gt;素材清单：先准备首发案例&lt;/h3&gt;
+      &lt;p class=&quot;hf-asset-lead&quot;&gt;文生图不要求图片素材；图生图和场景模板按下面清单准备即可。建议先给 1 个 SKU、1 套服装和 1 个角色样例，先验证 Prompt 与成片质量，再扩充数量。&lt;/p&gt;
+      &lt;div class=&quot;table-responsive&quot;&gt;
+        &lt;table class=&quot;table table-sm hf-asset-table&quot;&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;案例&lt;/th&gt;&lt;th&gt;优先级&lt;/th&gt;&lt;th&gt;必需素材&lt;/th&gt;&lt;th&gt;可选素材 / 说明&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;商品质感升级&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;P0&lt;/span&gt;&lt;/td&gt;&lt;td&gt;商品正面图 1 张，长边 ≥ 2000px&lt;/td&gt;&lt;td&gt;透明底图、包装文字特写、品牌色与禁用改动清单&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;人像风格焕新&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;P0&lt;/span&gt;&lt;/td&gt;&lt;td&gt;正脸或半身人像 1 张，已获肖像授权&lt;/td&gt;&lt;td&gt;风格参考 2–3 张、希望保留的脸部/发型说明&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;电商主图换背景&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;P0&lt;/span&gt;&lt;/td&gt;&lt;td&gt;商品图 1 张（无复杂遮挡）&lt;/td&gt;&lt;td&gt;背景参考 2 张、品牌色、常用比例（1:1 / 4:5）&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;模特穿搭试穿&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;P0&lt;/span&gt;&lt;/td&gt;&lt;td&gt;服装平铺或白底图 1 张&lt;/td&gt;&lt;td&gt;模特参考 1 张、正背面图、尺码/版型说明、禁改细节&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;品牌海报 / 角色类&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;P1&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品或角色主体素材 1 张，及准确文字稿&lt;/td&gt;&lt;td&gt;Logo PNG/SVG、字体/色值、旧海报或角色设定图、目标渠道比例&lt;/td&gt;&lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;hf-caption&quot;&gt;统一补充：目标渠道、输出比例、数量、清晰度、必须保留项、禁止出现项；涉及人物/IP 时同时提供授权或可用范围。&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-maintenance-section&quot;&gt;
+      &lt;h3&gt;Prompt 资产与维护方式&lt;/h3&gt;
+      &lt;p class=&quot;hf-maintenance-lead&quot;&gt;不要把每条案例写成 Skill。Skill 只承载编译规则；案例内容、字段和版本作为配置资产维护，生成时再保存一次不可变编译快照。&lt;/p&gt;
+      &lt;div class=&quot;table-responsive&quot;&gt;
+        &lt;table class=&quot;table table-sm hf-maintenance-table&quot;&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;层级&lt;/th&gt;&lt;th&gt;建议形式&lt;/th&gt;&lt;th&gt;保存内容&lt;/th&gt;&lt;th&gt;维护策略&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;编译规则&lt;/td&gt;&lt;td&gt;PromptCompilerService / Skill 规则&lt;/td&gt;&lt;td&gt;字段顺序、参考图角色、保留/禁止项、校验规则&lt;/td&gt;&lt;td&gt;代码评审 + 单元测试，规则升级有版本号&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;案例配置&lt;/td&gt;&lt;td&gt;PromptPreset / NodeTemplate（JSON + 数据库）&lt;/td&gt;&lt;td&gt;名称、模式、输入字段、默认文案、正向/负向模板、状态&lt;/td&gt;&lt;td&gt;草稿 → 评审 → 发布 → 归档；新任务只读最新发布版&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;编译快照&lt;/td&gt;&lt;td&gt;GenerationRun / GenerationJob 快照&lt;/td&gt;&lt;td&gt;原始输入、素材 ID 与角色、已填充 Prompt、编译器版本、案例版本、哈希&lt;/td&gt;&lt;td&gt;生成后不可覆盖，保证历史结果可复现和可追责&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;质量样例&lt;/td&gt;&lt;td&gt;PromptEvalCase（JSON / 数据库）&lt;/td&gt;&lt;td&gt;测试素材、期望保留项、禁出项、人工评分与失败原因&lt;/td&gt;&lt;td&gt;每次发布前跑回归，低于阈值不允许上线&lt;/td&gt;&lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;hf-caption&quot;&gt;最小可落地方案：先用版本化 JSON 管理 PromptPreset，稳定后迁移到数据库；场景模板继续复用 NodeTemplate，图生图/文生图快捷案例共用 PromptPreset。&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;hf-view&quot; data-view-panel=&quot;prompt-assets&quot; hidden&gt;
+    &lt;div class=&quot;hf-case-header&quot;&gt;
+      &lt;div&gt;
+        &lt;p class=&quot;hf-eyebrow&quot;&gt;Prompt 资产台账&lt;/p&gt;
+        &lt;h2&gt;让每次生成都可维护、可回溯&lt;/h2&gt;
+        &lt;p class=&quot;hf-case-lead&quot;&gt;案例是可版本化的配置资产，编译规则由服务统一执行，真实生成时保存不可变快照。设计、研发和运营看到的是同一份资产定义，修改不会悄悄影响历史结果。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;当前清单：11 个案例&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;hf-asset-overview&quot; aria-label=&quot;Prompt 资产概览&quot;&gt;
+      &lt;div class=&quot;hf-asset-stat&quot;&gt;&lt;span&gt;快捷案例&lt;/span&gt;&lt;strong&gt;11 个&lt;/strong&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-asset-stat&quot;&gt;&lt;span&gt;输入模式&lt;/span&gt;&lt;strong&gt;3 种&lt;/strong&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-asset-stat&quot;&gt;&lt;span&gt;资产层级&lt;/span&gt;&lt;strong&gt;4 层&lt;/strong&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-asset-stat&quot;&gt;&lt;span&gt;发布方式&lt;/span&gt;&lt;strong&gt;版本化&lt;/strong&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;从配置到结果&lt;/p&gt;
+    &lt;div class=&quot;hf-layer-flow&quot; role=&quot;img&quot; aria-label=&quot;Prompt 资产从编译规则到质量样例的维护流程&quot;&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;PromptCompilerService&lt;/strong&gt;&lt;span&gt;编译顺序、校验与角色映射&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;PromptPreset / NodeTemplate&lt;/strong&gt;&lt;span&gt;案例字段、模板变量与版本&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;GenerationRun 快照&lt;/strong&gt;&lt;span&gt;保存本次真实输入与已编译结果&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;PromptEvalCase&lt;/strong&gt;&lt;span&gt;发布前回归与失败原因记录&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;hf-case-toolbar&quot;&gt;
+      &lt;div class=&quot;hf-asset-filter&quot; role=&quot;group&quot; aria-label=&quot;Prompt 资产筛选&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-prompt-asset-filter=&quot;all&quot; aria-pressed=&quot;true&quot;&gt;全部 11&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-prompt-asset-filter=&quot;t2i&quot; aria-pressed=&quot;false&quot;&gt;文生图 4&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-prompt-asset-filter=&quot;i2i&quot; aria-pressed=&quot;false&quot;&gt;图生图 4&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-prompt-asset-filter=&quot;template&quot; aria-pressed=&quot;false&quot;&gt;场景模板 3&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;span class=&quot;text-muted&quot; data-prompt-asset-count&gt;显示 11 个资产</span&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm hf-prompt-asset-table&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;资产名称&lt;/th&gt;&lt;th&gt;模式&lt;/th&gt;&lt;th&gt;存储形式&lt;/th&gt;&lt;th&gt;版本&lt;/th&gt;&lt;th&gt;状态&lt;/th&gt;&lt;th&gt;快照字段&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;t2i&quot;&gt;&lt;td&gt;产品概念视觉&lt;/td&gt;&lt;td&gt;文生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;输入、Prompt、负向约束、设置&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;t2i&quot;&gt;&lt;td&gt;时尚人物概念&lt;/td&gt;&lt;td&gt;文生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;人物设定、镜头、风格、设置&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;t2i&quot;&gt;&lt;td&gt;品牌海报概念&lt;/td&gt;&lt;td&gt;文生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v0.9&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品、文案、版式、设置&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;t2i&quot;&gt;&lt;td&gt;动漫角色设定&lt;/td&gt;&lt;td&gt;文生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v0.9&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/td&gt;&lt;td&gt;角色锁定、世界观、动作组&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;i2i&quot;&gt;&lt;td&gt;商品质感升级&lt;/td&gt;&lt;td&gt;图生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;Image 1、保留项、改造项&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;i2i&quot;&gt;&lt;td&gt;人像风格焕新&lt;/td&gt;&lt;td&gt;图生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;Image 1 / 2、身份锁定&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;i2i&quot;&gt;&lt;td&gt;科技海报重构&lt;/td&gt;&lt;td&gt;图生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v0.9&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/td&gt;&lt;td&gt;Image 1 / 2、版式、文字安全区&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;i2i&quot;&gt;&lt;td&gt;角色风格转化&lt;/td&gt;&lt;td&gt;图生图&lt;/td&gt;&lt;td&gt;PromptPreset&lt;/td&gt;&lt;td&gt;v0.9&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/td&gt;&lt;td&gt;Image 1 / 2、身份与风格&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;template&quot;&gt;&lt;td&gt;电商主图换背景&lt;/td&gt;&lt;td&gt;场景模板&lt;/td&gt;&lt;td&gt;NodeTemplate&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;商品槽位、背景、留白&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;template&quot;&gt;&lt;td&gt;模特穿搭试穿&lt;/td&gt;&lt;td&gt;场景模板&lt;/td&gt;&lt;td&gt;NodeTemplate&lt;/td&gt;&lt;td&gt;v1.0&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;首发&lt;/span&gt;&lt;/td&gt;&lt;td&gt;服装槽位、模特槽位、姿势&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr data-prompt-asset-row data-prompt-asset-mode=&quot;template&quot;&gt;&lt;td&gt;动漫角色生成&lt;/td&gt;&lt;td&gt;场景模板&lt;/td&gt;&lt;td&gt;NodeTemplate&lt;/td&gt;&lt;td&gt;v0.9&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;后续&lt;/span&gt;&lt;/td&gt;&lt;td&gt;文字设定、参考槽位、动作组&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot; style=&quot;margin-top:18px&quot;&gt;资产生命周期&lt;/p&gt;
+    &lt;div class=&quot;hf-lifecycle&quot;&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;01 · 草稿&lt;/strong&gt;&lt;span&gt;补齐输入字段、正向 Prompt 和负向约束&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;02 · 评审&lt;/strong&gt;&lt;span&gt;用素材清单跑样例，检查保留项和失败边界&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;03 · 发布&lt;/strong&gt;&lt;span&gt;锁定版本，默认设置独立下发并记录编译器版本&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;04 · 归档&lt;/strong&gt;&lt;span&gt;旧版本只读，历史 GenerationRun 仍可复现&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;最小落地：先用版本化 JSON 管理 PromptPreset，稳定后迁移到数据库；Skill / PromptCompilerService 只维护编译规则，不承载具体案例文案。&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;hf-view&quot; data-view-panel=&quot;creative-director&quot; hidden&gt;
+    &lt;div class=&quot;hf-case-header&quot;&gt;
+      &lt;div&gt;
+        &lt;p class=&quot;hf-eyebrow&quot;&gt;Agent 唯一入口 · 多模态创意导演&lt;/p&gt;
+        &lt;h2&gt;让用户说目标，让 Agent 把目标变成可执行的图片方案&lt;/h2&gt;
+        &lt;p class=&quot;hf-case-lead&quot;&gt;本方案参考 OpenTu 的对话式创作和 Skill 组织方式，但沿用 HitFrame 现有竖型对话框、统一任务链路与商业图片工作区。AI 图片保持直接、可控；创意导演只存在于 Agent。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;待产品 + 技术确认&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;hf-positioning&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;&lt;strong&gt;AI 图片&lt;/strong&gt;&lt;span&gt;传统生图工作区：文生图、图生图、参考图、参数、直接生成。&lt;/span&gt;&lt;span class=&quot;viz-badge&quot;&gt;不加入对话导演&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;&lt;strong&gt;Agent&lt;/strong&gt;&lt;span&gt;唯一的对话式创作入口：理解需求、推荐 Skill、补全信息、编译 Prompt。&lt;/span&gt;&lt;span class=&quot;viz-badge&quot;&gt;创意导演&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;&lt;strong&gt;模板配置页&lt;/strong&gt;&lt;span&gt;继续使用槽位、变量和参数表单，可把当前上下文带入 Agent。&lt;/span&gt;&lt;span class=&quot;viz-badge&quot;&gt;结构化配置&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;产品边界与职责矩阵&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;能力&lt;/th&gt;&lt;th&gt;AI 图片&lt;/th&gt;&lt;th&gt;Agent 创意导演&lt;/th&gt;&lt;th&gt;实现约束&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;提示词&lt;/td&gt;&lt;td&gt;用户直接编辑原始 Prompt&lt;/td&gt;&lt;td&gt;原样 / 智能增强 / 创意导演三种处理&lt;/td&gt;&lt;td&gt;增强前后只在 Agent 展示&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;参考图&lt;/td&gt;&lt;td&gt;上传并直接用于图生图&lt;/td&gt;&lt;td&gt;分析图片、指定角色和保真等级&lt;/td&gt;&lt;td&gt;真实品牌商品默认严格保留&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;Skill&lt;/td&gt;&lt;td&gt;不展示 Skill 对话&lt;/td&gt;&lt;td&gt;自动推荐，可手动切换&lt;/td&gt;&lt;td&gt;Skill 只产生图片，不生成文章正文&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;执行&lt;/td&gt;&lt;td&gt;点击生成即进入统一链路&lt;/td&gt;&lt;td&gt;方案确认后才创建 Run / Job&lt;/td&gt;&lt;td&gt;分析、编译、预览零扣点&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;结果&lt;/td&gt;&lt;td&gt;结果面板和资产库&lt;/td&gt;&lt;td&gt;回到同一条 Agent 对话时间线&lt;/td&gt;&lt;td&gt;单图、图片组、宫格图共用任务模型&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;模型职责：一个理解，一个出图&lt;/p&gt;
+    &lt;div class=&quot;hf-stack&quot; role=&quot;img&quot; aria-label=&quot;gpt-5.6-sol 和 gpt-image-2 的职责分工&quot;&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;gpt-5.6-sol&lt;/strong&gt;&lt;span&gt;多模态创意导演：理解中文目标、观察参考图、判断角色、推荐 Skill、追问缺失信息。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;Prompt Compiler&lt;/strong&gt;&lt;span&gt;把原始需求、Skill、角色、控制项编译成结构化方案、正向 Prompt、负向约束和文字叠加计划。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;用户确认&lt;/strong&gt;&lt;span&gt;查看补充、修改方案或 Prompt，明确确认生成数量、比例、质量和预计点数。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-node&quot;&gt;&lt;strong&gt;gpt-image-2&lt;/strong&gt;&lt;span&gt;最终图片生成 / 编辑：t2i、i2i、模板、单图或图片组，不承担需求理解和品牌事实判断。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-foundation&quot;&gt;&lt;span&gt;&lt;strong&gt;服务端密钥&lt;/strong&gt; 只在中转站服务端&lt;/span&gt;&lt;span&gt;&lt;strong&gt;前端可见&lt;/strong&gt; 仅方案与脱敏摘要&lt;/span&gt;&lt;span&gt;&lt;strong&gt;图片文字&lt;/strong&gt; 前端 / 合成层叠加&lt;/span&gt;&lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;三种处理方式&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;原样 · 按我的描述执行&lt;/strong&gt;&lt;span&gt;保留原始创意，不提出新主题、不补营销卖点；只做素材检查、参数确认和必要的安全约束。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;智能增强 · 补全执行方案&lt;/strong&gt;&lt;span&gt;补齐主体、构图、光影、材质、保真和负向约束；不改变意图，不新增未经确认的品牌事实、功效或卖点。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;创意导演 · 让 Agent 设计方案&lt;/strong&gt;&lt;span&gt;在目标上提出主题、视觉叙事、色彩、场景、构图、标题、卖点和图片组建议；每项新增内容标记“AI 建议，待确认”。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;模式必须只出现在 Agent 对话框中。AI 图片页只保留“ 不知道怎么描述？去 Agent 获取创作方案 ”的轻量入口。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;首期图片 Skill 目录&lt;/p&gt;
+    &lt;div class=&quot;hf-prompt-tags&quot;&gt;
+      &lt;span class=&quot;hf-prompt-tag&quot;&gt;自动&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;商品换背景&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;模特上身 / 真人试穿&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;电商海报&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;小红书封面&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;小红书多图组&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;宫格图 / 九宫格&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;文章配图&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;信息图&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;图片组&lt;/strong&gt;&lt;span&gt;共享一份创意方案，拆成编号明确的图片任务；每张图记录自己的 Prompt 快照。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;文章配图&lt;/strong&gt;&lt;span&gt;只生成图片，不生成文章、标题正文或文档。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;信息图&lt;/strong&gt;&lt;span&gt;首期只输出图片，不承诺可编辑 SVG 或结构化图表。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;明确排除&lt;/strong&gt;&lt;span&gt;PPT 大纲、文章正文、文档生成不在本项目范围。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;Agent 对话和工作步骤&lt;/p&gt;
+    &lt;div class=&quot;hf-lifecycle&quot; aria-label=&quot;Agent 创意导演工作步骤&quot;&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;01 · 描述目标&lt;/strong&gt;&lt;span&gt;用户输入自然语言，可上传图片或引用资产。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;02 · 推荐 Skill&lt;/strong&gt;&lt;span&gt;返回推荐类型、t2i / i2i、比例、数量和缺图提示。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;03 · 定义角色&lt;/strong&gt;&lt;span&gt;给每张参考图指定商品、人物、背景、风格或 Logo 角色。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;04 · 补齐信息&lt;/strong&gt;&lt;span&gt;只追问影响成片的缺失项，如卖点、Logo、文案安全区、图数。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;05 · 生成方案&lt;/strong&gt;&lt;span&gt;展示主题、场景、构图、光影、文字计划和 AI 建议。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;06 · 编译 Prompt&lt;/strong&gt;&lt;span&gt;用户可查看、编辑、回退原始需求并重新编译。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;07 · 确认生成&lt;/strong&gt;&lt;span&gt;确认后才进入 hold → queue → worker → settle / refund。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;参考图角色与保真等级&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;角色&lt;/th&gt;&lt;th&gt;用途&lt;/th&gt;&lt;th&gt;默认保真&lt;/th&gt;&lt;th&gt;编译要求&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;商品主体&lt;/td&gt;&lt;td&gt;产品外观、包装、材质、Logo&lt;/td&gt;&lt;td&gt;严格保留&lt;/td&gt;&lt;td&gt;图生图锁定主体，禁止重绘包装文字&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;人物主体&lt;/td&gt;&lt;td&gt;身份、脸部、发型、体态&lt;/td&gt;&lt;td&gt;严格保留&lt;/td&gt;&lt;td&gt;禁止换脸、年龄漂移和额外肢体&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;背景参考&lt;/td&gt;&lt;td&gt;空间、氛围、色彩和光线&lt;/td&gt;&lt;td&gt;允许艺术化变化&lt;/td&gt;&lt;td&gt;只影响场景，不覆盖主体角色&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;风格参考&lt;/td&gt;&lt;td&gt;摄影、插画、色彩和质感&lt;/td&gt;&lt;td&gt;允许艺术化变化&lt;/td&gt;&lt;td&gt;不得指向在世艺术家模仿&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;Logo / 品牌素材&lt;/td&gt;&lt;td&gt;品牌标志和官方字形&lt;/td&gt;&lt;td&gt;严格保留&lt;/td&gt;&lt;td&gt;精确文字交给前端 / 合成层，模型只负责留白和主体关系&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;真实 OPPO、香奈儿、黄天鹅、以纯等品牌素材必须由用户提供并以参考图进入 i2i；无品牌护肤品或耳机可以作为“通用演示素材”建立虚拟品牌，但不能伪造真实品牌产品。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;多模态请求协议&lt;/p&gt;
+    &lt;div class=&quot;hf-prompt-contract&quot;&gt;
+      &lt;div class=&quot;hf-prompt-contract-head&quot;&gt;&lt;strong&gt;POST /api/v1/prompts/compile&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;只分析和编译 · 不扣点 · 不创建任务&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-block&quot;&gt;{ mode, generationMode, rawPrompt, skill, templateId, references: [{ assetId, role, fidelity }], controls: { ratio, candidateCount, quality } }&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-tags&quot;&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;model: gpt-5.6-sol&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;response_format: json_object&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;服务端保存 API Key&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;参考图需上游可读 URL / 受控 base64&lt;/span&gt;&lt;/div&gt;
+      &lt;p class=&quot;hf-caption&quot;&gt;服务端必须根据 assetId 解析原图，并生成短时效、不可公开索引的上游可读地址；仅传 assetId、role、fidelity 元数据不足以支持多模态观察。前端不得接触中转站密钥。&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-prompt-contract&quot;&gt;
+      &lt;div class=&quot;hf-prompt-contract-head&quot;&gt;&lt;strong&gt;编译响应（建议协议）&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;结构化结果可直接渲染方案卡&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-block&quot;&gt;{ normalizedBrief, referenceAnalysis, compiledPrompt, negativePrompt, textOverlayPlan, directorSuggestions, changeSummary, warnings, missingQuestions }&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;Prompt 可追溯与回填&lt;/p&gt;
+    &lt;div class=&quot;hf-layer-flow&quot; role=&quot;img&quot; aria-label=&quot;从用户需求到最终图片的提示词追溯链&quot;&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;用户原始需求&lt;/strong&gt;&lt;span&gt;原文、输入时间、模式和 Skill&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;参考图观察&lt;/strong&gt;&lt;span&gt;图片角色、保真等级、观察摘要&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;结构化方案&lt;/strong&gt;&lt;span&gt;主题、场景、构图、光影、文案建议&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;最终执行 Prompt&lt;/strong&gt;&lt;span&gt;正向、负向、设置、编译器版本和哈希&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-layer-step&quot;&gt;&lt;strong&gt;生成快照&lt;/strong&gt;&lt;span&gt;provider、model、耗时、结果和点数&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;查看执行提示词&lt;/strong&gt;&lt;span&gt;默认折叠，用户主动展开查看完整正向与负向 Prompt。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;查看本次补充&lt;/strong&gt;&lt;span&gt;逐条展示“锁定商品主体、增加商业光影、添加负向约束”等变化。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;编辑 / 回退 / 重编译&lt;/strong&gt;&lt;span&gt;编辑最终 Prompt 或恢复原始需求，均产生新版本，不覆盖历史快照。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;同一素材三模式对比演示&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;固定输入&lt;/strong&gt;&lt;span&gt;同一张护肤品参考图、同一比例、同一质量、同一数量和同一点数。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;用户需求&lt;/strong&gt;&lt;span&gt;“给这瓶护肤品做一张小红书封面，突出红山茶花和轻盈质地。”&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;原样&lt;/strong&gt;&lt;span&gt;只做执行检查，原始 Prompt 几乎不变，不主动增加主题或卖点。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;智能增强&lt;/strong&gt;&lt;span&gt;补齐产品主体、构图、光线、保真项、负向约束和文字安全区。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;创意导演&lt;/strong&gt;&lt;span&gt;提出“红山茶花焕活年轻光采”等主题、版式和卖点建议，全部标记待确认。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;验收页面必须同时显示：用户原始输入、Skill、追问过程、参考图角色、图片观察、结构化方案、增强前后 Prompt、修改摘要、用户确认内容、生成结果、耗时和点数。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;计费、失效与安全边界&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;操作&lt;/th&gt;&lt;th&gt;扣点&lt;/th&gt;&lt;th&gt;创建 Run / Job&lt;/th&gt;&lt;th&gt;规则&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;Skill 推荐、图片分析、Prompt 编译&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;允许反复编辑、重新编译&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;方案预览、模式切换、追问&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;不产生计费流水&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;确认方案并生成&lt;/td&gt;&lt;td&gt;是&lt;/td&gt;&lt;td&gt;是&lt;/td&gt;&lt;td&gt;复用现有 hold → queue → worker → settle / refund&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;修改素材、角色、比例、Skill 或模式&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;否&lt;/td&gt;&lt;td&gt;旧方案标记失效，必须重新编译&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;品牌与文字&lt;/strong&gt;&lt;span&gt;真实品牌只能基于用户提供的素材；精确中文、标题、卖点和 Logo 由前端 / 合成层叠加，图片模型负责画面和留白。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;密钥与隐私&lt;/strong&gt;&lt;span&gt;中转站密钥仅服务端保存；上游图片地址短时效、不可公开索引；响应对外只返回脱敏错误。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;编译失败&lt;/strong&gt;&lt;span&gt;明确返回可修复的缺失问题；不得静默伪造方案。无 gpt-5.6-sol 时仅允许受控规则降级，并标记为 fallback。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;分阶段开发计划&lt;/p&gt;
+    &lt;div class=&quot;hf-lifecycle&quot; aria-label=&quot;创意导演分阶段开发计划&quot;&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D0 · 契约冻结&lt;/strong&gt;&lt;span&gt;shared 类型、Skill 枚举、模式、参考图角色、编译响应和错误码。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D1 · 服务端编译器&lt;/strong&gt;&lt;span&gt;gpt-5.6-sol 中转调用、图片解析、JSON 校验、版本化快照和日志。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D2 · Agent 对话 UI&lt;/strong&gt;&lt;span&gt;Skill 菜单、三模式、角色标注、缺失追问、方案卡和 Prompt 折叠查看。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D3 · 执行闭环&lt;/strong&gt;&lt;span&gt;确认门禁、生成 DTO、现有队列计费、结果回填同一时间线。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D4 · 图片组与 Skill 扩展&lt;/strong&gt;&lt;span&gt;小红书多图组、宫格图、文章配图、信息图共享方案并拆分任务。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;D5 · 质量回归&lt;/strong&gt;&lt;span&gt;三模式对比、真实品牌 i2i、虚拟品牌 t2i、失败脱敏和账实回归。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;产品与技术验收门槛&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;结构&lt;/strong&gt;&lt;span&gt;AI 图片没有创意导演切换；Agent 是唯一对话入口；模板页可带入上下文。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;功能&lt;/strong&gt;&lt;span&gt;Skill 推荐、角色和保真、三模式差异、追问、方案修改、Prompt 查看和回退均可用。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;任务&lt;/strong&gt;&lt;span&gt;确认前零扣点零任务；确认后复用统一队列；结果回到 Agent 时间线。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;质量&lt;/strong&gt;&lt;span&gt;同一素材三模式对比可解释；真实品牌保真；虚拟品牌明确标注；中文信息不依赖模型绘制。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;可观测&lt;/strong&gt;&lt;span&gt;记录原始需求、编译版本、模型、耗时、错误、点数和结果，不泄漏密钥、路径或上游原文。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;最终产品定义：AI 图片是直接出图工具；Agent 是对话式创意导演。两者共享视觉语言、素材库和统一生成链路，但入口、职责和交互深度明确分离。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;本次产品确认结论&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;入口边界已锁定&lt;/strong&gt;&lt;span&gt;AI 图片继续是传统直接生图工作区；原样、智能增强、创意导演只存在于 Agent，不把 AI 图片改造成对话式工作台。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;首期范围已锁定&lt;/strong&gt;&lt;span&gt;只做图片 Skill：商品换背景、模特上身、电商海报、小红书封面、小红书多图组、宫格图、文章配图、信息图。PPT 大纲、文章正文、文档生成明确排除。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;商业真实规则&lt;/strong&gt;&lt;span&gt;真实品牌商品必须使用用户提供的参考图进入 i2i；无品牌护肤品和耳机可以作为通用演示素材并建立虚拟品牌，不凭空编造真实品牌产品。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;质量与控制项&lt;/strong&gt;&lt;span&gt;不强制所有商用模板默认 high；保留产品既有质量策略，同时逐步暴露比例、数量、质量、留白、文字安全区、保真和创意强度等可调整控制项，供预览和生产分别使用。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;计费门禁&lt;/strong&gt;&lt;span&gt;Skill 推荐、图片观察、提示词增强、方案预览和编译全部零扣点；用户确认方案并生成后才进入现有 hold → queue → worker → settle / refund。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;D0 · 产品与技术冻结表&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;冻结项&lt;/th&gt;&lt;th&gt;确认结论&lt;/th&gt;&lt;th&gt;开发约束 / 验收证据&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;编译模型&lt;/td&gt;&lt;td&gt;&lt;code&gt;gpt-5.6-sol&lt;/code&gt;，经服务端中转调用&lt;/td&gt;&lt;td&gt;多模态理解中文需求和参考图；前端不持有密钥&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;出图模型&lt;/td&gt;&lt;td&gt;&lt;code&gt;gpt-image-2&lt;/code&gt;&lt;/td&gt;&lt;td&gt;只负责 t2i / i2i / 模板出图，不负责需求理解和品牌事实判断&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;调用协议&lt;/td&gt;&lt;td&gt;中转站 OpenAI-compatible 协议，由 Provider Adapter 隔离&lt;/td&gt;&lt;td&gt;模型、端点、超时、重试和响应解析不可散落在业务层&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;多模态输入&lt;/td&gt;&lt;td&gt;服务端按 &lt;code&gt;assetId&lt;/code&gt; 读取图片，转短时效 signed URL 或受控 base64&lt;/td&gt;&lt;td&gt;仅传 assetId、角色元数据不足以完成图片观察；需记录传递方式和失败原因&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;结构化输出&lt;/td&gt;&lt;td&gt;JSON Schema / &lt;code&gt;json_object&lt;/code&gt;，服务端二次校验&lt;/td&gt;&lt;td&gt;解析失败不得静默伪造方案；返回可修复的缺失问题或脱敏错误码&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;版本与幂等&lt;/td&gt;&lt;td&gt;compiler、skill、promptCompilation、requestHash 全部版本化&lt;/td&gt;&lt;td&gt;修改素材、角色、Skill、模式、比例、质量或数量时旧方案失效并重新编译&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;降级策略&lt;/td&gt;&lt;td&gt;仅允许受控规则 fallback&lt;/td&gt;&lt;td&gt;响应显式返回 &lt;code&gt;fallback=true&lt;/code&gt; 与原因；不得伪装成模型增强结果&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;安全与日志&lt;/td&gt;&lt;td&gt;租户隔离、MIME / 大小校验、脱敏日志和统一错误响应&lt;/td&gt;&lt;td&gt;不得记录 API Key、Authorization、完整授权 URL、敏感图片内容或上游错误原文&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;D0 通过的定义：以上字段、枚举、错误语义、图片传递协议和版本失效规则由产品与技术共同确认，并与 shared 类型、API DTO 和数据库快照字段一一对应。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;Prompt Compiler 四段式逻辑&lt;/p&gt;
+    &lt;div class=&quot;hf-lifecycle&quot; aria-label=&quot;Prompt Compiler 四段式处理逻辑&quot;&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;01 · 确定性预处理&lt;/strong&gt;&lt;span&gt;清理输入、确定模式、Skill、比例、数量、质量、参考图角色和保真等级，校验租户与素材权限。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;02 · 多模态推理&lt;/strong&gt;&lt;span&gt;调用 gpt-5.6-sol 观察参考图并理解目标；只提出与成片有关的有限追问，不擅自增加品牌事实。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;03 · Schema 与策略校验&lt;/strong&gt;&lt;span&gt;检查字段完整性、角色冲突、真实品牌保真、文字边界、负向约束和可执行性；失败时返回缺失项。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-lifecycle-step&quot;&gt;&lt;strong&gt;04 · 编译执行 Prompt&lt;/strong&gt;&lt;span&gt;产出正向 Prompt、负向约束、文字叠加计划、修改摘要、警告、缺失问题和可追溯版本。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;提示词增强不是简单翻译或润色：原样只检查，智能增强补齐执行细节，创意导演才提出新的主题与商业视觉建议；所有新增创意必须显式标记“AI 建议，待确认”。&lt;/p&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;冻结版编译响应契约&lt;/p&gt;
+    &lt;div class=&quot;hf-prompt-contract&quot;&gt;
+      &lt;div class=&quot;hf-prompt-contract-head&quot;&gt;&lt;strong&gt;POST /api/v1/prompts/compile&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;D0 统一字段后再进入实现验收&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-prompt-block&quot;&gt;{ compileId, mode, compilerProvider, compilerModel, compilerVersion, rawPrompt, normalizedBrief, referenceAnalysis, compiledPrompt, negativePrompt, textOverlayPlan, directorSuggestions, changeSummary, warnings, missingQuestions, requiresConfirmation, requestHash, fallback }&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+        &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;用户可见&lt;/strong&gt;&lt;span&gt;原始需求、结构化方案、参考图观察摘要、正向 / 负向 Prompt、文字叠加计划、本次补充、警告和缺失问题。&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;服务端审计&lt;/strong&gt;&lt;span&gt;provider、model、compilerVersion、skillVersion、requestHash、fallback 原因和不可变快照。&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;hf-caption&quot;&gt;当前代码中的 PromptCompileResponseDto 尚未完整承载上述字段；这是 D0 前的契约差异，不代表能力已完成。冻结后必须同步 shared DTO、API、前端方案卡和快照表，再进行端到端验收。&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;方案失效、追溯与重新编译&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;不可变链路&lt;/strong&gt;&lt;span&gt;保存用户原始需求、结构化方案、参考图角色与观察摘要、最终 Prompt、负向约束、文字计划、编译器 / 模型 / Skill 版本和请求哈希。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;版本行为&lt;/strong&gt;&lt;span&gt;查看、编辑、回退、修改素材或任何控制项都产生新版本，不覆盖历史快照；旧 promptCompilationId 不得继续执行。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;执行快照&lt;/strong&gt;&lt;span&gt;确认生成时把最终方案复制到 GenerationRun / GenerationJob，结果、耗时、点数和失败码与该快照绑定。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;产品确认清单 · 待签字项&lt;/p&gt;
+    &lt;div class=&quot;table-responsive&quot;&gt;
+      &lt;table class=&quot;table table-sm&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;确认项&lt;/th&gt;&lt;th&gt;当前状态&lt;/th&gt;&lt;th&gt;确认人 / 备注&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;AI 图片与 Agent 入口边界&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;Skill 范围与排除项&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;三模式语义与 AI 建议标识&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品 + 设计&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;模型分工与中转协议&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;技术&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;参考图角色、保真和真实品牌规则&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品 + 技术&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;编译响应字段、版本失效和追溯&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;技术&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;计费门禁、fallback 和安全日志&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;技术 + 运维&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;真实品牌 i2i 与虚拟品牌 t2i 验收素材&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;viz-badge&quot;&gt;待确认&lt;/span&gt;&lt;/td&gt;&lt;td&gt;产品提供素材后锁定&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;p class=&quot;hf-section-label&quot;&gt;开发启动条件&lt;/p&gt;
+    &lt;div class=&quot;hf-case-rulebar&quot;&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;允许开始&lt;/strong&gt;&lt;span&gt;产品与技术确认 D0 清单后，才修改 shared 类型、固化 Provider、接入真实 gpt-5.6-sol、开发 Agent UI 或调用真实图片生成。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;禁止提前宣称&lt;/strong&gt;&lt;span&gt;现有未提交代码、mock / fake、规则 fallback 或静态方案不能作为真实多模态编译、浏览器体验或商业出图已验收的证据。&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;hf-case-rule&quot;&gt;&lt;strong&gt;混合工作树原则&lt;/strong&gt;&lt;span&gt;当前 Fable 未提交修改与本方案交叉；D0 确认前不 reset、stash、clean，不擅自提交或推送整棵工作树。&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;hf-caption&quot;&gt;本附录用于产品和技术确认，不等于实现完成。确认后按 D0 → D1 → D2 → D3 → D4 → D5 分阶段开发，并分别报告代码、测试、真实模型和浏览器验收状态。&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;hf-view&quot; data-view-panel=&quot;wireframes&quot; hidden&gt;
+    &lt;div class=&quot;hf-toolbar hf-wire-controls&quot; aria-label=&quot;页面线框选择&quot;&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-screen=&quot;home&quot; aria-pressed=&quot;true&quot;&gt;首页&lt;/button&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-screen=&quot;generate&quot; aria-pressed=&quot;false&quot;&gt;快速生成&lt;/button&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-screen=&quot;templates&quot; aria-pressed=&quot;false&quot;&gt;场景模板&lt;/button&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-screen=&quot;agent&quot; aria-pressed=&quot;false&quot;&gt;Agent&lt;/button&gt;
+      &lt;button type=&quot;button&quot; class=&quot;btn&quot; data-screen=&quot;assets&quot; aria-pressed=&quot;false&quot;&gt;资产库&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;card hf-app-shell&quot;&gt;
+      &lt;aside class=&quot;hf-sidebar&quot; aria-label=&quot;HitFrame 主导航&quot;&gt;
+        &lt;div class=&quot;hf-brand&quot;&gt;HitFrame&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item is-active&quot; data-nav=&quot;home&quot;&gt;&lt;i data-lucide=&quot;home&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;首页&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot; data-nav=&quot;generate&quot;&gt;&lt;i data-lucide=&quot;sparkles&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;快速生成&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot; data-nav=&quot;templates&quot;&gt;&lt;i data-lucide=&quot;layout-template&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;场景模板&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot; data-nav=&quot;agent&quot;&gt;&lt;i data-lucide=&quot;bot&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;Agent&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot; data-nav=&quot;assets&quot;&gt;&lt;i data-lucide=&quot;images&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;资产库&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-spacer&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot;&gt;&lt;i data-lucide=&quot;folder&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;项目&lt;/div&gt;
+        &lt;div class=&quot;hf-nav-item&quot;&gt;&lt;i data-lucide=&quot;circle-dollar-sign&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;积分&lt;/div&gt;
+      &lt;/aside&gt;
+
+      &lt;div class=&quot;hf-main&quot;&gt;
+        &lt;div class=&quot;hf-topbar&quot;&gt;
+          &lt;strong data-screen-title&gt;首页&lt;/strong&gt;
+          &lt;div class=&quot;hf-toolbar&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;1,240 积分&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn&quot;&gt;新建项目&lt;/button&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;hf-content&quot;&gt;
+          &lt;section class=&quot;hf-screen&quot; data-screen-panel=&quot;home&quot;&gt;
+            &lt;div class=&quot;hf-home-grid&quot;&gt;
+              &lt;div class=&quot;hf-agent-entry&quot;&gt;
+                &lt;strong&gt;告诉 HitFrame 你要做什么&lt;/strong&gt;
+                &lt;div class=&quot;hf-prompt-box&quot;&gt;
+                  &lt;span&gt;例如：用我的产品图生成一组 3:4 小红书种草图片……&lt;/span&gt;
+                  &lt;div class=&quot;hf-prompt-actions&quot;&gt;&lt;span&gt;@ 引用资产　＋ 上传图片&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;开始创作&lt;/button&gt;&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div&gt;
+                &lt;p class=&quot;hf-section-label&quot;&gt;快捷入口&lt;/p&gt;
+                &lt;div class=&quot;hf-quick-list&quot;&gt;
+                  &lt;div class=&quot;hf-quick-row&quot;&gt;&lt;span&gt;空白文生图&lt;/span&gt;&lt;span&gt;→&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-quick-row&quot;&gt;&lt;span&gt;参考图生图&lt;/span&gt;&lt;span&gt;→&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-quick-row&quot;&gt;&lt;span&gt;产品场景图&lt;/span&gt;&lt;span&gt;→&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-quick-row&quot;&gt;&lt;span&gt;最近项目&lt;/span&gt;&lt;span&gt;→&lt;/span&gt;&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;hf-case-toolbar&quot; style=&quot;margin-top:18px&quot;&gt;&lt;p class=&quot;hf-section-label&quot; style=&quot;margin:0&quot;&gt;三大场景案例&lt;/p&gt;&lt;span class=&quot;text-muted&quot;&gt;来自资产库 · 点击试试可复用&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;hf-template-grid&quot;&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_1d3c59fa-12e6-460b-9173-2c2a9fc5c965/job_1b9a0ba5-16aa-48fc-894b-1ba86e53543d.png&quot; alt=&quot;美妆主图案例 i2i-1b9a0ba5&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;图生图&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;美妆主图&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-1b9a0ba5&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-1b9a0ba5&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_cb1b8533-49ef-4043-b760-f72af27994bf/job_f52a72ab-2206-4455-bdc2-4cb0abe41a1e.png&quot; alt=&quot;模特穿搭案例 i2i-f52a72ab&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;图生图&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;模特穿搭&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f52a72ab&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-f52a72ab&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_32204ea3-a462-423b-8ab2-5daf0c2b29eb/job_f754b183-bf74-41cb-a7b2-293884ca39f0.png&quot; alt=&quot;商业海报案例 i2i-f754b183&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;图生图&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;商业海报&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f754b183&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-f754b183&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+
+          &lt;section class=&quot;hf-screen&quot; data-screen-panel=&quot;generate&quot; hidden&gt;
+            &lt;div class=&quot;hf-generator&quot;&gt;
+              &lt;div class=&quot;hf-panel&quot;&gt;
+                &lt;div class=&quot;hf-tabs&quot;&gt;&lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot; data-gen-mode=&quot;i2i&quot; aria-pressed=&quot;true&quot;&gt;图生图&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot; data-gen-mode=&quot;t2i&quot; aria-pressed=&quot;false&quot;&gt;文生图&lt;/button&gt;&lt;/div&gt;
+                &lt;div class=&quot;hf-upload&quot; data-gen-upload&gt;点击、拖拽或从资产库添加参考图&lt;/div&gt;
+                &lt;div class=&quot;hf-reference-strip&quot; data-gen-references hidden&gt;&lt;span&gt;已带入引用：&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;hf-field&quot;&gt;&lt;label&gt;创作描述&lt;/label&gt;&lt;div class=&quot;hf-input hf-large&quot; data-prompt-input contenteditable=&quot;true&quot; role=&quot;textbox&quot; aria-multiline=&quot;true&quot; spellcheck=&quot;false&quot;&gt;主体：@图片 1；目标：将商品改造成高端棚拍；场景：浅色石台、柔和侧光；保留：包装文字、瓶身比例和品牌标识；用途：电商首页。&lt;/div&gt;&lt;/div&gt;
+                &lt;div class=&quot;hf-prompt-contract&quot;&gt;
+                  &lt;div class=&quot;hf-prompt-contract-head&quot;&gt;&lt;strong&gt;Prompt 编译预览&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;可编辑 · 生成前确认&lt;/span&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-prompt-block&quot; data-prompt-preview contenteditable=&quot;true&quot; role=&quot;textbox&quot; aria-multiline=&quot;true&quot; spellcheck=&quot;false&quot;&gt;Image 1 是唯一商品主体；保持外观、比例、材质、包装文字和品牌标识不变。浅色石台，柔和侧光，高端商业棚拍，主体居中并保留上方留白，面向电商首页。&lt;/div&gt;
+                  &lt;div class=&quot;hf-prompt-tags&quot; data-prompt-tags&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;主体锁定&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;包装文字不改&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;文字安全区&lt;/span&gt;&lt;span class=&quot;hf-prompt-tag&quot;&gt;负向约束已启用&lt;/span&gt;&lt;/div&gt;
+                  &lt;span class=&quot;hf-prompt-label&quot;&gt;负向约束&lt;/span&gt;&lt;div class=&quot;hf-prompt-block&quot; data-prompt-negative contenteditable=&quot;true&quot; role=&quot;textbox&quot; aria-multiline=&quot;true&quot; spellcheck=&quot;false&quot;&gt;改变商品外观、包装文字或 Logo；产品变形、重复商品、漂浮、脏污、低清、乱码、水印。&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;p class=&quot;hf-section-label&quot; style=&quot;margin-top:14px&quot;&gt;资产库案例 · 一键复用&lt;/p&gt;
+                &lt;div class=&quot;hf-example-strip&quot; data-gen-example-group=&quot;i2i&quot;&gt;
+                  &lt;div class=&quot;hf-example-card&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_5bfe0c17-4ba5-4e7f-b0ed-06485069c243/job_a756efc7-8ff2-42a2-b71b-69c9fd887062.png&quot; alt=&quot;品牌海报重构案例&quot; loading=&quot;lazy&quot;&gt;&lt;div class=&quot;hf-example-card-body&quot;&gt;&lt;strong&gt;品牌海报重构&lt;/strong&gt;&lt;span&gt;i2i-a756efc7&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-a756efc7&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-example-card&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_32204ea3-a462-423b-8ab2-5daf0c2b29eb/job_f754b183-bf74-41cb-a7b2-293884ca39f0.png&quot; alt=&quot;商业海报案例&quot; loading=&quot;lazy&quot;&gt;&lt;div class=&quot;hf-example-card-body&quot;&gt;&lt;strong&gt;商业海报&lt;/strong&gt;&lt;span&gt;i2i-f754b183&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-f754b183&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;hf-example-strip&quot; data-gen-example-group=&quot;t2i&quot; hidden&gt;
+                  &lt;div class=&quot;hf-example-card&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_f955193d-fcf9-47ed-a444-4ab288b99383/job_eecb1358-803d-49b3-bae5-317e8b35513c.png&quot; alt=&quot;产品概念视觉案例&quot; loading=&quot;lazy&quot;&gt;&lt;div class=&quot;hf-example-card-body&quot;&gt;&lt;strong&gt;产品概念视觉&lt;/strong&gt;&lt;span&gt;t2i-eecb1358&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;t2i-eecb1358&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+                  &lt;div class=&quot;hf-example-card&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_4ce14a04-51fc-49a8-b128-34a5aa7ac584/job_c89ee74c-e483-4867-941d-6ee348aa26bd.png&quot; alt=&quot;社媒配图案例&quot; loading=&quot;lazy&quot;&gt;&lt;div class=&quot;hf-example-card-body&quot;&gt;&lt;strong&gt;社媒配图&lt;/strong&gt;&lt;span&gt;t2i-c89ee74c&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;t2i-c89ee74c&quot;&gt;试试&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;hf-settings&quot;&gt;
+                  &lt;div class=&quot;hf-setting&quot;&gt;&lt;span&gt;模型&lt;/span&gt;GPT Image 2&lt;/div&gt;
+                  &lt;div class=&quot;hf-setting&quot;&gt;&lt;span&gt;比例&lt;/span&gt;3:4&lt;/div&gt;
+                  &lt;div class=&quot;hf-setting&quot;&gt;&lt;span&gt;清晰度&lt;/span&gt;2K&lt;/div&gt;
+                  &lt;div class=&quot;hf-setting&quot;&gt;&lt;span&gt;数量&lt;/span&gt;4 张&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;button type=&quot;button&quot; class=&quot;btn btn-primary btn-block&quot;&gt;生成 · 24 积分&lt;/button&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;hf-results&quot;&gt;
+                &lt;div class=&quot;hf-topbar&quot; style=&quot;padding:0 0 12px;border-top:0&quot;&gt;&lt;strong&gt;生成结果&lt;/strong&gt;&lt;span class=&quot;text-muted&quot;&gt;变体 · 编辑 · 放大 · 下载&lt;/span&gt;&lt;/div&gt;
+                &lt;div class=&quot;hf-result-grid&quot;&gt;
+                  &lt;div class=&quot;hf-placeholder&quot;&gt;结果 1&lt;/div&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;结果 2&lt;/div&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;结果 3&lt;/div&gt;
+                  &lt;div class=&quot;hf-placeholder&quot;&gt;结果 4&lt;/div&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;最近创作&lt;/div&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;模板推荐&lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+
+          &lt;section class=&quot;hf-screen&quot; data-screen-panel=&quot;templates&quot; hidden&gt;
+            &lt;div class=&quot;hf-folderbar&quot;&gt;&lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot;&gt;全部&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;电商&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;社媒&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;人像&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;品牌设计&lt;/button&gt;&lt;/div&gt;
+            &lt;div class=&quot;hf-template-grid&quot;&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_1d3c59fa-12e6-460b-9173-2c2a9fc5c965/job_1b9a0ba5-16aa-48fc-894b-1ba86e53543d.png&quot; alt=&quot;美妆主图案例&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;资产库案例&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;美妆主图&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-1b9a0ba5&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-1b9a0ba5&quot;&gt;一键复用&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;hf-caption&quot;&gt;模特 + 产品 + 品牌文字&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_cb1b8533-49ef-4043-b760-f72af27994bf/job_f52a72ab-2206-4455-bdc2-4cb0abe41a1e.png&quot; alt=&quot;模特穿搭案例&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;资产库案例&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;模特穿搭&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f52a72ab&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-f52a72ab&quot;&gt;一键复用&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;hf-caption&quot;&gt;服装 + 人物 + 电商头图&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_32204ea3-a462-423b-8ab2-5daf0c2b29eb/job_f754b183-bf74-41cb-a7b2-293884ca39f0.png&quot; alt=&quot;商业海报案例&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;资产库案例&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;商业海报&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f754b183&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;i2i-f754b183&quot;&gt;一键复用&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;hf-caption&quot;&gt;手机 + 旅拍四宫格 + 中文信息区&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_66f90eb8-c6d4-470d-bfd7-550971d93547/job_5203c4cf-af1d-41c6-88ee-7a77f9b9f935.png&quot; alt=&quot;角色风格转化案例&quot; loading=&quot;lazy&quot;&gt;&lt;span class=&quot;viz-badge&quot;&gt;资产库案例&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;hf-card-foot&quot;&gt;&lt;div&gt;&lt;strong&gt;角色风格转化&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;t2i-5203c4cf&lt;/span&gt;&lt;/div&gt;&lt;button type=&quot;button&quot; class=&quot;btn hf-try-button&quot; data-asset-try=&quot;t2i-5203c4cf&quot;&gt;一键复用&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;hf-caption&quot;&gt;街头潮牌 + 动漫插画 + 人物姿态&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;结构化套图&lt;/div&gt;&lt;strong&gt;小红书 6 图&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;产品 + 卖点 + 参考笔记&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;品牌信息&lt;/div&gt;&lt;strong&gt;促销海报&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;产品 + 文案 + 日期&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-template-item&quot;&gt;&lt;div class=&quot;hf-placeholder&quot;&gt;包装参考&lt;/div&gt;&lt;strong&gt;产品包装样机&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;平面稿 + 包装类型&lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+
+          &lt;section class=&quot;hf-screen&quot; data-screen-panel=&quot;agent&quot; hidden&gt;
+            &lt;div class=&quot;hf-agent-entry&quot;&gt;
+              &lt;strong&gt;使用 Agent 创作&lt;/strong&gt;
+              &lt;div class=&quot;hf-prompt-box&quot;&gt;
+                &lt;span&gt;“把 @新品口红 做成一组高端棚拍和真人试色的小红书图片”&lt;/span&gt;
+                &lt;div class=&quot;hf-prompt-actions&quot;&gt;&lt;span&gt;@新品口红　＋ 真人参考&lt;/span&gt;&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;分析任务&lt;/button&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;hf-agent-flow&quot; aria-label=&quot;Agent 执行流程&quot;&gt;
+              &lt;div class=&quot;hf-agent-step&quot;&gt;&lt;strong&gt;1 理解目标&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;识别内容类型与交付规格&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-agent-step&quot;&gt;&lt;strong&gt;2 检查素材&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;追问缺失产品图或参考图&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-agent-step&quot;&gt;&lt;strong&gt;3 选择方案&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;模板、模型、比例与数量&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-agent-step&quot;&gt;&lt;strong&gt;4 用户确认&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;展示预计积分与执行步骤&lt;/div&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-agent-step&quot;&gt;&lt;strong&gt;5 自动执行&lt;/strong&gt;&lt;div class=&quot;hf-caption&quot;&gt;生成、筛选、编辑并入库&lt;/div&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+
+          &lt;section class=&quot;hf-screen&quot; data-screen-panel=&quot;assets&quot; hidden&gt;
+            &lt;div class=&quot;hf-folderbar&quot;&gt;&lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot;&gt;全部&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;图片&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;上传素材&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;生成结果&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;文件夹&lt;/button&gt;&lt;button class=&quot;btn&quot; type=&quot;button&quot;&gt;批量选择&lt;/button&gt;&lt;/div&gt;
+            &lt;div class=&quot;hf-asset-grid&quot;&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_1d3c59fa-12e6-460b-9173-2c2a9fc5c965/job_1b9a0ba5-16aa-48fc-894b-1ba86e53543d.png&quot; alt=&quot;i2i-1b9a0ba5&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;美妆主图&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-1b9a0ba5&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_cb1b8533-49ef-4043-b760-f72af27994bf/job_f52a72ab-2206-4455-bdc2-4cb0abe41a1e.png&quot; alt=&quot;i2i-f52a72ab&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;模特穿搭&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f52a72ab&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_32204ea3-a462-423b-8ab2-5daf0c2b29eb/job_f754b183-bf74-41cb-a7b2-293884ca39f0.png&quot; alt=&quot;i2i-f754b183&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;商业海报&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-f754b183&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_66f90eb8-c6d4-470d-bfd7-550971d93547/job_5203c4cf-af1d-41c6-88ee-7a77f9b9f935.png&quot; alt=&quot;t2i-5203c4cf&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;角色风格转化&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;t2i-5203c4cf&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_f955193d-fcf9-47ed-a444-4ab288b99383/job_eecb1358-803d-49b3-bae5-317e8b35513c.png&quot; alt=&quot;t2i-eecb1358&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;产品概念视觉&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;t2i-eecb1358&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;hf-asset-item&quot;&gt;&lt;div class=&quot;hf-case-media&quot;&gt;&lt;img src=&quot;http://localhost:3001/files/unassigned/run_5bfe0c17-4ba5-4e7f-b0ed-06485069c243/job_a756efc7-8ff2-42a2-b71b-69c9fd887062.png&quot; alt=&quot;i2i-a756efc7&quot; loading=&quot;lazy&quot;&gt;&lt;/div&gt;&lt;strong&gt;品牌海报重构&lt;/strong&gt;&lt;span class=&quot;hf-asset-id&quot;&gt;i2i-a756efc7&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/section&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;script&gt;
+    (() =&gt; {
+      const root = document.getElementById(&#x27;hitframe-product-structure&#x27;);
+      const viewButtons = root.querySelectorAll(&#x27;[data-view]&#x27;);
+      const viewPanels = root.querySelectorAll(&#x27;[data-view-panel]&#x27;);
+      const screenButtons = root.querySelectorAll(&#x27;[data-screen]&#x27;);
+      const screenPanels = root.querySelectorAll(&#x27;[data-screen-panel]&#x27;);
+      const navItems = root.querySelectorAll(&#x27;[data-nav]&#x27;);
+      const screenTitle = root.querySelector(&#x27;[data-screen-title]&#x27;);
+      const titles = { home: &#x27;首页&#x27;, generate: &#x27;快速生成&#x27;, templates: &#x27;场景模板&#x27;, agent: &#x27;Agent 创作&#x27;, assets: &#x27;资产库&#x27; };
+      const caseModeButtons = root.querySelectorAll(&#x27;[data-case-mode]&#x27;);
+      const caseFilterButtons = root.querySelectorAll(&#x27;[data-case-filter]&#x27;);
+      const caseCards = root.querySelectorAll(&#x27;[data-case-mode-card]&#x27;);
+      const promptAssetFilterButtons = root.querySelectorAll(&#x27;[data-prompt-asset-filter]&#x27;);
+      const promptAssetRows = root.querySelectorAll(&#x27;[data-prompt-asset-row]&#x27;);
+      const promptAssetCount = root.querySelector(&#x27;[data-prompt-asset-count]&#x27;);
+      const genModeButtons = root.querySelectorAll(&#x27;[data-gen-mode]&#x27;);
+      const genModeUpload = root.querySelector(&#x27;[data-gen-upload]&#x27;);
+      const genExampleGroups = root.querySelectorAll(&#x27;[data-gen-example-group]&#x27;);
+      const genReferences = root.querySelector(&#x27;[data-gen-references]&#x27;);
+      const promptInput = root.querySelector(&#x27;[data-prompt-input]&#x27;);
+      const promptPreview = root.querySelector(&#x27;[data-prompt-preview]&#x27;);
+      const promptNegative = root.querySelector(&#x27;[data-prompt-negative]&#x27;);
+      const promptTags = root.querySelector(&#x27;[data-prompt-tags]&#x27;);
+      const assetTryButtons = root.querySelectorAll(&#x27;[data-asset-try]&#x27;);
+      let activeCaseMode = &#x27;t2i&#x27;;
+      let activeCaseFilter = &#x27;all&#x27;;
+      let activePromptAssetFilter = &#x27;all&#x27;;
+
+      const updateCaseCards = () =&gt; {
+        caseCards.forEach((card) =&gt; {
+          const modeMatch = card.dataset.caseModeCard === activeCaseMode;
+          const filterMatch = activeCaseFilter === &#x27;all&#x27;
+            || card.dataset.casePriority === activeCaseFilter
+            || (activeCaseFilter === &#x27;input&#x27; &amp;&amp; card.dataset.caseInput === &#x27;required&#x27;);
+          card.hidden = !(modeMatch &amp;&amp; filterMatch);
+        });
+      };
+
+      const updatePromptAssetRows = () =&gt; {
+        let visibleCount = 0;
+        promptAssetRows.forEach((row) =&gt; {
+          const visible = activePromptAssetFilter === &#x27;all&#x27;
+            || row.dataset.promptAssetMode === activePromptAssetFilter;
+          row.hidden = !visible;
+          if (visible) visibleCount += 1;
+        });
+        if (promptAssetCount) promptAssetCount.textContent = `显示 ${visibleCount} 个资产`;
+      };
+
+      const assetPromptData = {
+        &#x27;i2i-1b9a0ba5&#x27;: {
+          mode: &#x27;i2i&#x27;,
+          title: &#x27;美妆主图&#x27;,
+          prompt: &#x27;使用 Image 1 作为香奈儿红色背景模特横图，使用 Image 2 作为香奈儿一号山茶花乳液透明 PNG；制作高端护肤营销封面。严格保留模特五官、脸型、肤色、发型、姿态、黑色服装、双 C 耳饰和深红背景；严格保留产品瓶身、黑色瓶盖、N°1 DE CHANEL 标志、包装文字、材质、比例和轮廓。模特位于画面右侧，产品置于左下暗红漆面展示台，后方加入一朵克制的红山茶花；产品光线匹配原图，形成真实接触阴影，不能有粘贴感。左侧排布品牌名、红山茶花、焕活年轻光采、红山茶花活能乳液及三项卖点，保持奢华品牌的克制留白。&#x27;,
+          negative: &#x27;额外人物、第二张脸、额外手臂或手持动作、改变模特身份、改变服装或耳饰、第二个产品、产品变形、包装文字或 Logo 改写、价格折扣、促销贴纸、乱码、水印、低清、花朵遮挡产品。&#x27;,
+          tags: [&#x27;Image 1 模特锁定&#x27;, &#x27;Image 2 产品锁定&#x27;, &#x27;品牌文字保留&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [&#x27;http://localhost:3001/files/uploads/asset_586dd9f6-1e2f-4b49-8f00-ba787f6ce68d.jpg&#x27;],
+        },
+        &#x27;i2i-f52a72ab&#x27;: {
+          mode: &#x27;i2i&#x27;,
+          title: &#x27;模特穿搭&#x27;,
+          prompt: &#x27;Image 1 是服装与人物参考，保持人物气质、服装结构、材质、纹理与配色；生成自然站姿、轻微侧身的商业穿搭图，置于暖光室内，采用电商服装头图构图，服装与人体结构贴合真实，画面干净、主体完整、细节清晰。&#x27;,
+          negative: &#x27;改变服装版型、颜色、材质、纹理或标识；脸部漂移、额外人物、肢体错位、额外手指、衣物穿透、褶皱不自然、背景杂乱、低清、乱码、水印。&#x27;,
+          tags: [&#x27;Image 1 服装参考&#x27;, &#x27;人物气质保留&#x27;, &#x27;电商头图&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [&#x27;http://localhost:3001/files/unassigned/run_96792587-3e0c-4ad0-97e9-862b198357e5/job_c5b4a96d-a91b-4c35-afd1-1470beb88016.png&#x27;],
+        },
+        &#x27;i2i-f754b183&#x27;: {
+          mode: &#x27;i2i&#x27;,
+          title: &#x27;商业海报&#x27;,
+          prompt: &#x27;保持输入手机主体与产品信息，制作 OPPO Find X9 Ultra × 哈苏原生影调旅拍商业海报。底部保留白色信息区，露出手机名称与哈苏信息；左侧突出手机主视觉，让手机突破白色背景并形成嵌入关系；其余区域用四宫格展示桂林烟雨青山、大连海岸线、滤镜和长焦旅拍效果。整体真实、克制，兼具科技感与高端旅拍气质，信息层级清楚，留白可编辑。&#x27;,
+          negative: &#x27;乱码、错别字、错误 Logo、信息重复、信息遮挡主体、手机变形、画面裁切、杂乱装饰、低清、水印。&#x27;,
+          tags: [&#x27;Image 1 主体保留&#x27;, &#x27;四宫格叙事&#x27;, &#x27;中文信息区&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [&#x27;http://localhost:3001/files/uploads/asset_50efbd28-a9e4-4e91-af7c-ef2d682666bd.webp&#x27;],
+        },
+        &#x27;i2i-a756efc7&#x27;: {
+          mode: &#x27;i2i&#x27;,
+          title: &#x27;品牌海报重构&#x27;,
+          prompt: &#x27;使用 Image 1 的香奈儿一号山茶花乳液透明 PNG，制作高端护肤品商业广告。严格保留乳白色半透明瓶身、黑色圆柱瓶盖、N°1 DE CHANEL 标志、包装文字、材质、比例和轮廓，不得重绘或遮挡。背景为深红到暗酒红的高级漆面，产品置于象牙白奶油质感台面，加入一朵克制的深红山茶花；侧后方柔光勾勒瓶盖与瓶身，正面补光保证文字清楚，底部有真实接触阴影。产品置于画面右侧，左侧保留品牌、红山茶花活能乳液、轻盈一抹、焕活年轻光采及卖点信息区，保持奢华品牌留白。&#x27;,
+          negative: &#x27;第二个产品、改变瓶身或 Logo、包装文字模糊或改写、花朵遮挡产品、廉价促销贴、价格折扣、金色边框、大量花瓣、随机文字、低清、乱码、水印。&#x27;,
+          tags: [&#x27;Image 1 产品锁定&#x27;, &#x27;品牌信息区&#x27;, &#x27;产品文字可读&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [&#x27;http://localhost:3001/files/uploads/asset_9bbc6310-fd19-4ea2-bc95-ed177b580c14.png&#x27;],
+        },
+        &#x27;t2i-eecb1358&#x27;: {
+          mode: &#x27;t2i&#x27;,
+          title: &#x27;产品概念视觉&#x27;,
+          prompt: &#x27;为虚拟消费电子品牌 NOVAUDIO 设计旗舰头戴式降噪耳机 ARC ONE。产品采用石墨黑哑光耳罩、钛银色金属转轴和少量电光紫装饰线，椭圆形记忆海绵耳罩，纤细但坚固的可调节头梁，整体克制、可信、适合量产，不采用夸张科幻结构。左右耳罩外侧预留平整的品牌标志合成区域。正面三分之三角度，高端消费电子产品摄影，深灰摄影棚背景，柔和轮廓光突出金属和哑光材质，真实接触阴影，完整展示产品。右上角放置品牌名，耳机保留清晰 Logo，并加入简洁可读的中文卖点说明。&#x27;,
+          negative: &#x27;夸张科幻结构、塑料质感、产品变形、耳罩缺失、Logo 模糊、乱码、无法阅读的小字、背景杂乱、过度反光、低清、水印。&#x27;,
+          tags: [&#x27;无参考图&#x27;, &#x27;材质与结构&#x27;, &#x27;品牌安全区&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [],
+        },
+        &#x27;t2i-c89ee74c&#x27;: {
+          mode: &#x27;t2i&#x27;,
+          title: &#x27;社媒配图&#x27;,
+          prompt: &#x27;午后咖啡馆木桌上的手冲咖啡与翻开的书，暖光斜照，蒸汽可见，生活方式杂志风，画面自然松弛，主体清楚，留白适合社交媒体配文。&#x27;,
+          negative: &#x27;额外人物、杯具变形、书页乱码、过度摆拍、脏污桌面、强烈噪点、低清、裁切主体、水印。&#x27;,
+          tags: [&#x27;无参考图&#x27;, &#x27;生活方式&#x27;, &#x27;社媒留白&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [],
+        },
+        &#x27;t2i-5203c4cf&#x27;: {
+          mode: &#x27;t2i&#x27;,
+          title: &#x27;角色风格转化&#x27;,
+          prompt: &#x27;杰作级高端街头潮牌广告主视觉，编辑摄影与动漫插画混合风格。人物是一位 20–24 岁白人女孩，五官轮廓分明，带自信的痞笑，铂金色凌乱高马尾，小巧鼻环，散发街头文化的不羁态度。她穿短款罗纹露腰背心，手腕缠绕彩色编织手绳，白色高帮帆布鞋搭配糖果色鞋带。姿态充满嘻哈张力，一腿大幅张开，另一腿微屈后踢，一只手高举鼓棒定格在击打瞬间，另一只手向外张开五指；四肢解剖正确，每只手五根手指。极简奶白摄影棚，背景架子鼓和少量糖果色喷漆笔触，右上硬主光加粉色与薄荷色凝胶轮廓光，色彩克制、背景干净、主体完整。&#x27;,
+          negative: &#x27;额外人物、重复肢体、畸形手指、面部错位、塑料皮肤、过度磨皮、品牌 Logo、乱码、水印、低清、裁切头顶或脚部、模仿在世艺术家。&#x27;,
+          tags: [&#x27;无参考图&#x27;, &#x27;姿态与手部&#x27;, &#x27;街头潮牌&#x27;, &#x27;负向约束已启用&#x27;],
+          refs: [],
+        },
+      };
+
+      // Asset IDs are the stable lookup key shared by the asset library and reuse actions.
+      const getAssetPromptById = (assetId) =&gt; assetPromptData[assetId] || null;
+
+      const generatorPromptCopy = {
+        i2i: {
+          input: &#x27;主体：@图片 1；目标：将商品改造成高端棚拍；场景：浅色石台、柔和侧光；保留：包装文字、瓶身比例和品牌标识；用途：电商首页。&#x27;,
+          preview: &#x27;Image 1 是唯一商品主体；保持外观、比例、材质、包装文字和品牌标识不变。浅色石台，柔和侧光，高端商业棚拍，主体居中并保留上方留白，面向电商首页。&#x27;,
+          negative: &#x27;改变商品外观、包装文字或 Logo；产品变形、重复商品、漂浮、脏污、低清、乱码、水印。&#x27;,
+          tags: [&#x27;主体锁定&#x27;, &#x27;包装文字不改&#x27;, &#x27;文字安全区&#x27;, &#x27;负向约束已启用&#x27;],
+        },
+        t2i: {
+          input: &#x27;主体：磨砂玻璃精华液瓶；目标：生成电商首页产品视觉；场景：浅色石台、柔和侧光；风格：高端商业棚拍。&#x27;,
+          preview: &#x27;主体为磨砂玻璃精华液瓶，浅色石台与柔和侧光，高端商业棚拍，主体居中并保留上方留白。材质纹理清晰，包装文字不虚构，面向电商首页。&#x27;,
+          negative: &#x27;主体变形、重复产品、漂浮结构、过度反光、脏污背景、乱码、无关文字、水印。&#x27;,
+          tags: [&#x27;无参考图&#x27;, &#x27;主体与用途&#x27;, &#x27;构图留白&#x27;, &#x27;负向约束已启用&#x27;],
+        },
+      };
+
+      const setGeneratorMode = (selected, copyOverride) =&gt; {
+        const copy = copyOverride || generatorPromptCopy[selected];
+        if (!copy) return;
+        genModeButtons.forEach((item) =&gt; {
+          const active = item.dataset.genMode === selected;
+          item.classList.toggle(&#x27;btn-primary&#x27;, active);
+          item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+        });
+        if (promptInput) promptInput.textContent = copy.input || copy.prompt;
+        if (promptPreview) promptPreview.textContent = copy.preview || copy.prompt;
+        if (promptNegative) promptNegative.textContent = copy.negative || &#x27;默认负向约束已启用。&#x27;;
+        if (promptTags) promptTags.innerHTML = (copy.tags || []).map((tag) =&gt; `&lt;span class=&quot;hf-prompt-tag&quot;&gt;${tag}&lt;/span&gt;`).join(&#x27;&#x27;);
+        if (genModeUpload) genModeUpload.hidden = selected === &#x27;t2i&#x27;;
+        genExampleGroups.forEach((group) =&gt; { group.hidden = group.dataset.genExampleGroup !== selected; });
+        if (genReferences) {
+          genReferences.replaceChildren();
+          const refs = copy.refs || [];
+          genReferences.hidden = refs.length === 0;
+          if (refs.length) {
+            const label = document.createElement(&#x27;span&#x27;);
+            label.textContent = &#x27;已带入引用：&#x27;;
+            genReferences.appendChild(label);
+            refs.forEach((src, index) =&gt; {
+              const image = document.createElement(&#x27;img&#x27;);
+              image.className = &#x27;hf-ref-thumb&#x27;;
+              image.src = src;
+              image.alt = `Image ${index + 1}`;
+              image.title = `Image ${index + 1}`;
+              genReferences.appendChild(image);
+            });
+          }
+        }
+      };
+
+      const showGenerateScreen = () =&gt; {
+        screenButtons.forEach((item) =&gt; {
+          const active = item.dataset.screen === &#x27;generate&#x27;;
+          item.classList.toggle(&#x27;btn-primary&#x27;, active);
+          item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+        });
+        screenPanels.forEach((panel) =&gt; { panel.hidden = panel.dataset.screenPanel !== &#x27;generate&#x27;; });
+        navItems.forEach((item) =&gt; item.classList.toggle(&#x27;is-active&#x27;, item.dataset.nav === &#x27;generate&#x27;));
+        if (screenTitle) screenTitle.textContent = titles.generate;
+      };
+
+      genModeButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; setGeneratorMode(button.dataset.genMode));
+      });
+
+      assetTryButtons.forEach((button) =&gt; {
+        button.dataset.originalLabel = button.textContent;
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          const selected = button.dataset.assetTry;
+          const copy = getAssetPromptById(selected);
+          if (!copy) return;
+          setGeneratorMode(copy.mode, { ...copy, input: copy.prompt, preview: copy.prompt });
+          showGenerateScreen();
+          assetTryButtons.forEach((item) =&gt; {
+            const active = item.dataset.assetTry === selected;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.textContent = active ? &#x27;已带入&#x27; : item.dataset.originalLabel;
+            item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+          });
+        });
+      });
+
+      caseModeButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          activeCaseMode = button.dataset.caseMode;
+          caseModeButtons.forEach((item) =&gt; {
+            const active = item.dataset.caseMode === activeCaseMode;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.setAttribute(&#x27;aria-selected&#x27;, String(active));
+          });
+          updateCaseCards();
+        });
+      });
+
+      caseFilterButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          activeCaseFilter = button.dataset.caseFilter;
+          caseFilterButtons.forEach((item) =&gt; {
+            const active = item.dataset.caseFilter === activeCaseFilter;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+          });
+          updateCaseCards();
+        });
+      });
+
+      promptAssetFilterButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          activePromptAssetFilter = button.dataset.promptAssetFilter;
+          promptAssetFilterButtons.forEach((item) =&gt; {
+            const active = item.dataset.promptAssetFilter === activePromptAssetFilter;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+          });
+          updatePromptAssetRows();
+        });
+      });
+
+      root.querySelectorAll(&#x27;[data-case-select]&#x27;).forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          const card = button.closest(&#x27;[data-case-mode-card]&#x27;);
+          const selected = card?.classList.toggle(&#x27;is-selected&#x27;);
+          button.textContent = selected ? (card?.dataset.caseModeCard === &#x27;i2i&#x27; ? &#x27;已采纳&#x27; : &#x27;已采纳模板&#x27;) : (card?.dataset.caseModeCard === &#x27;i2i&#x27; ? &#x27;采纳命名&#x27; : &#x27;采纳模板&#x27;);
+          button.setAttribute(&#x27;aria-pressed&#x27;, String(Boolean(selected)));
+        });
+      });
+      updateCaseCards();
+      updatePromptAssetRows();
+
+      viewButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          const selected = button.dataset.view;
+          viewButtons.forEach((item) =&gt; {
+            const active = item.dataset.view === selected;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.setAttribute(&#x27;aria-selected&#x27;, String(active));
+          });
+          viewPanels.forEach((panel) =&gt; { panel.hidden = panel.dataset.viewPanel !== selected; });
+        });
+      });
+
+      screenButtons.forEach((button) =&gt; {
+        button.addEventListener(&#x27;click&#x27;, () =&gt; {
+          const selected = button.dataset.screen;
+          screenButtons.forEach((item) =&gt; {
+            const active = item.dataset.screen === selected;
+            item.classList.toggle(&#x27;btn-primary&#x27;, active);
+            item.setAttribute(&#x27;aria-pressed&#x27;, String(active));
+          });
+          screenPanels.forEach((panel) =&gt; { panel.hidden = panel.dataset.screenPanel !== selected; });
+          navItems.forEach((item) =&gt; item.classList.toggle(&#x27;is-active&#x27;, item.dataset.nav === selected));
+          screenTitle.textContent = titles[selected];
+          if (window.lucide) window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        });
+      });
+    })();
+  &lt;/script&gt;
+&lt;/div&gt;
+
+&lt;script src=&quot;https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  if (window.FloatingUIDOM == null) {
+    return;
+  }
+  const { autoUpdate, computePosition, flip, offset, shift, size } =
+    window.FloatingUIDOM;
+  const tooltipPlacements = new Set([&quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;]);
+  const tooltipId = `codex-visualization-tooltip-${
+    window.crypto?.randomUUID?.() ?? Date.now().toString(36)
+  }`;
+  const tooltipGap = 5;
+  const hoverDelay = 700;
+  const skipDelay = 300;
+  let activeTrigger = null;
+  let pendingTrigger = null;
+  let tooltip = null;
+  let openTimeout = null;
+  let autoUpdateCleanup = null;
+  let positionRequest = 0;
+  let skipDelayUntil = 0;
+
+  const getTrigger = (target) =&gt;
+    target?.nodeType === Node.ELEMENT_NODE
+      ? target.closest(&quot;[data-tooltip]&quot;)
+      : null;
+  const containsTarget = (trigger, target) =&gt;
+    target?.nodeType != null &amp;&amp; trigger.contains(target);
+  const getContent = (trigger) =&gt;
+    trigger.getAttribute(&quot;data-tooltip&quot;)?.trim() ?? &quot;&quot;;
+  const getPlacement = (trigger) =&gt; {
+    const placement = trigger.getAttribute(&quot;data-tooltip-placement&quot;);
+    return tooltipPlacements.has(placement) ? placement : &quot;top&quot;;
+  };
+  const getTooltip = () =&gt; {
+    if (tooltip == null) {
+      tooltip = document.createElement(&quot;div&quot;);
+      tooltip.id = tooltipId;
+      tooltip.className = &quot;tooltip&quot;;
+      tooltip.setAttribute(&quot;role&quot;, &quot;tooltip&quot;);
+    }
+    return tooltip;
+  };
+  const setDescribedBy = (trigger, described) =&gt; {
+    const ids = new Set(
+      (trigger.getAttribute(&quot;aria-describedby&quot;) ?? &quot;&quot;)
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+    if (described) {
+      ids.add(tooltipId);
+    } else {
+      ids.delete(tooltipId);
+    }
+    if (ids.size === 0) {
+      trigger.removeAttribute(&quot;aria-describedby&quot;);
+    } else {
+      trigger.setAttribute(&quot;aria-describedby&quot;, [...ids].join(&quot; &quot;));
+    }
+  };
+  const clearOpenTimeout = () =&gt; {
+    if (openTimeout != null) {
+      window.clearTimeout(openTimeout);
+      openTimeout = null;
+    }
+    pendingTrigger = null;
+  };
+  const closeTooltip = (activateSkipDelay = true) =&gt; {
+    clearOpenTimeout();
+    positionRequest += 1;
+    autoUpdateCleanup?.();
+    autoUpdateCleanup = null;
+    if (activeTrigger == null) {
+      return;
+    }
+    setDescribedBy(activeTrigger, false);
+    activeTrigger = null;
+    tooltip?.remove();
+    if (activateSkipDelay) {
+      skipDelayUntil = Date.now() + skipDelay;
+    }
+  };
+  const updatePosition = (trigger, floating) =&gt; {
+    const request = ++positionRequest;
+    void computePosition(trigger, floating, {
+      middleware: [
+        offset(tooltipGap),
+        flip({ padding: tooltipGap }),
+        shift({ padding: tooltipGap }),
+        size({
+          padding: tooltipGap,
+          apply({ availableHeight, availableWidth, elements }) {
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-width&quot;,
+              `${Math.max(0, availableWidth)}px`,
+            );
+            elements.floating.style.setProperty(
+              &quot;--tooltip-available-height&quot;,
+              `${Math.max(0, availableHeight)}px`,
+            );
+          },
+        }),
+      ],
+      placement: getPlacement(trigger),
+      strategy: &quot;fixed&quot;,
+    })
+      .then(({ x, y }) =&gt; {
+        if (activeTrigger !== trigger || request !== positionRequest) {
+          return;
+        }
+        const scale = window.devicePixelRatio || 1;
+        floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
+        floating.style.visibility = &quot;visible&quot;;
+      })
+      .catch(() =&gt; {
+        if (activeTrigger === trigger &amp;&amp; request === positionRequest) {
+          closeTooltip(false);
+        }
+      });
+  };
+  const openTooltip = (trigger) =&gt; {
+    const content = getContent(trigger);
+    if (!trigger.isConnected || content.length === 0) {
+      return;
+    }
+    clearOpenTimeout();
+    if (activeTrigger === trigger) {
+      return;
+    }
+    closeTooltip();
+    const floating = getTooltip();
+    floating.textContent = content;
+    floating.style.visibility = &quot;hidden&quot;;
+    floating.style.transform = &quot;translate(0, 0)&quot;;
+    document.body.appendChild(floating);
+    activeTrigger = trigger;
+    setDescribedBy(trigger, true);
+    autoUpdateCleanup = autoUpdate(trigger, floating, () =&gt; {
+      updatePosition(trigger, floating);
+    });
+  };
+  const requestOpen = (trigger, immediate = false) =&gt; {
+    if (
+      getContent(trigger).length === 0 ||
+      activeTrigger === trigger ||
+      pendingTrigger === trigger
+    ) {
+      return;
+    }
+    clearOpenTimeout();
+    pendingTrigger = trigger;
+    const delay =
+      immediate || activeTrigger != null || Date.now() &lt; skipDelayUntil
+        ? 0
+        : hoverDelay;
+    if (delay === 0) {
+      openTooltip(trigger);
+      return;
+    }
+    openTimeout = window.setTimeout(() =&gt; {
+      openTimeout = null;
+      pendingTrigger = null;
+      openTooltip(trigger);
+    }, delay);
+  };
+  const handlePointerOpen = (event) =&gt; {
+    if (event.pointerType === &quot;touch&quot;) {
+      return;
+    }
+    const trigger = getTrigger(event.target);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    requestOpen(trigger);
+  };
+  const handleLeave = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handleFocusIn = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (trigger?.matches(&quot;:focus-visible&quot;)) {
+      requestOpen(trigger, true);
+    }
+  };
+  const handleKeyDown = (event) =&gt; {
+    if (event.key === &quot;Escape&quot;) {
+      closeTooltip();
+    }
+  };
+  const handleContextMenu = (event) =&gt; {
+    const trigger = getTrigger(event.target);
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const destroy = () =&gt; {
+    closeTooltip(false);
+    document.removeEventListener(&quot;pointerover&quot;, handlePointerOpen);
+    document.removeEventListener(&quot;pointerout&quot;, handleLeave);
+    document.removeEventListener(&quot;focusin&quot;, handleFocusIn);
+    document.removeEventListener(&quot;focusout&quot;, handleLeave);
+    document.removeEventListener(&quot;keydown&quot;, handleKeyDown);
+    document.removeEventListener(&quot;contextmenu&quot;, handleContextMenu);
+    tooltip = null;
+  };
+
+  document.addEventListener(&quot;pointerover&quot;, handlePointerOpen);
+  document.addEventListener(&quot;pointerout&quot;, handleLeave);
+  document.addEventListener(&quot;focusin&quot;, handleFocusIn);
+  document.addEventListener(&quot;focusout&quot;, handleLeave);
+  document.addEventListener(&quot;keydown&quot;, handleKeyDown);
+  document.addEventListener(&quot;contextmenu&quot;, handleContextMenu);
+  window.addEventListener(&quot;pagehide&quot;, destroy, { once: true });
+})();
+&lt;/script&gt;
+&lt;script id=&quot;codex-visualization-lucide&quot; async src=&quot;https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+(() =&gt; {
+  const initialize = () =&gt; {
+    globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
+  };
+  if (globalThis.lucide != null) {
+    initialize();
+    return;
+  }
+  document
+    .getElementById(&quot;codex-visualization-lucide&quot;)
+    ?.addEventListener(&quot;load&quot;, initialize, { once: true });
+})();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</body>
+</html>

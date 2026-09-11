@@ -60,7 +60,7 @@ queued ──► running ──► succeeded
 | code  | 场景                                             | message 示例              |
 | ----- | ------------------------------------------------ | ------------------------- |
 | 0     | 成功                                             | ok / accepted             |
-| 40001 | 参数无效（mode/ratio/quality/candidateCount 等） | candidateCount 取值 1–4   |
+| 40001 | 参数无效（mode/ratio/quality/candidateCount 等） | quality 取 `preview / standard / high`；candidateCount 取值 1–4   |
 | 40002 | 模板不存在                                       | 模板不存在                |
 | 40003 | 槽位/变量缺失                                    | 模板需要 1 个必填图片槽位 |
 | 40004 | 项目不存在                                       | 项目不存在                |

@@ -3,6 +3,18 @@ import type { JobErrorCode, Quality } from '@hitframe/shared';
 /** 错误三分类：M1 消费方 = 扣点（失败不扣）+ 前端文案；M2a 复用为重试策略 */
 export type ProviderErrorKind = 'retryable' | 'non_retryable' | 'moderation_rejected';
 
+/**
+ * Provider HTTP response metadata. The relay body requestId and the response
+ * header x-request-id are intentionally kept separate until the relay contract
+ * proves they are the same identifier.
+ */
+export interface ProviderResponseMeta {
+  httpStatus?: number;
+  relayRequestId?: string;
+  providerTraceId?: string;
+  relayCode?: string | number;
+}
+
 export class ProviderError extends Error {
   constructor(
     message: string,
@@ -11,6 +23,7 @@ export class ProviderError extends Error {
     public readonly raw?: unknown,
     /** S4：显式错误码（内部抛错点直接指定；缺省时由 classifyJobError 从 kind/httpStatus 推导） */
     public readonly errorCode?: JobErrorCode,
+    public readonly responseMeta?: ProviderResponseMeta,
   ) {
     super(message);
     this.name = 'ProviderError';
@@ -19,8 +32,8 @@ export class ProviderError extends Error {
 
 export interface GenerateInput {
   prompt: string;
-  /** 引擎 size（由 shared 的 RATIO_TO_SIZE 映射而来） */
-  size: string;
+  /** 引擎 size（省略时使用引擎自动比例） */
+  size?: string;
   quality: Quality;
 }
 
@@ -34,7 +47,8 @@ export interface EditInput {
   prompt: string;
   /** 多图输入：槽位顺序即 image[] 顺序（模特模板双槽位 M2a 使用） */
   images: EditImageFile[];
-  size: string;
+  /** 引擎 size（省略时使用引擎自动比例） */
+  size?: string;
   quality: Quality;
   /** 商品主体保真（换背景场景传 'high'） */
   inputFidelity?: 'high';
@@ -52,6 +66,8 @@ export interface ImageResult {
   model: string;
   /** Provider 原始用量元数据，原样写入 UsageEvent.providerUsage */
   usage?: unknown;
+  /** HTTP status and request identifiers observed from the relay response. */
+  responseMeta?: ProviderResponseMeta;
 }
 
 /**

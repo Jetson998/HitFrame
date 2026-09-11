@@ -1,32 +1,18 @@
-import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { TEMPLATE_COVER, templatePresentation } from '@/components/TemplateSwitcher';
 
 const SCENE_ICON: Record<string, string> = { bg: '🎨', poster: '📕', model: '👗' };
+const SCENE_LABEL: Record<string, string> = {
+  bg: '商品场景',
+  model: '人物服饰',
+  poster: '营销封面',
+};
 
 /** 正式模板封面（复用首页真实图，按模板 id 映射）；未映射的回退 emoji 占位 */
-const TEMPLATE_COVER: Record<string, string> = {
-  tpl_bg: '/demo/d2-street-bg-1-fixed.png',
-  tpl_model: '/demo/tryon-real3-full.png',
-  tpl_poster: '/demo/chanel-model.png',
-};
-
-/** 场景分类：sceneType → 分类键（S5 模板卡筛选） */
-const SCENE_CATEGORY: Record<string, CategoryKey> = {
-  bg: 'product',
-  model: 'people',
-  poster: 'marketing',
-};
-
-type CategoryKey = 'all' | 'product' | 'people' | 'marketing';
-const CATEGORIES: Array<{ key: CategoryKey; label: string }> = [
-  { key: 'all', label: '全部' },
-  { key: 'product', label: '商品场景' },
-  { key: 'people', label: '人物服饰' },
-  { key: 'marketing', label: '营销封面' },
-];
-
 /** M2b 计划型创作预告（PlanTemplate 层，不可点） */
 const SOON = [
   {
@@ -42,52 +28,31 @@ const SOON = [
 /** 场景模板卡片墙：数据来自 GET /templates（模板数据化，前端不硬编码流程） */
 export function TemplateCards() {
   const { templates, setActiveTplId } = useAppStore();
-  const [category, setCategory] = useState<CategoryKey>('all');
-
-  const filtered =
-    category === 'all'
-      ? templates
-      : templates.filter((t) => SCENE_CATEGORY[t.sceneType] === category);
 
   return (
     <div>
-      <p className="mt-0 mb-3.5 text-[12.5px] text-dim">
-        模板 = 图片槽位 + 业务变量，预置好出图流程，填空即用。
-      </p>
-
-      {/* 分类筛选 */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.key}
-            type="button"
-            onClick={() => setCategory(c.key)}
-            className={cn(
-              'rounded-full border px-3.5 py-1.5 text-[12px] transition-colors',
-              category === c.key
-                ? 'border-primary/40 bg-primary/15 font-semibold text-ink'
-                : 'border-line bg-panel text-dim hover:border-primary/30 hover:text-ink',
-            )}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((tpl) => {
+        {templates.map((tpl) => {
+          const copy = templatePresentation(tpl);
           const requiredSlots = tpl.slots.filter((s) => s.required !== false).length;
-          const optionalSlots = tpl.slots.length - requiredSlots;
+          const slotsText =
+            requiredSlots === tpl.slots.length
+              ? `${requiredSlots} 个必填素材`
+              : `${requiredSlots} 个必填素材 · ${tpl.slots.length} 个图片槽位`;
           return (
-            <div
+            <Card
               key={tpl.id}
-              className="flex flex-col overflow-hidden rounded-[--radius-card] border border-line bg-panel transition-all hover:-translate-y-0.5 hover:border-primary"
+              variant="default"
+              padding="none"
+              interactive
+              className="flex flex-col overflow-hidden hover:border-primary/40"
+              onClick={() => setActiveTplId(tpl.id)}
             >
-              <div className="relative aspect-square overflow-hidden bg-panel-muted">
+              <div className="relative aspect-[16/10] overflow-hidden bg-panel-muted">
                 {TEMPLATE_COVER[tpl.id] ? (
                   <img
                     src={TEMPLATE_COVER[tpl.id]}
-                    alt={tpl.title}
+                    alt={copy.title}
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -98,73 +63,69 @@ export function TemplateCards() {
                     {SCENE_ICON[tpl.sceneType] ?? '🧩'}
                   </div>
                 )}
-                <span className="absolute top-2.5 right-2.5 rounded-full border border-line bg-white/85 px-2 py-0.5 text-[10.5px] text-dim backdrop-blur-sm">
-                  图片槽位 × {tpl.slots.length}
-                  {optionalSlots > 0 && `（${requiredSlots} 必填）`}
-                </span>
               </div>
               <div className="flex flex-1 flex-col p-4">
-                <div className="text-[15px] font-bold">{tpl.title}</div>
-                <div className="mt-1.5 mb-2.5 flex-1 text-[12px] leading-relaxed text-dim">
-                  {tpl.description}
+                <Badge variant="primary" size="sm" className="mb-2 self-start">
+                  {SCENE_LABEL[tpl.sceneType] ?? '场景模板'}
+                </Badge>
+                <div className="text-[16px] font-semibold text-ink">{copy.title}</div>
+                <div className="mt-1.5 mb-3 flex-1 text-[12.5px] leading-relaxed text-dim">
+                  {copy.description}
                 </div>
-                {/* 变量摘要：让用户预判需要填什么 */}
-                <div className="mb-3 flex flex-wrap gap-1">
+                <div className="mb-3 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-faint">{slotsText}</span>
+                  <span className="text-[11px] text-line-strong">·</span>
                   {tpl.varsSchema.slice(0, 4).map((v) => (
-                    <span
+                    <Badge
                       key={v.key}
-                      className="rounded border border-line-soft bg-panel-muted px-1.5 py-0.5 text-[10px] text-faint"
+                      size="sm"
+                      className="border-line-soft bg-panel-muted px-1.5 py-0.5 text-[10px] text-faint"
                     >
                       {v.label}
                       {v.required ? ' *' : ''}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
                 <Button variant="primary" className="w-full" onClick={() => setActiveTplId(tpl.id)}>
-                  使用模板
+                  使用模板 <ArrowRight size={15} />
                 </Button>
               </div>
-            </div>
+            </Card>
           );
         })}
-        {/* 「全部」视图才展示 M2b 预告，避免污染分类结果 */}
-        {category === 'all' &&
-          SOON.map((s) => (
-            <div
-              key={s.name}
-              className="flex flex-col overflow-hidden rounded-[--radius-card] border border-line bg-panel opacity-55"
-            >
-              <div className="grid aspect-[16/10] place-items-center bg-panel-muted text-4xl">
-                {s.icon}
-              </div>
-              <div className="flex flex-1 flex-col p-4">
-                <div className="flex items-center gap-2 text-[15px] font-bold">
-                  {s.name}
-                  <span className="rounded-full border border-line px-2 py-0.5 text-[10px] font-normal text-faint">
-                    {s.note}
-                  </span>
-                </div>
-                <div className="mt-1.5 mb-3 flex-1 text-[12px] leading-relaxed text-dim">
-                  {s.desc}
-                </div>
-                <Button className="w-full" disabled>
-                  即将上线
-                </Button>
-              </div>
+        {SOON.map((s) => (
+          <div
+            key={s.name}
+            className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel opacity-55"
+          >
+            <div className="grid aspect-[16/10] place-items-center bg-panel-muted text-4xl">
+              {s.icon}
             </div>
-          ))}
+            <div className="flex flex-1 flex-col p-4">
+              <div className="flex items-center gap-2 text-[15px] font-bold">
+                {s.name}
+                <span className="rounded-full border border-line px-2 py-0.5 text-[10px] font-normal text-faint">
+                  {s.note}
+                </span>
+              </div>
+              <div className="mt-1.5 mb-3 flex-1 text-[12px] leading-relaxed text-dim">
+                {s.desc}
+              </div>
+              <Button className="w-full" disabled>
+                即将上线
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {templates.length === 0 ? (
+      {templates.length === 0 && (
         <div className="mt-8 rounded-xl border border-warn/40 bg-warn/10 px-4 py-6 text-center text-[12.5px] text-warn">
           模板数据未加载。这通常是 API 未连接或数据库未 seed，
           <br />
-          请检查 HitFrame API 是否运行并执行过 <code className="text-ink">node scripts/seed.mjs</code>。
+          请检查 HitFrame API 是否运行并执行过{' '}
+          <code className="text-ink">node scripts/seed.mjs</code>。
         </div>
-      ) : (
-        filtered.length === 0 && (
-          <div className="mt-8 text-center text-[12.5px] text-faint">该分类下暂无模板</div>
-        )
       )}
     </div>
   );

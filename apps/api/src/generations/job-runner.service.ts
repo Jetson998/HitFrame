@@ -9,21 +9,34 @@ import {
   POINTS_PER_IMAGE,
   Quality,
 } from '@hitframe/shared';
-import { ProviderError } from '@hitframe/image-provider';
+import {
+  ProviderError,
+  type ImageResult,
+  type ProviderResponseMeta,
+} from '@hitframe/image-provider';
 import { DB, Db } from '../db/db.module';
 import { assets, generationJobs, generationRuns, usageEvents } from '../db/schema';
 import { StorageService } from '../storage/storage.service';
 import { CreditsService } from '../credits/credits.service';
 import { getImageProvider } from '../provider.factory';
+import { GenerationLogsService } from './generation-logs.service';
+import { logEvent } from '../queue/queue.constants';
 
 const TENANT = 'default';
 
 export interface JobInputParams {
   prompt: string;
-  size: string;
+  userPrompt?: string;
+  requestId?: string;
+  /** 未设置时不传给 Provider，由引擎自动决定比例 */
+  size?: string;
+  ratio?: string;
   quality: Quality;
+  candidateCount?: number;
   slots: string[];
+  vars?: Record<string, string>;
   inputFidelity?: 'high';
+  referenceMap?: Array<{ assetId: string; imageNumber: number }>;
 }
 
 type JobRow = typeof generationJobs.$inferSelect;
@@ -54,6 +67,7 @@ export class JobRunnerService {
     @Inject(DB) private readonly db: Db,
     private readonly storage: StorageService,
     private readonly credits: CreditsService,
+    private readonly logs: GenerationLogsService,
   ) {}
 
   /**
@@ -72,6 +86,19 @@ export class JobRunnerService {
       .returning();
     if (first) {
       await this.markRunRunning(first.runId);
+      await this.logs.record({
+        event: 'claimed',
+        tenantId: first.tenantId,
+        actorId: first.actorId ?? undefined,
+        runId: first.runId,
+        jobId: first.id,
+        status: 'running',
+        mode: first.mode,
+        templateId: first.templateId ?? undefined,
+        endpoint: first.endpoint,
+        attemptNo: first.attempts,
+        requestId: (first.inputParams as { requestId?: string }).requestId,
+      });
       return { job: first, viaRecovery: false };
     }
 
@@ -94,6 +121,20 @@ export class JobRunnerService {
       .returning();
     if (!recovered) return null;
     await this.markRunRunning(recovered.runId);
+    await this.logs.record({
+      event: 'claimed',
+      tenantId: recovered.tenantId,
+      actorId: recovered.actorId ?? undefined,
+      runId: recovered.runId,
+      jobId: recovered.id,
+      status: 'running',
+      mode: recovered.mode,
+      templateId: recovered.templateId ?? undefined,
+      endpoint: recovered.endpoint,
+      attemptNo: recovered.attempts,
+      requestId: (recovered.inputParams as { requestId?: string }).requestId,
+      metadata: { viaRecovery: true },
+    });
     return { job: recovered, viaRecovery: true };
   }
 
@@ -109,91 +150,259 @@ export class JobRunnerService {
   async execute(job: JobRow): Promise<void> {
     const params = job.inputParams as unknown as JobInputParams;
     const provider = getImageProvider();
+    const startedAt = new Date();
+    let providerStartedAt: number | undefined;
+    let providerDurationMs: number | undefined;
+    let responseMeta: ProviderResponseMeta | undefined;
+    let responseEventRecorded = false;
+    await this.logs.record({
+      event: 'provider_started',
+      tenantId: job.tenantId,
+      actorId: job.actorId ?? undefined,
+      runId: job.runId,
+      jobId: job.id,
+      status: 'running',
+      mode: job.mode,
+      templateId: job.templateId ?? undefined,
+      endpoint: job.endpoint,
+      attemptNo: job.attempts,
+      requestId: params.requestId,
+      provider: provider.name,
+      model: provider.model,
+      userPrompt: params.userPrompt,
+      compiledPrompt: params.prompt,
+      inputParams: params,
+      startedAt,
+    });
 
-    const result =
-      job.endpoint === 'edits'
-        ? await provider.edit({
-            prompt: params.prompt,
-            images: await this.loadSlots(params.slots),
-            size: params.size,
-            quality: params.quality,
-            inputFidelity: params.inputFidelity,
-          })
-        : await provider.generate({
-            prompt: params.prompt,
-            size: params.size,
-            quality: params.quality,
-          });
-
-    // 引擎 URL 有时效：立即取二进制并转存（DB 永不存临时 URL）；下载带退避重试
-    const item = result.images[0];
-    const buf = item.b64 ? Buffer.from(item.b64, 'base64') : await this.downloadWithRetry(item.url!);
-    const ext = sniffImage(buf);
-    if (!ext)
-      throw new ProviderError(
-        '引擎返回内容不是有效图片（魔数校验失败）',
-        'retryable',
-        undefined,
-        undefined,
-        'JOB_RESULT_INVALID',
-      );
-    const key = objectKey(
-      job.projectId ?? 'unassigned',
-      job.runId,
-      job.id,
-      ext === 'jpeg' ? 'jpg' : ext,
-    );
-    let stored: { key: string; url: string };
     try {
-      stored = await this.storage.save(key, buf);
-    } catch (err) {
-      // 存储层异常（对象存储不可达/写失败）：retryable，脱敏为 JOB_STORAGE_ERROR
-      throw new ProviderError(
-        `结果保存失败：${String(err)}`,
-        'retryable',
-        undefined,
-        undefined,
-        'JOB_STORAGE_ERROR',
-      );
-    }
+      let result: ImageResult;
+      if (job.endpoint === 'edits') {
+        const images = await this.loadSlots(params.slots);
+        providerStartedAt = Date.now();
+        result = await provider.edit({
+          prompt: params.prompt,
+          images,
+          size: params.size,
+          quality: params.quality,
+          inputFidelity: params.inputFidelity,
+        });
+      } else {
+        providerStartedAt = Date.now();
+        result = await provider.generate({
+          prompt: params.prompt,
+          size: params.size,
+          quality: params.quality,
+        });
+      }
+      responseMeta = result.responseMeta;
+      await this.recordProviderResponse(job, params, provider, responseMeta);
+      responseEventRecorded = true;
+      providerDurationMs = Date.now() - providerStartedAt;
 
-    const pointsCost = POINTS_PER_IMAGE[params.quality];
-    const assetId = `asset_${randomUUID()}`;
-    await this.db.transaction(async (tx) => {
-      // 终态 CAS：只有仍处 running 的行才能翻 succeeded（防重复投递双写资产）
-      const done = await tx
-        .update(generationJobs)
-        .set({ status: 'succeeded', resultUrl: stored.url, pointsCost, finishedAt: new Date() })
-        .where(and(eq(generationJobs.id, job.id), eq(generationJobs.status, 'running')))
-        .returning({ id: generationJobs.id });
-      if (done.length === 0) return; // 已被他方终态化：放弃本次写入（文件为孤儿，S3 巡检回收）
-      await tx.insert(assets).values({
-        id: assetId,
-        tenantId: TENANT,
-        projectId: job.projectId,
-        type: 'result',
-        url: stored.url,
-        name: `${job.mode}-${job.id.slice(4, 12)}`,
-        genParams: { ...params, mode: job.mode, templateId: job.templateId, runId: job.runId },
-        sourceJobId: job.id,
-        meta: { storageKey: key, bytes: buf.length },
+      // 引擎 URL 有时效：立即取二进制并转存（DB 永不存临时 URL）；下载带退避重试
+      const item = result.images[0];
+      const buf = item.b64
+        ? Buffer.from(item.b64, 'base64')
+        : await this.downloadWithRetry(item.url!);
+      const ext = sniffImage(buf);
+      if (!ext)
+        throw new ProviderError(
+          '引擎返回内容不是有效图片（魔数校验失败）',
+          'retryable',
+          undefined,
+          undefined,
+          'JOB_RESULT_INVALID',
+        );
+      const key = objectKey(
+        job.projectId ?? 'unassigned',
+        job.runId,
+        job.id,
+        ext === 'jpeg' ? 'jpg' : ext,
+      );
+      let stored: { key: string; url: string };
+      try {
+        stored = await this.storage.save(key, buf);
+      } catch (err) {
+        // 存储层异常（对象存储不可达/写失败）：retryable，脱敏为 JOB_STORAGE_ERROR
+        throw new ProviderError(
+          `结果保存失败：${String(err)}`,
+          'retryable',
+          undefined,
+          undefined,
+          'JOB_STORAGE_ERROR',
+        );
+      }
+
+      const pointsCost = POINTS_PER_IMAGE[params.quality];
+      const assetId = `asset_${randomUUID()}`;
+      let persisted = false;
+      await this.db.transaction(async (tx) => {
+        // 终态 CAS：只有仍处 running 的行才能翻 succeeded（防重复投递双写资产）
+        const done = await tx
+          .update(generationJobs)
+          .set({ status: 'succeeded', resultUrl: stored.url, pointsCost, finishedAt: new Date() })
+          .where(and(eq(generationJobs.id, job.id), eq(generationJobs.status, 'running')))
+          .returning({ id: generationJobs.id });
+        if (done.length === 0) return; // 已被他方终态化：放弃本次写入（文件为孤儿，S3 巡检回收）
+        persisted = true;
+        await tx.insert(assets).values({
+          id: assetId,
+          tenantId: TENANT,
+          projectId: job.projectId,
+          type: 'result',
+          url: stored.url,
+          name: `${job.mode}-${job.id.slice(4, 12)}`,
+          genParams: { ...params, mode: job.mode, templateId: job.templateId, runId: job.runId },
+          sourceJobId: job.id,
+          meta: { storageKey: key, bytes: buf.length },
+        });
+        await tx.insert(usageEvents).values({
+          id: `ue_${randomUUID()}`,
+          tenantId: TENANT,
+          runId: job.runId,
+          jobId: job.id,
+          operation: job.endpoint === 'edits' ? 'edit' : 'generate',
+          provider: provider.name,
+          model: result.model,
+          quantity: 1,
+          providerUsage: result.usage as Record<string, unknown> | undefined,
+          status: 'succeeded',
+        });
+        // S1：hold 已在入队事务扣减，此处只记 settle 确认凭证（amount=0）
+        await this.credits.settle(tx as unknown as Db, TENANT, job.runId, job.id, pointsCost);
       });
-      await tx.insert(usageEvents).values({
-        id: `ue_${randomUUID()}`,
-        tenantId: TENANT,
+
+      if (!persisted) return;
+
+      const finishedAt = new Date();
+      await this.logs.record({
+        event: 'succeeded',
+        tenantId: job.tenantId,
+        actorId: job.actorId ?? undefined,
         runId: job.runId,
         jobId: job.id,
-        operation: job.endpoint === 'edits' ? 'edit' : 'generate',
+        status: 'succeeded',
+        mode: job.mode,
+        templateId: job.templateId ?? undefined,
+        endpoint: job.endpoint,
+        attemptNo: job.attempts,
+        requestId: params.requestId,
         provider: provider.name,
         model: result.model,
-        quantity: 1,
-        providerUsage: result.usage as Record<string, unknown> | undefined,
-        status: 'succeeded',
+        userPrompt: params.userPrompt,
+        compiledPrompt: params.prompt,
+        inputParams: params,
+        resultAssetId: assetId,
+        resultUrl: stored.url,
+        resultBytes: buf.length,
+        providerUsage: result.usage,
+        providerRequestId: responseMeta?.relayRequestId,
+        relayRequestId: responseMeta?.relayRequestId,
+        providerTraceId: responseMeta?.providerTraceId,
+        providerHttpStatus: responseMeta?.httpStatus,
+        metadata: {
+          outcome: 'response_success',
+          relayCode: responseMeta?.relayCode,
+        },
+        pointsCost,
+        startedAt,
+        finishedAt,
+        durationMs: finishedAt.getTime() - startedAt.getTime(),
+        providerDurationMs,
       });
-      // S1：hold 已在入队事务扣减，此处只记 settle 确认凭证（amount=0）
-      await this.credits.settle(tx as unknown as Db, TENANT, job.runId, job.id, pointsCost);
+      this.log.log(`job ${job.id} succeeded (${pointsCost} pts, ${buf.length} bytes)`);
+    } catch (err) {
+      const finishedAt = new Date();
+      const providerError = err instanceof ProviderError ? err : undefined;
+      responseMeta = providerError?.responseMeta ?? responseMeta;
+      if (responseMeta && !responseEventRecorded) {
+        await this.recordProviderResponse(job, params, provider, responseMeta);
+      }
+      await this.logs.record({
+        event: 'provider_failed',
+        tenantId: job.tenantId,
+        actorId: job.actorId ?? undefined,
+        runId: job.runId,
+        jobId: job.id,
+        status: 'failed',
+        mode: job.mode,
+        templateId: job.templateId ?? undefined,
+        endpoint: job.endpoint,
+        attemptNo: job.attempts,
+        requestId: params.requestId,
+        provider: provider.name,
+        model: provider.model,
+        userPrompt: params.userPrompt,
+        compiledPrompt: params.prompt,
+        inputParams: params,
+        providerRequestId: responseMeta?.relayRequestId,
+        relayRequestId: responseMeta?.relayRequestId,
+        providerTraceId: responseMeta?.providerTraceId,
+        providerHttpStatus: responseMeta?.httpStatus ?? providerError?.httpStatus,
+        errorKind: providerError?.kind ?? 'non_retryable',
+        errorCode: providerError?.errorCode,
+        errorMessage: err instanceof Error ? err.message : String(err),
+        metadata: responseMeta
+          ? { outcome: 'response_error', relayCode: responseMeta.relayCode }
+          : { outcome: 'transport_error' },
+        startedAt,
+        finishedAt,
+        durationMs: finishedAt.getTime() - startedAt.getTime(),
+        providerDurationMs:
+          providerDurationMs ??
+          (providerStartedAt === undefined ? undefined : Date.now() - providerStartedAt),
+      });
+      throw err;
+    }
+  }
+
+  /** Record the relay response before parsing, downloading, or storing its image. */
+  private async recordProviderResponse(
+    job: JobRow,
+    params: JobInputParams,
+    provider: { name: string; model: string },
+    responseMeta: ProviderResponseMeta | undefined,
+  ): Promise<void> {
+    if (!responseMeta) return;
+    const status = responseMeta.httpStatus;
+    await this.logs.record({
+      event: 'provider_response',
+      tenantId: job.tenantId,
+      actorId: job.actorId ?? undefined,
+      runId: job.runId,
+      jobId: job.id,
+      requestId: params.requestId,
+      status: status !== undefined && status >= 200 && status < 300 ? 'received' : 'error',
+      mode: job.mode,
+      templateId: job.templateId ?? undefined,
+      endpoint: job.endpoint,
+      attemptNo: job.attempts,
+      provider: provider.name,
+      model: provider.model,
+      inputParams: params,
+      providerRequestId: responseMeta.relayRequestId,
+      relayRequestId: responseMeta.relayRequestId,
+      providerTraceId: responseMeta.providerTraceId,
+      providerHttpStatus: status,
+      metadata: {
+        outcome:
+          status !== undefined && status >= 200 && status < 300
+            ? 'response_success'
+            : 'response_error',
+        relayCode: responseMeta.relayCode,
+      },
     });
-    this.log.log(`job ${job.id} succeeded (${pointsCost} pts, ${buf.length} bytes)`);
+    logEvent('provider_response', {
+      jobId: job.id,
+      runId: job.runId,
+      requestId: params.requestId,
+      providerRequestId: responseMeta.relayRequestId,
+      providerTraceId: responseMeta.providerTraceId,
+      providerHttpStatus: status,
+      relayCode: responseMeta.relayCode,
+      attempts: job.attempts,
+    });
   }
 
   /**
@@ -216,6 +425,8 @@ export class JobRunnerService {
       kind: kind as JobErrorKind,
       httpStatus: signal?.httpStatus,
     });
+    let transitioned = false;
+    const finishedAt = new Date();
     await this.db.transaction(async (tx) => {
       const updated = await tx
         .update(generationJobs)
@@ -231,6 +442,7 @@ export class JobRunnerService {
         )
         .returning({ id: generationJobs.id });
       if (updated.length === 0) return; // 已终态：幂等跳过（不重复 refund）
+      transitioned = true;
       await this.credits.refund(tx as unknown as Db, TENANT, job.runId, job.id, refundAmount);
       await tx.insert(usageEvents).values({
         id: `ue_${randomUUID()}`,
@@ -244,6 +456,32 @@ export class JobRunnerService {
         status: 'failed',
       });
     });
+    if (transitioned) {
+      await this.logs.record({
+        event: 'failed',
+        tenantId: job.tenantId,
+        actorId: job.actorId ?? undefined,
+        runId: job.runId,
+        jobId: job.id,
+        status: 'failed',
+        mode: job.mode,
+        templateId: job.templateId ?? undefined,
+        endpoint: job.endpoint,
+        attemptNo: job.attempts,
+        provider: providerName ?? 'muskapis',
+        model: providerModel ?? 'gpt-image-2',
+        userPrompt: params.userPrompt,
+        compiledPrompt: params.prompt,
+        inputParams: params,
+        errorKind: kind,
+        errorCode,
+        errorMessage: message,
+        pointsCost: refundAmount,
+        startedAt: job.createdAt,
+        finishedAt,
+        durationMs: Math.max(0, finishedAt.getTime() - job.createdAt.getTime()),
+      });
+    }
     return errorCode;
   }
 

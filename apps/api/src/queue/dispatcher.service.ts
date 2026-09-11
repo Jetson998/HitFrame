@@ -11,6 +11,7 @@ import {
   MAX_ATTEMPTS,
   redisConnection,
 } from './queue.constants';
+import { GenerationLogsService } from '../generations/generation-logs.service';
 
 const RECONCILE_INTERVAL_MS = 30_000;
 const PENDING_GRACE_MS = 5_000; // 刚提交的行留给 Dispatcher 即时投递的窗口
@@ -28,7 +29,10 @@ export class QueueDispatcherService implements OnApplicationShutdown {
   private queue: Queue<GenerationJobData> | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(@Inject(DB) private readonly db: Db) {
+  constructor(
+    @Inject(DB) private readonly db: Db,
+    private readonly logs: GenerationLogsService,
+  ) {
     if (executionMode() === 'queue') {
       this.queue = new Queue<GenerationJobData>(GENERATION_QUEUE, {
         connection: redisConnection(),
@@ -54,10 +58,16 @@ export class QueueDispatcherService implements OnApplicationShutdown {
     const jobs = await this.db.query.generationJobs.findMany({
       where: and(eq(generationJobs.runId, runId), eq(generationJobs.status, 'queued')),
     });
-    for (const job of jobs) await this.dispatchOne(job.id, runId);
+    for (const job of jobs) {
+      await this.dispatchOne(
+        job.id,
+        runId,
+        (job.inputParams as { requestId?: string }).requestId,
+      );
+    }
   }
 
-  private async dispatchOne(jobId: string, runId: string): Promise<void> {
+  private async dispatchOne(jobId: string, runId: string, requestId?: string): Promise<void> {
     if (!this.queue) return;
     try {
       // BullMQ jobId = GenerationJob.id：重复 add 幂等（已存在即忽略）
@@ -66,9 +76,24 @@ export class QueueDispatcherService implements OnApplicationShutdown {
         .update(generationJobs)
         .set({ enqueueState: 'enqueued', queueJobId: jobId })
         .where(eq(generationJobs.id, jobId));
+      await this.logs.record({
+        event: 'enqueued',
+        runId,
+        jobId,
+        requestId,
+        status: 'queued',
+      });
       logEvent('enqueue', { jobId, runId });
     } catch (err) {
       // 投递失败留在 pending，Reconciler 下轮补投
+      await this.logs.record({
+        event: 'enqueue_failed',
+        runId,
+        jobId,
+        status: 'queued',
+        errorKind: 'retryable',
+        errorMessage: err instanceof Error ? err.message : String(err),
+      });
       this.log.warn(`dispatch ${jobId} failed (reconciler will retry): ${String(err)}`);
     }
   }
@@ -86,7 +111,11 @@ export class QueueDispatcherService implements OnApplicationShutdown {
     });
     for (const job of stale) {
       this.log.log(`reconciler: redispatch ${job.id}`);
-      await this.dispatchOne(job.id, job.runId);
+      await this.dispatchOne(
+        job.id,
+        job.runId,
+        (job.inputParams as { requestId?: string }).requestId,
+      );
     }
     return stale.length;
   }

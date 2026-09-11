@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DEFAULT_PROJECT_ID } from '@hitframe/shared';
 import { FolderPlus } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { Button } from '@/components/ui/button';
@@ -60,11 +61,10 @@ export function ProjectSwitcher() {
         </div>
       )}
       <select
-        value={currentProjectId ?? ''}
+        value={currentProjectId ?? DEFAULT_PROJECT_ID}
         onChange={(e) => setCurrentProject(e.target.value || null)}
         className="w-full cursor-pointer rounded-[--radius-control] border border-line bg-panel-muted px-2.5 py-2 text-[12px] text-ink focus:border-primary focus:outline-none"
       >
-        <option value="">未归类</option>
         {projects.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}

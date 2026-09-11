@@ -14,6 +14,11 @@ await pool.query(
    ON CONFLICT (id) DO NOTHING`,
 );
 
+await pool.query(
+  `INSERT INTO projects (id, tenant_id, name) VALUES ('proj_default', 'default', '默认项目')
+   ON CONFLICT (id) DO NOTHING`,
+);
+
 const tplBg = {
   id: 'tpl_bg',
   title: '商品换背景',
@@ -39,7 +44,8 @@ const tplBg = {
       options: ['自然光', '柔光', '暖光', '冷光'],
     },
   ],
-  promptTemplate: '保持图中商品主体不变，背景替换为{bgStyle}，{light}，电商主图风格，高质感',
+  promptTemplate:
+    '以 Image 1 为唯一商品主体，保持其外观、比例、材质、包装文字与品牌标识不变，背景替换为{bgStyle}，{light}，电商主图风格，高质感',
   defaultParams: { inputFidelity: 'high' },
 };
 
@@ -80,7 +86,7 @@ const tplModel = {
     },
   ],
   promptTemplate:
-    '{modelType}穿着图中服装，{pose}，{scene}，时尚摄影，高质感，电商主图风格',
+    'Image 1 是必须准确保留版型、颜色、材质、纹理与标识的服装或商品；若提供 Image 2，则 Image 2 是必须保持身份、面部、发型与体态的模特参考。让{modelType}自然穿着 Image 1 中的服装，{pose}，{scene}，服装与人体结构贴合真实，时尚摄影，高质感，电商主图风格',
   defaultParams: { inputFidelity: 'high' },
 };
 
@@ -118,7 +124,7 @@ const tplPoster = {
     },
   ],
   promptTemplate:
-    '电商海报设计，标题"{title}"，{sellingPoint}，{style}风格，商品居中，文字排版清晰，营销氛围感强',
+    '以 Image 1 为唯一商品主体并保持产品外观、包装文字与品牌标识准确，{style}风格电商营销海报，商品主体清晰突出，围绕标题「{title}」和卖点「{sellingPoint}」形成完整、饱满、有视觉冲击力的画面；不要生成、改写或臆造任何中文标题、卖点、Logo 或随机文字',
   defaultParams: { inputFidelity: 'high' },
 };
 

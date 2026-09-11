@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Home, Sparkles, MessageSquare, FolderOpen, Menu, X, Coins, HelpCircle } from 'lucide-react';
+import {
+  Sparkles,
+  MessageSquare,
+  FolderOpen,
+  Menu,
+  X,
+  Coins,
+  HelpCircle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore, navFromLocation, type NavKey } from '@/store';
 import { Logo } from '@/components/Logo';
@@ -13,8 +21,7 @@ import { TemplateConfigPage } from '@/pages/TemplateConfigPage';
 import { AgentPage } from '@/pages/AgentPage';
 import { AssetsPage } from '@/pages/AssetsPage';
 
-const NAV_ITEMS: Array<{ key: NavKey; icon: typeof Home; label: string }> = [
-  { key: 'home', icon: Home, label: '首页' },
+const NAV_ITEMS: Array<{ key: NavKey; icon: typeof Sparkles; label: string }> = [
   { key: 'generate', icon: Sparkles, label: 'AI 图片' },
   { key: 'agent', icon: MessageSquare, label: 'Agent' },
   { key: 'assets', icon: FolderOpen, label: '资产库' },
@@ -55,9 +62,7 @@ export default function App() {
 
   if (auth === 'unauthorized') return <TokenGate />;
   if (auth === 'checking')
-    return (
-      <div className="grid h-screen place-items-center text-[12.5px] text-faint">加载中…</div>
-    );
+    return <div className="grid h-screen place-items-center text-[12.5px] text-faint">加载中…</div>;
   if (auth === 'error')
     return (
       <div className="grid h-screen place-items-center bg-workspace-bg px-6">
@@ -65,7 +70,9 @@ export default function App() {
           className="w-[440px] rounded-[--radius-card] border border-err/40 bg-panel p-6 text-center"
           style={{ boxShadow: 'var(--shadow-modal)' }}
         >
-          <div className="mb-2 text-[15px] font-bold text-err">环境异常 · 无法连接 HitFrame API</div>
+          <div className="mb-2 text-[15px] font-bold text-err">
+            环境异常 · 无法连接 HitFrame API
+          </div>
           <p className="mb-4 text-[12.5px] leading-relaxed text-dim">{bootError}</p>
           <button
             type="button"
@@ -95,104 +102,131 @@ export default function App() {
             'md:w-[72px] lg:w-[224px]',
           )}
         >
-        {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 lg:px-5 pt-5 pb-4">
-          <Logo size={32} />
-          <span className={cn('text-[17px] font-bold text-ink', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
-            HitFrame
-          </span>
-        </div>
-
-        {/* 导航 */}
-        <nav className="flex-1 overflow-y-auto py-2">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setNav(item.key)}
-                className={cn(
-                  'mx-2 my-0.5 flex w-[calc(100%-16px)] items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-all',
-                  nav === item.key
-                    ? 'bg-primary-soft text-primary font-semibold'
-                    : 'text-dim hover:bg-panel-muted hover:text-ink',
-                  sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
-                )}
-              >
-                <Icon size={20} className="shrink-0" />
-                <span className={cn('text-[14px]', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
-                  {item.label}
-                </span>
-                {item.key === 'assets' && assets.length > 0 && (
-                  <span className={cn('ml-auto text-[11px] text-faint tabular-nums', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
-                    {assets.length}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* 底部：帮助 + 项目切换 + 余额 */}
-        <div className="p-3 border-t border-line">
+          {/* Logo */}
           <button
             type="button"
-            onClick={() => setHelpOpen(true)}
-            title="快速上手"
-            className={cn(
-              'mb-2 flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-[13px] text-dim transition-colors hover:bg-panel-muted hover:text-ink',
-              sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
-            )}
+            onClick={() => setNav('home')}
+            title="返回首页"
+            className="flex h-16 shrink-0 items-center gap-2.5 px-4 text-left lg:px-5"
           >
-            <HelpCircle size={16} className="shrink-0" />
-            <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>快速上手</span>
+            <Logo variant="mark" size={32} className="lg:hidden" />
+            <Logo variant="wordmark" size={32} className="hidden lg:block" />
           </button>
-          <div className={cn('mb-3', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
-            <ProjectSwitcher />
+
+          {/* 导航 */}
+          <nav className="flex-1 overflow-y-auto py-2">
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setNav(item.key)}
+                  className={cn(
+                    'mx-2 my-0.5 flex w-[calc(100%-16px)] items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-all',
+                    nav === item.key
+                      ? 'bg-primary-soft text-primary font-semibold'
+                      : 'text-dim hover:bg-panel-muted hover:text-ink',
+                    sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
+                  )}
+                >
+                  <Icon size={20} className="shrink-0" />
+                  <span
+                    className={cn('text-[14px]', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}
+                  >
+                    {item.label}
+                  </span>
+                  {item.key === 'assets' && assets.length > 0 && (
+                    <span
+                      className={cn(
+                        'ml-auto text-[11px] text-faint tabular-nums',
+                        sidebarCollapsed ? 'hidden' : 'hidden lg:block',
+                      )}
+                    >
+                      {assets.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* 底部：帮助 + 项目切换 + 余额 */}
+          <div className="p-3 border-t border-line">
+            <button
+              type="button"
+              onClick={() => setHelpOpen(true)}
+              title="快速上手"
+              className={cn(
+                'mb-2 flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-[13px] text-dim transition-colors hover:bg-panel-muted hover:text-ink',
+                sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
+              )}
+            >
+              <HelpCircle size={16} className="shrink-0" />
+              <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>快速上手</span>
+            </button>
+            <div className={cn('mb-3', sidebarCollapsed ? 'hidden' : 'hidden lg:block')}>
+              <ProjectSwitcher />
+            </div>
+            <div
+              className={cn(
+                'flex items-center gap-2 rounded-[10px] bg-panel-muted px-3 py-2.5 text-[13px] text-ink',
+                sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
+              )}
+            >
+              <Coins size={16} className="shrink-0 text-warn" />
+              <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>余额</span>
+              <b
+                className={cn(
+                  'tabular-nums',
+                  sidebarCollapsed ? 'hidden' : 'hidden lg:inline ml-auto',
+                )}
+              >
+                {balance ?? '—'}
+              </b>
+            </div>
           </div>
-          <div
-            className={cn(
-              'flex items-center gap-2 rounded-[10px] bg-panel-muted px-3 py-2.5 text-[13px] text-ink',
-              sidebarCollapsed ? 'justify-center' : 'lg:justify-start justify-center',
-            )}
-          >
-            <Coins size={16} className="shrink-0 text-warn" />
-            <span className={cn(sidebarCollapsed ? 'hidden' : 'hidden lg:inline')}>余额</span>
-            <b className={cn('tabular-nums', sidebarCollapsed ? 'hidden' : 'hidden lg:inline ml-auto')}>
-              {balance ?? '—'}
-            </b>
-          </div>
-        </div>
-      </aside>
+        </aside>
       )}
 
-      {/* 移动端顶部栏 (<768px) - 首页深色随营销页，子页浅色随工作区 */}
+      {/* 移动端顶部栏 (<768px) - 首页与子页均为浅色体系 */}
       <div
         className={cn(
           'md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between border-b px-4 py-3',
           isHome ? 'bg-hero-bg border-hero-line' : 'bg-panel border-line',
         )}
       >
-        <div className="flex items-center gap-2">
-          <Logo size={28} />
-          <span className={cn('text-[15px] font-bold', isHome ? 'text-hero-text' : 'text-ink')}>
-            HitFrame
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className={cn('flex items-center gap-1.5 text-[12px]', isHome ? 'text-hero-text-dim' : 'text-dim')}>
-            <Coins size={14} className="text-warn" />
-            <b className="tabular-nums">{balance ?? '—'}</b>
-          </div>
+        <button
+          type="button"
+          onClick={() => setNav('home')}
+          className="flex items-center gap-2 text-left"
+          aria-label="返回首页"
+        >
+          <Logo variant="mark" size={28} />
+        </button>
+        {isHome ? (
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={isHome ? 'text-hero-text hover:text-hero-text-dim' : 'text-ink hover:text-dim'}
+            onClick={() => setNav('generate')}
+            className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius-control)] border border-hero-line bg-hero-surface px-3 text-[12px] font-medium text-hero-text transition-colors hover:bg-hero-surface-hover"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            <Sparkles size={14} /> 快速开始
           </button>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-[12px] text-dim">
+              <Coins size={14} className="text-warn" />
+              <b className="tabular-nums">{balance ?? '—'}</b>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-ink hover:text-dim"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 移动端抽屉菜单 */}
@@ -215,7 +249,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className={isHome ? 'text-hero-text-dim hover:text-hero-text' : 'text-dim hover:text-ink'}
+                className={
+                  isHome ? 'text-hero-text-dim hover:text-hero-text' : 'text-dim hover:text-ink'
+                }
               >
                 <X size={20} />
               </button>
@@ -274,8 +310,12 @@ export default function App() {
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-1.5 transition-colors',
                 isHome
-                  ? active ? 'text-hero-text' : 'text-hero-text-dim'
-                  : active ? 'text-primary' : 'text-dim',
+                  ? active
+                    ? 'text-hero-text'
+                    : 'text-hero-text-dim'
+                  : active
+                    ? 'text-primary'
+                    : 'text-dim',
               )}
             >
               <Icon size={20} />
@@ -286,11 +326,17 @@ export default function App() {
       </div>
 
       {/* 主内容区 */}
-      <main ref={mainRef} className="flex-1 overflow-y-auto pt-[54px] pb-[64px] md:pt-0 md:pb-0">
+      <main
+        ref={mainRef}
+        className={cn(
+          'flex-1 overflow-y-auto pt-[54px] pb-[64px] md:pt-0 md:pb-0',
+          isHome ? 'bg-hero-bg' : 'bg-panel',
+        )}
+      >
         {nav === 'home' && <HomePage />}
         {nav === 'generate' &&
-          (genMode === 'template' && activeTplId ? (
-            <TemplateConfigPage key={activeTplId} />
+          (genMode === 'template' ? (
+            <TemplateConfigPage key={activeTplId ?? 'template'} />
           ) : (
             <GeneratePage />
           ))}

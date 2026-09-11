@@ -1,17 +1,17 @@
 /**
  * HitFrame 设计令牌 v1.0 (S6-UX)
- * 深色品牌外壳与首页 Hero，浅色高效率创作区，蓝紫品牌色
+ * 白色商业首页与浅色高效率创作区，蓝紫品牌色
  */
 
 export const designTokens = {
   colors: {
-    // 品牌深色区
-    heroBg: '#0B0F19',
-    heroSurface: '#141A28',
-    heroSurfaceHover: '#1A2233',
-    heroText: '#F8FAFC',
-    heroTextDim: '#A8B1C3',
-    heroLine: 'rgba(255,255,255,0.10)',
+    // 首页品牌区
+    heroBg: '#FFFFFF',
+    heroSurface: '#FFFFFF',
+    heroSurfaceHover: '#F8F9FC',
+    heroText: '#111827',
+    heroTextDim: '#5B6475',
+    heroLine: '#E3E7EF',
 
     // 浅色工作区
     workspaceBg: '#F4F6FA',
@@ -56,8 +56,8 @@ export const designTokens = {
   },
 
   radius: {
-    button: '10px',
-    control: '10px',
+    button: '12px',
+    control: '9px',
     card: '14px',
     image: '12px',
     modal: '16px',
@@ -117,24 +117,19 @@ export const designTokens = {
 
 /** 首页文案 */
 export const homeCopy = {
-  badge: 'AI 商品视觉工作台 · 在线',
+  heroTitle: '创作你的商业视觉，让灵感即刻生成',
 
-  heroTitle: '一张商品图，生成能直接发布的商业视觉',
+  heroSubtitle: '电商主图、自媒体素材，从生成和归档，在一个工作台完成。',
 
-  heroSubtitle:
-    '换背景、真人试穿、营销封面，从上传素材到生成和归档，在一个工作台完成。',
-
-  heroPrimaryCTA: '从商品图开始',
-  heroSecondaryCTA: '描述需求给 Agent',
-
-  heroProof: ['2 点起 / 张', '支持 1–4 张候选', '自动保存到资产库'],
+  heroPrimaryCTA: '图片生成',
+  heroPrimaryNote: 'GPT-image2 极致效果',
+  heroSecondaryCTA: '创作 Agent',
 
   quickStartTitle: '快速开始',
   quickStartSubtitle: '选择一个场景模板，从商品素材直接生成成图',
 
   recentTitle: '最近创作',
   showcaseTitle: '精选案例',
-  showcaseSubtitle: '查看原始素材与生成结果，直接复用同款模板',
 
   emptyState: {
     noAssets: '还没有作品。从一个模板开始，生成结果会自动保存在这里。',

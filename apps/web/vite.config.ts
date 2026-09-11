@@ -16,11 +16,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // 可在本地多实例验收时切换 API；生产构建不依赖该开发代理。
     proxy: {
-      // 前端只与本系统 API 交互；引擎密钥永不到前端
-      '/api': 'http://localhost:3001',
-      // 结果/素材静态托管（M1 本地 Volume）
-      '/files': 'http://localhost:3001',
+      // HitFrame 本地 API 使用 3011；仍允许多实例通过环境变量覆盖。
+      '/api': process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:3011',
+      '/files': process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:3011',
     },
   },
 });

@@ -35,6 +35,12 @@
 - **死信留存**：BullMQ `removeOnFail=false`，failed 集合可查/可导出；`scripts/ops/dead-letters.mjs` 只读列举（BullMQ failed 计数 + DB `error_code` 分布）。
 - **死信重放口径（评审拍板：重放仅诊断，不改账）**：retryable 耗尽的 Job 在终态失败时已「自动退款」（S2 场景5），hold 已回退。若程序化重放成功→用户白得一张图，且 `credit_tx` 单发键 `(tenant,run,job,type)` 不允许二次 hold。故**不做程序化重放**；用户侧恢复 = 前端重新发起一单（走正常 hold/settle）。
 
+### S4.3 后续补充：持久化生成调用日志（迁移 0005）
+
+S4 的 stdout 观测事件之外，新增 `generation_logs` 作为可回查的排障日志库：按 Run/Job 追加记录 API 接收、入队、认领、供应商调用、重试、成功和终态失败，并保存提示词快照、供应商错误、HTTP 状态、总耗时与供应商耗时。接口为受保护的 `GET /api/v1/internal/generation-logs`，暂不接入前端。
+
+详细字段、事件顺序、隐私边界和查询命令见 [`docs/M2a_日志库与调用审计.md`](M2a_日志库与调用审计.md) 与 [`docs/generation-logs.md`](generation-logs.md)。
+
 ## 四、S4.4 孤儿对象巡检回收
 
 - `StorageDriver.list()`（local 递归遍历 / s3 分页 ListObjectsV2）；`StorageReclaimService.reclaimOnce(graceMs)`。

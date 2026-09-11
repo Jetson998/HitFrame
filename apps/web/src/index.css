@@ -2,17 +2,17 @@
 
 /**
  * HitFrame S6-UX 设计系统
- * 深色品牌外壳与首页 Hero，浅色高效率创作区，蓝紫品牌色
+ * 白色商业首页与浅色高效率创作区，蓝紫品牌色
  */
 
 @theme {
-  /* 品牌深色区 */
-  --color-hero-bg: #0b0f19;
-  --color-hero-surface: #141a28;
-  --color-hero-surface-hover: #1a2233;
-  --color-hero-text: #f8fafc;
-  --color-hero-text-dim: #a8b1c3;
-  --color-hero-line: rgba(255, 255, 255, 0.1);
+  /* 首页品牌区 */
+  --color-hero-bg: #ffffff;
+  --color-hero-surface: #ffffff;
+  --color-hero-surface-hover: #f8f9fc;
+  --color-hero-text: #111827;
+  --color-hero-text-dim: #5b6475;
+  --color-hero-line: #e3e7ef;
 
   /* 浅色工作区 */
   --color-workspace-bg: #f4f6fa;
@@ -44,8 +44,8 @@
   --color-info: #2563eb;
 
   /* 圆角 */
-  --radius-button: 10px;
-  --radius-control: 10px;
+  --radius-button: 12px;
+  --radius-control: 9px;
   --radius-card: 14px;
   --radius-image: 12px;
   --radius-modal: 16px;
@@ -117,42 +117,4 @@ body {
 /* 渐变背景 */
 .hf-gradient-primary {
   background: linear-gradient(135deg, #635bff 0%, #3b82f6 100%);
-}
-
-/* ---- HitFrame Logo 逐笔描边动画（参考 ModLudus）---- */
-/* 每笔 pathLength 归一到 100，用 dash 从满偏移到 0 实现"绘制" */
-/* 默认可见(offset:0)，动画用 backwards 让隐藏态只在延迟期生效；动画不跑也不会消失 */
-.hf-logo-animated .hf-p1,
-.hf-logo-animated .hf-p2,
-.hf-logo-animated .hf-p3 {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 0;
-  animation-timing-function: ease-out;
-}
-/* H 三笔逐笔绘制，每笔 0.55s，依次 0 / 0.35 / 0.7s 启动 */
-.hf-logo-animated .hf-p1 {
-  animation: hf-draw 0.55s 0s backwards ease-out;
-}
-.hf-logo-animated .hf-p2 {
-  animation: hf-draw 0.55s 0.35s backwards ease-out;
-}
-.hf-logo-animated .hf-p3 {
-  animation: hf-draw 0.55s 0.7s backwards ease-out;
-}
-@keyframes hf-draw {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-/* 无障碍：减少动态效果 → 直接展示完整 Logo */
-@media (prefers-reduced-motion: reduce) {
-  .hf-logo-animated .hf-p1,
-  .hf-logo-animated .hf-p2,
-  .hf-logo-animated .hf-p3 {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
 }

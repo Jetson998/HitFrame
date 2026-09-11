@@ -29,6 +29,7 @@ export interface GenerationJobData {
 export type JobEventType =
   | 'enqueue'
   | 'claim'
+  | 'provider_response'
   | 'succeeded'
   | 'failed'
   | 'retry'
@@ -50,6 +51,11 @@ export function logEvent(
     attempts?: number;
     points?: number;
     mode?: string;
+    requestId?: string;
+    providerRequestId?: string;
+    providerTraceId?: string;
+    providerHttpStatus?: number;
+    relayCode?: string | number;
   },
 ): void {
   console.log(JSON.stringify({ evt: `job.${event}`, ts: new Date().toISOString(), ...fields }));

@@ -1,9 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import type { AgentRouteRequestDto } from '@hitframe/shared';
 import { AgentService } from './agent.service';
 
-export class RouteRequestDto {
+export class RouteRequestDto implements AgentRouteRequestDto {
   userInput!: string;
   uploadedImages?: string[];
+  references?: AgentRouteRequestDto['references'];
+  skillId?: string;
+  referencePreference?: AgentRouteRequestDto['referencePreference'];
 }
 
 @Controller('agent')
@@ -17,7 +21,13 @@ export class AgentController {
    */
   @Post('route')
   route(@Body() dto: RouteRequestDto) {
-    const plan = this.agent.route(dto.userInput, dto.uploadedImages);
+    const plan = this.agent.route(
+      dto.userInput,
+      dto.uploadedImages,
+      dto.skillId,
+      dto.references,
+      dto.referencePreference,
+    );
     return { data: plan };
   }
 }
